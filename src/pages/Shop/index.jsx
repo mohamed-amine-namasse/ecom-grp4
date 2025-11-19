@@ -2,7 +2,7 @@ import "./style.css";
 
 function Shop() {
   return (
-    <div>
+    <div className="shop-container">
       <p>iiii</p>
     </div>
   );

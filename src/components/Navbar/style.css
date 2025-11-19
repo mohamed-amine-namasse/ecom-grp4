@@ -1,0 +1,46 @@
+/* Styles pour Navbar.jsx */
+
+.navbar-container {
+  background-color: #282c34; /* Couleur de fond sombre */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+}
+
+.navbar-brand {
+  color: goldenrod;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li {
+  margin-left: 20px;
+}
+
+.navbar-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 5px 10px;
+  transition: color 0.3s;
+}
+
+.navbar-links a:hover {
+  color: #61dafb;
+}

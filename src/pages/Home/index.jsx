@@ -3,7 +3,7 @@ import "./style.css";
 function Home() {
   return (
     <div>
-      <p>ICI TA PAGE DACCUEIL</p>
+      <p>ICI TA PAGE DACCUEIL!</p>
     </div>
   );
 }

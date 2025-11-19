@@ -1,16 +1,13 @@
-
-import { Route, Router, Routes } from "react-router"
-import { Contact } from "./pages/Contact ";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import Contact from "./pages/Contact";
+import './App.css';
 function App() {
   return (
-  
-      <Router>
-       <Routes> 
-         <Route path="/contact" element={<Contact />}/>
-         <Route path="*" element={<Error />}/>
-         </Routes>
-      </Router>
-   
+    <Router>
+      <Routes>
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
   );
 }
 export default App;

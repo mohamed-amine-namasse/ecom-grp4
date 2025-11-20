@@ -2,42 +2,107 @@
   font-weight: 700; /* bold */
 }
 
-/* ...existing code... */
-
-.search-group {
-  border: 1px solid #ced4da; /* bordure extérieure */
-  border-radius: 8px;
-  overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
-  background: #fff;
-  padding: 2px; /* petit padding autour */
+/* remplace les styles inline */
+.nav-links,
+.nav-right {
+  max-height: 100px;
 }
 
+/* contrôle la largeur et la marge du groupe recherche (remplace mx-3 + style) */
+.search-group {
+  width: 40%;
+  min-width: 200px;
+  max-width: 500px;
+  margin: 0 1rem; /* équivalent mx-3 */
+  border: 1px solid #ced4da; /* (optionnel si tu veux garder la bordure) */
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* ajuste le bouton et l'input pour rester alignés */
 .search-group .btn-search {
   width: 44px;
   height: 44px;
   padding: 0;
-  border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
+  margin: 0;
+  border: none !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent; /* ou utiliser une couleur si souhaitée */
-  color: inherit;
-}
-
-.search-group .btn-search:focus,
-.search-group .btn-search:active {
-  box-shadow: none;
-  outline: none;
+  background: transparent;
 }
 
 .search-group .form-control {
-  border: none; /* masquer la bordure native de l'input */
+  border: none;
   box-shadow: none;
   border-radius: 0;
-  height: 44px; /* aligner la hauteur sur le bouton */
+  height: 44px;
+  padding-left: 10px;
+  margin: 0;
 }
 
-.search-group .form-control:focus {
+.search-group .form-control:focus,
+.search-group .btn-search:focus {
   box-shadow: none;
   outline: none;
 }
+
+/* ...existing code... */
+
+/* mobile: forcer le collapse des liens à se placer sous la barre (sous le burger) */
+@media (max-width: 991.98px) {
+  .navbar .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* burger à gauche */
+  .navbar-toggler {
+    order: 1;
+    margin-right: 0.5rem;
+  }
+
+  /* brand après le burger */
+  .navbar-brand {
+    order: 2;
+  }
+
+  /* garder la loupe / icônes visibles à droite */
+  .search-group {
+    order: 3;
+    margin-left: auto;
+  }
+  .d-flex.align-items-center {
+    order: 4;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  /* collapse des liens : occupe toute la largeur et s'affiche sous la barre */
+  #nav-links-collapse {
+    order: 5;
+    width: 100%;
+    flex-basis: 100%;
+    padding-top: 0.5rem;
+  }
+
+  /* liens empilés verticalement */
+  #nav-links-collapse .nav {
+    flex-direction: column;
+    background: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 6px 0;
+  }
+
+  #nav-links-collapse .nav-link {
+    padding: 10px 16px;
+  }
+}
+/* ...existing code... */

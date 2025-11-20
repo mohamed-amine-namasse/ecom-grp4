@@ -10,7 +10,7 @@ function Footer() {
       <div className="footer-content">
         <div className="container">
           <div>
-            <h3>Services</h3>
+            <h3>A propos</h3>
             <nav className="links">
               <a href="#">Web design</a>
               <a href="#">Development</a>

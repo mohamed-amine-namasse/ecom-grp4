@@ -1,49 +1,42 @@
+/* Navbar component styles */
+
+/* active link */
 .nav-link.active {
-  font-weight: 700; /* bold */
+  font-weight: 700;
 }
 
-/* remplace les styles inline */
+/* utility limits */
 .nav-links,
 .nav-right {
   max-height: 100px;
 }
 
-/* contrôle la largeur et la marge du groupe recherche (remplace mx-3 + style) */
+/* basic search-group and button styles */
 .search-group {
-  width: 40%;
-  min-width: 200px;
-  max-width: 500px;
-  margin: 0 1rem; /* équivalent mx-3 */
-  border: 1px solid #ced4da; /* (optionnel si tu veux garder la bordure) */
+  border: 1px solid #ced4da; /* bordure extérieure */
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
   background: #fff;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  gap: 0;
+  padding: 2px; /* petit padding autour */
 }
 
-/* ajuste le bouton et l'input pour rester alignés */
 .search-group .btn-search {
   width: 44px;
   height: 44px;
   padding: 0;
-  margin: 0;
-  border: none !important;
+  border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: transparent; /* ou utiliser une couleur si souhaitée */
+  color: inherit;
 }
 
 .search-group .form-control {
-  border: none;
+  border: none; /* masquer la bordure native de l'input */
   box-shadow: none;
   border-radius: 0;
-  height: 44px;
-  padding-left: 10px;
-  margin: 0;
+  height: 44px; /* aligner la hauteur sur le bouton */
 }
 
 .search-group .form-control:focus,
@@ -52,9 +45,16 @@
   outline: none;
 }
 
-/* ...existing code... */
+/* icons block default */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-/* mobile: forcer le collapse des liens à se placer sous la barre (sous le burger) */
+/* Mobile: burger left, brand next, then loupe + icons to the right;
+   collapse of links will open full-width under the bar.
+   Also hide the search input so only the loupe button remains. */
 @media (max-width: 991.98px) {
   .navbar .container-fluid {
     display: flex;
@@ -62,40 +62,79 @@
     align-items: center;
   }
 
-  /* burger à gauche */
+  /* toggler visually first */
   .navbar-toggler {
     order: 1;
     margin-right: 0.5rem;
   }
 
-  /* brand après le burger */
+  /* brand after toggler */
   .navbar-brand {
     order: 2;
   }
 
-  /* garder la loupe / icônes visibles à droite */
+  /* search-group (only loupe visible) */
   .search-group {
     order: 3;
     margin-left: auto;
-  }
-  .d-flex.align-items-center {
-    order: 4;
-    margin-left: 0.5rem;
-    display: flex;
-    align-items: center;
+    margin-right: 0.5rem;
+    width: auto;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
   }
 
-  /* collapse des liens : occupe toute la largeur et s'affiche sous la barre */
+  /* hide input explicitly (in case bootstrap class missing) */
+  .search-group .form-control {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .search-group .btn-search {
+    width: 36px;
+    height: 36px;
+    background: transparent !important;
+    color: black !important;
+  }
+
+  /* icons stay inline and to the right of the search loupe */
+  .nav-icons {
+    order: 4;
+    margin-left: 0.5rem;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+
+  .nav-icons .nav,
+  .nav-icons .nav > .nav-link {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* collapse with links appears below bar and is full width */
   #nav-links-collapse {
     order: 5;
     width: 100%;
     flex-basis: 100%;
     padding-top: 0.5rem;
+    display: none; /* Bootstrap will toggle .show */
   }
 
-  /* liens empilés verticalement */
+  #nav-links-collapse.show {
+    display: block;
+  }
+
   #nav-links-collapse .nav {
-    flex-direction: column;
+    flex-direction: column !important;
     background: #fff;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     padding: 6px 0;
@@ -105,4 +144,57 @@
     padding: 10px 16px;
   }
 }
-/* ...existing code... */
+
+/* safety: increase specificity if bootstrap overrides */
+@media (max-width: 991.98px) {
+  .navbar .container-fluid > .nav-icons,
+  .navbar .container-fluid > .nav-icons .nav {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+}
+
+/* ----------------------------
+   DESKTOP: equal-width layout
+   make the four direct children of the container
+   act as equal columns so spacing between them is identical
+   (Brand | Links | Search | Icons) --> three equal gaps
+   ---------------------------- */
+@media (min-width: 992px) {
+  /* give each of the four main blocks the same flex weight */
+  .navbar .container-fluid > .navbar-brand,
+  .navbar .container-fluid > #nav-links-collapse,
+  .navbar .container-fluid > .search-group,
+  .navbar .container-fluid > .nav-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* center content in each column */
+    min-width: 0;
+  }
+
+  /* Links: keep them inline and centered within their column */
+  #nav-links-collapse .nav {
+    display: inline-flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  /* Search: limit the internal input width so it doesn't stretch whole column */
+  .search-group {
+    justify-content: center;
+  }
+  .search-group .form-control {
+    width: 100%;
+  }
+
+  /* Icons: center icons inside their column */
+  .nav-icons {
+    justify-content: center;
+    margin-left: 50px;
+  }
+
+  /* ensure collapse visible on desktop */
+  #nav-links-collapse {
+    display: flex !important;
+  }
+}

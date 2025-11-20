@@ -1,40 +1,76 @@
-// src/components/Navbar.jsx
-
-import React from "react";
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import { PiShoppingCartFill } from "react-icons/pi";
+import { BiSolidUserCircle } from "react-icons/bi";
+import { NavLink } from "react-router";
+import { IoSearchOutline } from "react-icons/io5";
 import "./style.css";
-
-function Navbar({ onBackToList }) {
-  // Fonction pour gérer le clic sur le logo/titre
-  const handleLogoClick = (e) => {
-    e.preventDefault(); // Empêche le rechargement standard de la page
-    if (onBackToList) {
-      onBackToList(); // Utilise la fonction passée par App.js pour revenir à la liste
-    } else {
-      // Option de secours si onBackToList n'est pas passé
-      console.log("Navigation vers l'accueil (Blog List)");
-    }
-  };
-
+function NavScrollExample() {
   return (
-    <header className="navbar-container">
-      <nav className="navbar">
-        {/* Logo ou Titre du Blog */}
-        <a href="/" onClick={handleLogoClick} className="navbar-brand">
-          Mon Blog WP
-        </a>
+    <Navbar expand="lg" className="p-3">
+      <Container
+        fluid
+        className="d-flex align-items-center justify-content-between "
+      >
+        <Navbar.Brand href="#" className="fw-bold">
+          Foot Market
+        </Navbar.Brand>
+        <Nav
+          className="my-2 my-lg-0 "
+          style={{ maxHeight: "100px" }}
+          navbarScroll
+        >
+          <Nav.Link as={NavLink} to="/" end>
+            Accueil
+          </Nav.Link>
+          <Nav.Link as={NavLink} to="/shop">
+            Boutique
+          </Nav.Link>
+          <Nav.Link as={NavLink} to="/register">
+            Inscription
+          </Nav.Link>
+        </Nav>
+        <Form
+          className="d-flex  mx-3 search-group align-items-center"
+          style={{ width: "40%", minWidth: "200px", maxWidth: "500px" }}
+        >
+          <Button
+            variant="outline-dark "
+            className="btn-search  d-flex align-items-center justify-content-center"
+          >
+            <IoSearchOutline size={25} />
+          </Button>
+          <Form.Control
+            type="search"
+            placeholder="Rechercher un article"
+            aria-label="Search"
+          />
+        </Form>
 
-        {/* Liens de Navigation */}
-        <ul className="navbar-links">
-          <li>
-            {/* Ce lien utilise la même fonction de retour pour s'assurer que vous êtes sur la liste */}
-            <a href="/" onClick={handleLogoClick}>
-              Accueil
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+        <div className="d-flex align-items-center">
+          <Navbar.Toggle aria-controls="navbarScroll" />
+          <Navbar.Collapse id="navbarScroll">
+            <Nav
+              className="my-2 my-lg-0 "
+              style={{ maxHeight: "100px" }}
+              navbarScroll
+            >
+              <Nav.Link href="#action1">
+                <PiShoppingCartFill size={30} />
+              </Nav.Link>
+              <Nav.Link href="#action2">
+                <BiSolidUserCircle size={30} />
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </div>
+      </Container>
+    </Navbar>
   );
 }
 
-export default Navbar;
+export default NavScrollExample;

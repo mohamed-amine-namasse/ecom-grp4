@@ -1,46 +1,43 @@
-/* Styles pour Navbar.jsx */
-
-.navbar-container {
-  background-color: #282c34; /* Couleur de fond sombre */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.nav-link.active {
+  font-weight: 700; /* bold */
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
+/* ...existing code... */
+
+.search-group {
+  border: 1px solid #ced4da; /* bordure extérieure */
+  border-radius: 8px;
+  overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
+  background: #fff;
+  padding: 2px; /* petit padding autour */
 }
 
-.navbar-brand {
-  color: goldenrod;
-  text-decoration: none;
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.navbar-links {
-  list-style: none;
-  display: flex;
-  margin: 0;
+.search-group .btn-search {
+  width: 44px;
+  height: 44px;
   padding: 0;
+  border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* ou utiliser une couleur si souhaitée */
+  color: inherit;
 }
 
-.navbar-links li {
-  margin-left: 20px;
+.search-group .btn-search:focus,
+.search-group .btn-search:active {
+  box-shadow: none;
+  outline: none;
 }
 
-.navbar-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  padding: 5px 10px;
-  transition: color 0.3s;
+.search-group .form-control {
+  border: none; /* masquer la bordure native de l'input */
+  box-shadow: none;
+  border-radius: 0;
+  height: 44px; /* aligner la hauteur sur le bouton */
 }
 
-.navbar-links a:hover {
-  color: #61dafb;
+.search-group .form-control:focus {
+  box-shadow: none;
+  outline: none;
 }

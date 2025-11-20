@@ -104,7 +104,7 @@
   /* icons stay inline and to the right of the search loupe */
   .nav-icons {
     order: 4;
-    margin-left: 0.5rem;
+    margin-left: 0;
     display: flex !important;
     flex-direction: row !important;
     gap: 0.5rem;

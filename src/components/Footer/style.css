@@ -29,19 +29,12 @@ nav.links {
   display: flex;
   flex-direction: column;
 }
-a {
+.footer-container a {
   color: white;
   text-decoration: none;
-  text-align: left;
 }
 
-h3 {
-  color: white;
-  font-family: "Trebuchet MS"; /*a modifier*/
-  margin-bottom: 10px;
-}
-
-.hr_milieu {
+.hr-milieu {
   margin-left: 25%;
   margin-right: 25%;
   border: solid gray 1px;

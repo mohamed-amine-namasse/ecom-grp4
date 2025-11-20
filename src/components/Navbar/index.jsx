@@ -1,40 +1,51 @@
-// src/components/Navbar.jsx
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 
-import React from "react";
-import "./style.css";
-
-function Navbar({ onBackToList }) {
-  // Fonction pour gérer le clic sur le logo/titre
-  const handleLogoClick = (e) => {
-    e.preventDefault(); // Empêche le rechargement standard de la page
-    if (onBackToList) {
-      onBackToList(); // Utilise la fonction passée par App.js pour revenir à la liste
-    } else {
-      // Option de secours si onBackToList n'est pas passé
-      console.log("Navigation vers l'accueil (Blog List)");
-    }
-  };
-
+function NavScrollExample() {
   return (
-    <header className="navbar-container">
-      <nav className="navbar">
-        {/* Logo ou Titre du Blog */}
-        <a href="/" onClick={handleLogoClick} className="navbar-brand">
-          Mon Blog WP
-        </a>
-
-        {/* Liens de Navigation */}
-        <ul className="navbar-links">
-          <li>
-            {/* Ce lien utilise la même fonction de retour pour s'assurer que vous êtes sur la liste */}
-            <a href="/" onClick={handleLogoClick}>
-              Accueil
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+    <Navbar expand="lg" className="bg-body-tertiary">
+      <Container fluid>
+        <Navbar.Brand href="#">Navbar scroll</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll" />
+        <Navbar.Collapse id="navbarScroll">
+          <Nav
+            className="me-auto my-2 my-lg-0"
+            style={{ maxHeight: "100px" }}
+            navbarScroll
+          >
+            <Nav.Link href="#action1">Home</Nav.Link>
+            <Nav.Link href="#action2">Link</Nav.Link>
+            <NavDropdown title="Link" id="navbarScrollingDropdown">
+              <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
+              <NavDropdown.Item href="#action4">
+                Another action
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action5">
+                Something else here
+              </NavDropdown.Item>
+            </NavDropdown>
+            <Nav.Link href="#" disabled>
+              Link
+            </Nav.Link>
+          </Nav>
+          <Form className="d-flex">
+            <Form.Control
+              type="search"
+              placeholder="Search"
+              className="me-2"
+              aria-label="Search"
+            />
+            <Button variant="outline-success">Search</Button>
+          </Form>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 }
 
-export default Navbar;
+export default NavScrollExample;

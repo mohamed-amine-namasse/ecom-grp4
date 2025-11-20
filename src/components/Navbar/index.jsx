@@ -39,7 +39,7 @@ function NavScrollExample() {
           style={{ width: "40%", minWidth: "200px", maxWidth: "500px" }}
         >
           <Button
-            variant="outline-dark"
+            variant="outline-dark "
             className="btn-search  d-flex align-items-center justify-content-center"
           >
             <IoSearchOutline size={25} />

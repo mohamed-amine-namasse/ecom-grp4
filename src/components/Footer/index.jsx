@@ -61,9 +61,7 @@ function Footer() {
 
         <hr className="hr-milieu" />
 
-        <p>
-          &copy; {currentYear} Mon Blog WordPress / React. Tous droits réservés.
-        </p>
+        <p>&copy; {currentYear} Foot Market. Tous droits réservés.</p>
       </div>
     </footer>
   );

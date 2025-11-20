@@ -42,7 +42,7 @@ function NavScrollExample() {
             variant="outline-dark"
             className="btn-search  d-flex align-items-center justify-content-center"
           >
-            <IoSearchOutline />
+            <IoSearchOutline size={25} />
           </Button>
           <Form.Control
             type="search"

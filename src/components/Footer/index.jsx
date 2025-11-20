@@ -9,7 +9,7 @@ function Footer() {
       <div className="footer-content">
         <div className="container">
           <div>
-            <h5>A propos</h5>
+            <h5>Entreprise</h5>
             <nav className="links">
               <NavLink
                 to="/about"
@@ -17,7 +17,7 @@ function Footer() {
                   isActive ? "footer-link active" : "footer-link"
                 }
               >
-                Qui sommes-nous ?
+                A propos
               </NavLink>
               <NavLink
                 to="/terms"

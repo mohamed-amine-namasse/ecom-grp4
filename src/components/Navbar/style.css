@@ -21,6 +21,7 @@
   align-items: center;
   justify-content: center;
   background: transparent; /* ou utiliser une couleur si souhaitée */
+  color: inherit;
 }
 
 .search-group .btn-search:focus,

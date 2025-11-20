@@ -1,0 +1,42 @@
+.nav-link.active {
+  font-weight: 700; /* bold */
+}
+
+/* ...existing code... */
+
+.search-group {
+  border: 1px solid #ced4da; /* bordure extérieure */
+  border-radius: 8px;
+  overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
+  background: #fff;
+  padding: 2px; /* petit padding autour */
+}
+
+.search-group .btn-search {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* ou utiliser une couleur si souhaitée */
+}
+
+.search-group .btn-search:focus,
+.search-group .btn-search:active {
+  box-shadow: none;
+  outline: none;
+}
+
+.search-group .form-control {
+  border: none; /* masquer la bordure native de l'input */
+  box-shadow: none;
+  border-radius: 0;
+  height: 44px; /* aligner la hauteur sur le bouton */
+}
+
+.search-group .form-control:focus {
+  box-shadow: none;
+  outline: none;
+}

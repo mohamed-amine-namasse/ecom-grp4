@@ -1,13 +1,17 @@
+import { NavLink } from "react-router";
+import Nav from "react-bootstrap/Nav";
+
 import "./style.css";
 function Terms() {
   return (
-    <div>
+    <div className="background">
       <h1>Politique de confidentialité</h1>
 
       <h2>Qui sommes-nous ?</h2>
-      <p>
-        <strong>Adresse de notre site :</strong> <a href="#">A EDITER</a>
-      </p>
+
+      <Nav.Link as={NavLink} to="/about">
+        A propos
+      </Nav.Link>
 
       <h2>Commentaires</h2>
       <p>

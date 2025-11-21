@@ -13,18 +13,25 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
 import "./style.css";
 
-// URL DE BASE DE VOTRE SITE WOOCOMMERCE
+// ----------------------------------------------------------------------
+// --- CONFIGURATION WOOCOMMERCE ---
+// ----------------------------------------------------------------------
+
+// URL de base de votre site WordPress/WooCommerce.
+// NOTE : L'erreur 401 indique que l'accès anonyme est refusé.
+// NOUS DEVONS UTILISER LES CLÉS DE CONSOMMATEUR POUR L'AUTHENTIFICATION.
 const WOOCOMMERCE_BASE_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/";
 
-// --- FONCTION DE RÉCUPÉRATION DES PRODUITS WOOCOMMERCE ---
+const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
+const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
+
+// ----------------------------------------------------------------------
+// --- FONCTION DE RÉCUPÉRATION DES PRODUITS WOOCOMMERCE (AUTHENTIFIÉE) ---
+// ----------------------------------------------------------------------
+
 /**
- * Récupère les suggestions de produits de l'API WooCommerce.
- *
- * ATTENTION: Dans un environnement de production, l'authentification API
- * (clés Consumer Key et Secret) NE DOIT PAS être exposée dans le code front-end.
- * Idéalement, cet appel devrait passer par un proxy ou une fonction serveur
- * pour masquer les clés.
+ * Récupère les suggestions de produits de l'API WooCommerce en utilisant l'authentification Basic Auth.
  *
  * @param {string} query Terme de recherche de l'utilisateur.
  * @returns {Promise<Array<{id: number, name: string, link: string}>>} Liste des produits.
@@ -34,39 +41,40 @@ const fetchWooCommerceProducts = async (query) => {
     return [];
   }
 
-  // Endpoint standard de recherche de produits WooCommerce
-  // Nous demandons au maximum 5 produits correspondant au terme de recherche.
-  const apiUrl = `${WOOCOMMERCE_BASE_URL}wp-json/wc/v3/products?search=${query}&per_page=5`;
+  if (!CONSUMER_KEY || !CONSUMER_SECRET) {
+    throw new Error(
+      "Clés WooCommerce manquantes. Veuillez remplir CONSUMER_KEY et CONSUMER_SECRET."
+    );
+  }
+
+  // Encodage en Base64 des clés pour Basic Auth
+  const authHeader = "Basic " + btoa(`${CONSUMER_KEY}:${CONSUMER_SECRET}`);
+
+  // Construction de l'URL de l'API REST pour les produits.
+  const apiUrl = `${WOOCOMMERCE_BASE_URL}wp-json/wc/v3/products?search=${query}&per_page=5&status=publish`;
 
   try {
-    // --------------------------------------------------------------------------------
-    // !!! INSTRUCTION IMPORTANTE CONCERNANT L'AUTHENTIFICATION !!!
-    // L'API WooCommerce nécessite une authentification (via Basic Auth ou OAuth).
-    // Si votre API n'est pas accessible publiquement, vous DEVEZ ajouter ici
-    // l'authentification (e.g., dans les headers), mais faites-le de manière sécurisée
-    // en utilisant un backend pour masquer vos clés secrètes.
-    // Pour les besoins de ce démo/test, nous faisons une requête sans authentification,
-    // qui pourrait échouer si les permissions ne sont pas correctement configurées
-    // pour l'accès non authentifié aux produits.
-    // --------------------------------------------------------------------------------
-
-    const response = await fetch(apiUrl);
+    // Appel AVEC en-tête d'autorisation (Basic Auth)
+    const response = await fetch(apiUrl, {
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader, // Ajout de l'authentification
+      },
+    });
 
     if (!response.ok) {
-      // Log l'erreur pour le débogage
-      console.error(
-        "Erreur API WooCommerce:",
-        response.status,
-        response.statusText
-      );
-      // Tente de lire le corps de l'erreur pour plus de détails
-      const errorBody = await response.json();
-      console.error("Détails de l'erreur:", errorBody);
+      // Si l'API retourne un statut d'erreur (4xx ou 5xx)
+      let errorDetails = `Statut: ${response.status} ${response.statusText}`;
+      try {
+        const errorBody = await response.json();
+        errorDetails += `. Message API: ${errorBody.message || "Non spécifié"}`;
+      } catch (e) {
+        errorDetails += ". Corps de réponse non-JSON.";
+      }
 
-      // Lance une erreur pour le bloc catch
-      throw new Error(
-        `Erreur lors de la récupération des produits: ${response.statusText}`
-      );
+      console.error("Erreur API WooCommerce:", errorDetails);
+      throw new Error(`Erreur lors de l'appel à l'API. ${errorDetails}`);
     }
 
     const data = await response.json();
@@ -78,13 +86,21 @@ const fetchWooCommerceProducts = async (query) => {
       link: product.permalink || `/shop/${product.slug}`,
     }));
   } catch (error) {
-    console.error("Échec de la recherche de produits:", error);
-    // Retourne un tableau vide en cas d'erreur
-    return [];
+    // Si la requête fetch elle-même échoue (erreur réseau, CORS, timeout)
+    console.error(
+      "Échec de la recherche de produits (Network/CORS/Fetch):",
+      error
+    );
+    // Propager une erreur claire pour l'affichage dans l'interface
+    throw new Error(
+      `Échec de connexion réseau. Cause probable: Erreur CORS ou URL/Clés incorrectes. Vérifiez la console (F12) pour plus de détails.`
+    );
   }
 };
 
+// ----------------------------------------------------------------------
 // --- COMPONENT PRINCIPAL ---
+// ----------------------------------------------------------------------
 
 function NavScrollExample() {
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -94,10 +110,11 @@ function NavScrollExample() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Nouvel état pour gérer les erreurs API
+  const [error, setError] = useState(null);
 
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
+    // N'appelle l'API que si le terme de recherche a au moins 2 caractères
     if (query.length < 2) {
       setSuggestions([]);
       setError(null);
@@ -110,8 +127,16 @@ function NavScrollExample() {
     try {
       const fetchedSuggestions = await fetchWooCommerceProducts(query);
       setSuggestions(fetchedSuggestions);
+
+      // Si la recherche réussit mais ne trouve rien (pas d'erreur API, juste un tableau vide)
+      if (fetchedSuggestions.length === 0 && query.length >= 2) {
+        setError(`Aucun produit trouvé pour "${query}".`);
+      }
     } catch (e) {
-      setError("Erreur de connexion à la boutique.");
+      // Afficher l'erreur dans l'interface utilisateur
+      setError(
+        e.message || "Une erreur inconnue s'est produite lors de la recherche."
+      );
       setSuggestions([]);
       console.error("Erreur gérée lors de la recherche:", e);
     }
@@ -137,7 +162,7 @@ function NavScrollExample() {
   // Gestionnaire de clic sur une suggestion (simule la navigation)
   const handleSuggestionClick = (link) => {
     console.log("Naviguer vers:", link);
-    // REMPLACEZ PAR VOTRE LOGIQUE DE NAVIGATION REACT ROUTER DOM
+    // Dans une vraie app, vous utiliseriez 'navigate(link)' de react-router-dom
 
     setSearchTerm("");
     setSuggestions([]);
@@ -145,11 +170,11 @@ function NavScrollExample() {
   };
 
   const handleSearchClick = (e) => {
-    // si mobile (breakpoint lg = 992px)
+    // Si mobile (< 992px), ouvre la modale
     if (window.innerWidth < 992) {
       setShowSearchModal(true);
     } else {
-      // sur desktop on focus l'input
+      // Sur desktop, focus l'input
       inputRef.current?.focus();
     }
   };
@@ -160,7 +185,6 @@ function NavScrollExample() {
     setSuggestions([]);
     setError(null);
   };
-
   return (
     <Navbar expand="lg" className="p-3">
       <Container fluid className="d-flex align-items-center">

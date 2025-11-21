@@ -121,6 +121,8 @@ function NavScrollExample() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null); // Utilisé uniquement pour les erreurs d'API/réseau
+  // État pour s'assurer que l'utilisateur a initié une recherche valide (>= 2 chars) et que l'appel a été fait.
+  const [searchAttempted, setSearchAttempted] = useState(false);
 
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
@@ -128,15 +130,19 @@ function NavScrollExample() {
     if (query.length < 2) {
       setSuggestions([]);
       setError(null);
+      setSearchAttempted(false); // Réinitialiser si le terme est trop court
       return;
     }
 
     setLoading(true);
     setError(null);
+    setSearchAttempted(true); // Marquer qu'une recherche a été tentée
 
     try {
       const fetchedSuggestions = await fetchWooCommerceProducts(query);
       setSuggestions(fetchedSuggestions);
+      // Important : Si l'API est réussie, même avec un tableau vide, l'erreur est null.
+      setError(null);
     } catch (e) {
       // Afficher l'erreur d'API/réseau dans l'interface utilisateur
       setError(
@@ -153,6 +159,11 @@ function NavScrollExample() {
   useEffect(() => {
     // Annuler la recherche si l'utilisateur efface le terme
     if (searchTerm.length < 2) {
+      // Important: Nettoyer les anciens résultats et erreurs
+      setSuggestions([]);
+      setError(null);
+      setLoading(false);
+      setSearchAttempted(false);
       return;
     }
 
@@ -195,19 +206,17 @@ function NavScrollExample() {
     setSuggestions([]);
     setError(null);
     setLoading(false); // S'assurer que tout est bien réinitialisé
+    setSearchAttempted(false);
   };
 
   // ----------------------------------------------------------------------
   // --- RENDU DES SUGGESTIONS (LOGIQUE CENTRALISÉE) ---
   // ----------------------------------------------------------------------
 
-  // Variable pour déterminer s'il faut afficher le conteneur de suggestions.
+  // Nouvelle variable pour déterminer s'il faut afficher le conteneur de suggestions.
+  // Afficher si : Terme >= 2 ET (Chargement en cours, ou Erreur, ou Tentative faite ET non-loading).
   const shouldShowSuggestionsContainer =
-    searchTerm.length >= 2 &&
-    (loading ||
-      error ||
-      suggestions.length > 0 ||
-      (!loading && !error && suggestions.length === 0));
+    searchTerm.length >= 2 && (loading || error || searchAttempted);
 
   const renderSuggestionsContent = (isMobile = false) => {
     if (!shouldShowSuggestionsContainer) {
@@ -229,8 +238,8 @@ function NavScrollExample() {
           {error}
         </ListGroup.Item>
       );
-    } else if (suggestions.length === 0) {
-      // Cas où l'API est contactée avec succès mais retourne 0 résultat
+    } else if (!loading && !error && suggestions.length === 0) {
+      // CAS CRITIQUE : ZÉRO RÉSULTAT trouvé APRÈS UNE RECHERCHE TERMINÉE (non-loading, non-error)
       content = (
         <ListGroup.Item className="text-muted text-center">
           Aucun produit trouvé pour "{searchTerm}".
@@ -252,166 +261,354 @@ function NavScrollExample() {
     // Le style de ListGroup diffère légèrement (pas de 'mt-3' sur desktop par exemple)
     const listGroupClass = isMobile ? "mt-3" : "";
 
+    // Si nous sommes dans l'état "suggestions.length === 0", on retourne le ListGroup avec le message.
+    // Sinon, si suggestions.length > 0, on retourne le ListGroup avec les résultats.
+    // Le composant ListGroup doit toujours être retourné si shouldShowSuggestionsContainer est true.
     return <ListGroup className={listGroupClass}>{content}</ListGroup>;
   };
 
+  // ----------------------------------------------------------------------
+  // --- RENDU PRINCIPAL DU COMPOSANT ---
+  // ----------------------------------------------------------------------
+
   return (
-    <Navbar expand="lg" className="p-3">
-      <Container fluid className="d-flex align-items-center">
-        {" "}
-        <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
-        <Navbar.Brand href="#" className="fw-bold ">
-          Foot Market
-        </Navbar.Brand>
-        {/* links inside collapse (toggler opens only these) */}
-        <Navbar.Collapse id="nav-links-collapse">
-          <Nav className="my-2 my-lg-0 nav-links" navbarScroll>
-            <Nav.Link as={NavLink} to="/" end>
-              Accueil
-            </Nav.Link>
-            <Nav.Link as={NavLink} to="/shop">
-              Boutique
-            </Nav.Link>
-            <Nav.Link as={NavLink} to="/register">
-              Inscription
-            </Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-        {/* search group: input hidden on < lg, only icon visible */}
-        <div className="search-container me-0 ms-auto">
+    <>
+      {/* Styles personnalisés pour la barre de navigation et l'autocomplétion.
+          Le CSS fourni par l'utilisateur remplace le bloc précédent.
+      */}
+      <style>{`
+        /* Navbar component styles */
+
+        /* active link */
+        .nav-link.active {
+          font-weight: 700;
+        }
+
+        /* utility limits - Suppression de max-height qui pourrait interagir avec le scroll */
+        .nav-links,
+        .nav-right {
+          /* max-height: 100px; <-- Supprimé pour éviter les conflits de scroll */
+        }
+
+        /* basic search-group and button styles */
+        .search-group {
+          border: 1px solid #ced4da; /* bordure extérieure */
+          border-radius: 8px;
+          overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
+          background: #fff;
+          padding: 2px; /* petit padding autour */
+        }
+
+        .search-group .btn-search {
+          width: 44px;
+          height: 44px;
+          padding: 0;
+          border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent; /* ou utiliser une couleur si souhaitée */
+          color: inherit;
+        }
+
+        .search-group .form-control {
+          border: none; /* masquer la bordure native de l'input */
+          box-shadow: none;
+          border-radius: 0;
+          height: 44px; /* aligner la hauteur sur le bouton */
+        }
+
+        .search-group .form-control:focus,
+        .search-group .btn-search:focus {
+          box-shadow: none;
+          outline: none;
+        }
+
+        /* icons block default */
+        .nav-icons {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        /* Styles pour le conteneur de recherche pour gérer la position relative */
+        .search-container {
+          /* Position relative est nécessaire pour positionner la liste de suggestions */
+          position: relative;
+        }
+
+        /* Styles pour la liste de suggestions d'autocomplétion (desktop) */
+        .suggestions-list {
+          /* Positionne la liste juste en dessous du champ de recherche */
+          position: absolute;
+          top: 100%;
+          /* Centrage horizontal par rapport au conteneur. La largeur sera définie ci-dessous. */
+          left: 50%;
+          transform: translateX(-50%); 
+          /* Assure que la liste est au-dessus des autres éléments de la nav */
+          z-index: 1050;
+          background-color: white;
+          /* Ombre pour un effet de pop-up */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          border-radius: 0.25rem;
+          margin-top: 2px;
+          /* Limite la hauteur et rend le contenu défilable */
+          max-height: 300px;
+          overflow-y: auto;
+        }
+
+        /* Mobile: burger left, brand next, then loupe + icons to the right;
+          collapse of links will open full-width under the bar.
+          Also hide the search input so only the loupe button remains. */
+        @media (max-width: 991.98px) {
+          .navbar .container-fluid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+          }
+
+          /* toggler visually first */
+          .navbar-toggler {
+            margin-right: 0.5rem;
+          }
+
+          /* search-group (only loupe visible) */
+          .search-container {
+             /* Utilisez flex pour le conteneur afin de regrouper la loupe et les icônes à droite */
+             display: flex;
+             align-items: center;
+             /* Pousser tout le groupe loupe + icons vers la droite */
+             margin-left: auto;
+          }
+          
+          .search-group {
+            border: none;
+            background: transparent;
+            /* Retire le flex-grow et le margin-left: auto qui éloignait la loupe */
+            flex-grow: 0; 
+            margin-left: 0;
+          }
+
+          /* hide input explicitly (in case bootstrap class missing) */
+          .search-group .form-control {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+          }
+
+          .search-group .btn-search {
+            width: 36px;
+            height: 36px;
+            background: transparent !important;
+            color: black !important;
+          }
+
+          /* icons stay inline and to the right of the search loupe */
+          .nav-icons {
+            margin-left: 0 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 0.5rem;
+            align-items: center;
+            flex: 0 0 auto;
+          }
+
+          .nav-icons .nav,
+          .nav-icons .nav > .nav-link {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          /* collapse with links appears below bar and is full width */
+          #nav-links-collapse {
+            order: 2;
+            width: 100%;
+            flex-basis: 100%;
+            padding-top: 0.5rem;
+            /* Pas de overflow/max-height ici, le comportement par défaut de Bootstrap est souhaité */
+            display: none; /* Bootstrap will toggle .show */
+          }
+
+          #nav-links-collapse.show {
+            display: block;
+          }
+
+          #nav-links-collapse .nav {
+            /* S'assurer que .nav n'a pas de max-height ni d'overflow qui causerait le scroll interne */
+            flex-direction: column !important;
+            background: #fff;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 6px 0;
+            overflow-y: visible !important; /* S'assurer qu'il n'y a pas de scroll interne */
+          }
+
+          #nav-links-collapse .nav-link {
+            padding: 10px 16px;
+          }
+        }
+
+        /* safety: increase specificity if bootstrap overrides */
+        @media (max-width: 991.98px) {
+          .navbar .container-fluid > .nav-icons,
+          .navbar .container-fluid > .nav-icons .nav {
+            display: flex !important;
+            flex-direction: row !important;
+          }
+        }
+
+        /* ----------------------------
+          DESKTOP: equal-width layout
+          ---------------------------- */
+        @media (min-width: 992px) {
+          /* give each of the four main blocks the same flex weight */
+          .navbar .container-fluid > .navbar-brand,
+          .navbar .container-fluid > #nav-links-collapse,
+          .navbar .container-fluid > .search-container, 
+          .navbar .container-fluid > .nav-icons {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* center content in each column */
+            min-width: 0;
+          }
+          
+          /* Links: keep them inline and centered within their column */
+          #nav-links-collapse .nav {
+            display: inline-flex;
+            gap: 1rem;
+            justify-content: center;
+          }
+
+          /* Search Bar (Form) width adjustment and centering */
+          .search-group {
+              /* Définir une largeur fixe pour la barre de recherche visible */
+              width: 350px; 
+              justify-content: center;
+          }
+
+          /* L'input desktop doit maintenant prendre une largeur fixe pour un look propre */
+          .search-group .form-control {
+            width: 300px; 
+          }
+
+          /* Suggestion List width to match the search bar */
+          .suggestions-list {
+              width: 350px; /* Aligner la largeur sur .search-group */
+          }
+
+          /* Icons: center icons inside their column */
+          .nav-icons {
+            justify-content: center;
+            margin-left: 80px; 
+          }
+
+          /* ensure collapse visible on desktop */
+          #nav-links-collapse {
+            display: flex !important;
+          }
+        }
+      `}</style>
+
+      <Navbar expand="lg" className="p-3">
+        <Container fluid className="d-flex align-items-center">
           {" "}
-          {/* Conteneur pour positionner la liste de suggestions */}
-          <Form className="d-flex search-group align-items-center ">
-            <Button
-              variant="outline-dark"
-              className="btn-search d-flex align-items-center justify-content-center"
-              aria-label="Recherche"
-              onClick={
-                handleSearchClick
-              } /* ouvre modal en mobile, focus en desktop */
-            >
-              <IoSearchOutline size={25} />
-            </Button>
-            <Form.Control
-              ref={inputRef}
-              className="d-none d-lg-block"
-              type="search"
-              placeholder="Rechercher un article"
-              aria-label="Search"
-              value={searchTerm} // Liaison de la valeur
-              onChange={handleSearchTermChange} // Gestionnaire de changement
-            />
-          </Form>
-          {/* SUGGESTIONS DESKTOP */}
-          {searchTerm.length >= 2 &&
-            window.innerWidth >= 992 &&
-            (suggestions.length > 0 || loading || error) && (
-              <ListGroup className="suggestions-list">
-                {loading && (
-                  <ListGroup.Item className="d-flex align-items-center justify-content-center py-2">
-                    <Spinner animation="border" size="sm" className="me-2" />
-                    Chargement...
-                  </ListGroup.Item>
-                )}
-                {error && (
-                  <ListGroup.Item className="text-danger">
-                    {error}
-                  </ListGroup.Item>
-                )}
-                {!loading &&
-                  !error &&
-                  suggestions.length > 0 &&
-                  suggestions.map((product) => (
-                    <ListGroup.Item
-                      key={product.id}
-                      action
-                      onClick={() => handleSuggestionClick(product.link)}
-                    >
-                      {product.name}
-                    </ListGroup.Item>
-                  ))}
-                {!loading && !error && suggestions.length === 0 && (
-                  <ListGroup.Item className="text-muted">
-                    Aucun produit trouvé.
-                  </ListGroup.Item>
-                )}
-              </ListGroup>
-            )}
-        </div>
-        {/* icons remain outside collapse and visible in mobile */}
-        <Nav className="nav-icons d-flex align-items-center ">
-          <Nav.Link href="#cart" className="p-1">
-            <PiShoppingCartFill size={30} />
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/login" className="p-1">
-            <BiSolidUserCircle size={30} />
-          </Nav.Link>
-        </Nav>
-      </Container>
-
-      {/* Modal de recherche pour mobile */}
-      <Modal show={showSearchModal} onHide={handleModalClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Rechercher</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form
-            onSubmit={(e) => {
-              e.preventDefault();
-              // Optionnel: ajouter logique recherche/redirection
-              if (suggestions.length > 0) {
-                handleSuggestionClick(suggestions[0].link);
-              }
-            }}
-          >
-            <Form.Control
-              autoFocus
-              type="search"
-              placeholder="Rechercher un article"
-              aria-label="Search"
-              value={searchTerm} // Liaison de la valeur
-              onChange={handleSearchTermChange} // Gestionnaire de changement
-            />
-          </Form>
-
-          {/* SUGGESTIONS MOBILE (dans la modale) */}
-          {searchTerm.length >= 2 &&
-            (suggestions.length > 0 || loading || error) && (
-              <div className="mt-3">
-                {loading && (
-                  <div className="d-flex align-items-center justify-content-center py-3">
-                    <Spinner animation="border" className="me-2" />
-                    <span className="text-muted">
-                      Chargement des produits...
-                    </span>
-                  </div>
-                )}
-                {error && (
-                  <p className="text-danger text-center mt-3">{error}</p>
-                )}
-                {!loading && !error && suggestions.length > 0 && (
-                  <ListGroup>
-                    {suggestions.map((product) => (
-                      <ListGroup.Item
-                        key={product.id}
-                        action
-                        onClick={() => handleSuggestionClick(product.link)}
-                      >
-                        {product.name}
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                )}
-                {!loading && !error && suggestions.length === 0 && (
-                  <p className="text-muted text-center mt-3">
-                    Aucun produit trouvé pour "{searchTerm}".
-                  </p>
-                )}
+          <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
+          <Navbar.Brand href="#" className="fw-bold ">
+            Foot Market
+          </Navbar.Brand>
+          {/* liens à l'intérieur du collapse */}
+          <Navbar.Collapse id="nav-links-collapse">
+            <Nav className="my-2 my-lg-0 nav-links" navbarScroll>
+              <Nav.Link as={NavLink} to="/" end>
+                Accueil
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/shop">
+                Boutique
+              </Nav.Link>
+              <Nav.Link as={NavLink} to="/register">
+                Inscription
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+          {/* groupe de recherche */}
+          <div className="search-container">
+            {" "}
+            {/* J'ai supprimé 'me-0 ms-auto' ici, car votre CSS desktop gère l'espacement */}
+            <Form className="d-flex search-group align-items-center ">
+              <Button
+                variant="outline-dark"
+                className="btn-search d-flex align-items-center justify-content-center"
+                aria-label="Recherche"
+                onClick={handleSearchClick}
+              >
+                <IoSearchOutline size={25} />
+              </Button>
+              <Form.Control
+                ref={inputRef}
+                className="d-none d-lg-block"
+                type="search"
+                placeholder="Rechercher un article"
+                aria-label="Search"
+                value={searchTerm} // Liaison de la valeur
+                onChange={handleSearchTermChange} // Gestionnaire de changement
+              />
+            </Form>
+            {/* SUGGESTIONS DESKTOP */}
+            {window.innerWidth >= 992 && shouldShowSuggestionsContainer && (
+              <div className="suggestions-list">
+                {renderSuggestionsContent(false)}
               </div>
             )}
-        </Modal.Body>
-      </Modal>
-    </Navbar>
+          </div>
+          {/* icons restent visibles en mobile */}
+          <Nav className="nav-icons">
+            <Nav.Link href="#cart" className="p-1">
+              <PiShoppingCartFill size={30} />
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/login" className="p-1">
+              <BiSolidUserCircle size={30} />
+            </Nav.Link>
+          </Nav>
+        </Container>
+
+        {/* Modal de recherche pour mobile */}
+        <Modal show={showSearchModal} onHide={handleModalClose} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Rechercher</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Simuler une recherche si l'utilisateur appuie sur Entrée
+                if (searchTerm.length >= 2 && suggestions.length > 0) {
+                  handleSuggestionClick(suggestions[0].link);
+                } else if (searchTerm.length >= 2) {
+                  // Optionnel : rediriger vers une page de résultats de recherche complète
+                  console.log("Recherche complète pour :", searchTerm);
+                  setShowSearchModal(false);
+                }
+              }}
+            >
+              <Form.Control
+                autoFocus
+                type="search"
+                placeholder="Rechercher un article"
+                aria-label="Search"
+                value={searchTerm} // Liaison de la valeur
+                onChange={handleSearchTermChange} // Gestionnaire de changement
+              />
+            </Form>
+
+            {/* SUGGESTIONS MOBILE (dans la modale) */}
+            {renderSuggestionsContent(true)}
+          </Modal.Body>
+        </Modal>
+      </Navbar>
+    </>
   );
 }
 

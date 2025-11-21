@@ -1,4 +1,4 @@
-.register-page {
+.form {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,7 +8,7 @@
   padding: 20px;
 }
 
-.register-page h1 {
+.form h1 {
   color: #fff;
   font-size: 2.5rem;
   margin-bottom: 30px;
@@ -16,7 +16,7 @@
   font-weight: 700;
 }
 
-.register-page form {
+.form form {
   background-color: #fff;
   padding: 40px;
   border-radius: 10px;

@@ -5,12 +5,6 @@
   font-weight: 700;
 }
 
-/* utility limits - Suppression de max-height qui pourrait interagir avec le scroll */
-.nav-links,
-.nav-right {
-  /* max-height: 100px; <-- Supprimé pour éviter les conflits de scroll */
-}
-
 /* basic search-group and button styles */
 .search-group {
   border: 1px solid #ced4da; /* bordure extérieure */

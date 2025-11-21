@@ -1,5 +1,5 @@
 // ...existing code...
-import React from "react";
+import React, { useState, useRef } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -9,9 +9,25 @@ import { PiShoppingCartFill } from "react-icons/pi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { NavLink } from "react-router";
 import { IoSearchOutline } from "react-icons/io5";
+import Modal from "react-bootstrap/Modal"; // changed to react-bootstrap Modal
 import "./style.css";
 
 function NavScrollExample() {
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const inputRef = useRef(null);
+
+  const handleSearchClick = (e) => {
+    // si mobile (breakpoint lg = 992px)
+    if (window.innerWidth < 992) {
+      setShowSearchModal(true);
+    } else {
+      // sur desktop on focus l'input
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleModalClose = () => setShowSearchModal(false);
+
   return (
     <Navbar expand="lg" className="p-3">
       <Container
@@ -46,10 +62,14 @@ function NavScrollExample() {
             variant="outline-dark"
             className="btn-search d-flex align-items-center justify-content-center"
             aria-label="Recherche"
+            onClick={
+              handleSearchClick
+            } /* ouvre modal en mobile, focus en desktop */
           >
             <IoSearchOutline size={25} />
           </Button>
           <Form.Control
+            ref={inputRef}
             className="d-none d-lg-block"
             type="search"
             placeholder="Rechercher un article"
@@ -68,6 +88,29 @@ function NavScrollExample() {
           </Nav.Link>
         </Nav>
       </Container>
+
+      {/* Modal de recherche pour mobile */}
+      <Modal show={showSearchModal} onHide={handleModalClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Rechercher</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            onSubmit={(e) => {
+              e.preventDefault();
+              // ajouter logique recherche si besoin
+              handleModalClose();
+            }}
+          >
+            <Form.Control
+              autoFocus
+              type="search"
+              placeholder="Rechercher un article"
+              aria-label="Search"
+            />
+          </Form>
+        </Modal.Body>
+      </Modal>
     </Navbar>
   );
 }

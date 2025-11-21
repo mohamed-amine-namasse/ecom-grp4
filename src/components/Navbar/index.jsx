@@ -249,7 +249,7 @@ function NavScrollExample() {
           <Nav.Link href="#cart" className="p-1">
             <PiShoppingCartFill size={30} />
           </Nav.Link>
-          <Nav.Link href="#user" className="p-1">
+          <Nav.Link as={NavLink} to="/login" className="p-1">
             <BiSolidUserCircle size={30} />
           </Nav.Link>
         </Nav>

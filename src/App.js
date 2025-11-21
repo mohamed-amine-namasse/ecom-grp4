@@ -8,6 +8,8 @@ import Error from "./pages/Error";
 import Shop from "./pages/Shop";
 import Terms from "./pages/Terms";
 import About from "./pages/About";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Error />} />
       </Routes>

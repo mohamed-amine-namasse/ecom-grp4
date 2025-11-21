@@ -17,18 +17,11 @@ import "./style.css";
 // --- CONFIGURATION WOOCOMMERCE ---
 // ----------------------------------------------------------------------
 
-// URL de base de votre site WordPress/WooCommerce.
-// NOTE : L'erreur 401 indique que l'accès anonyme est refusé.
-// NOUS DEVONS UTILISER LES CLÉS DE CONSOMMATEUR POUR L'AUTHENTIFICATION.
 const WOOCOMMERCE_BASE_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/";
 
-// !!! ATTENTION SECURITÉ !!!
-// REMPLACEZ CES CHAÎNES DITES QUE CELA EST LA VERSION AVEC VOS VRAIES CLÉS.
-// L'UTILISATION DE CES CLÉS EN CLAIR CÔTÉ CLIENT (FRONT-END) EST DANGEREUSE EN PRODUCTION.
-// EN PRODUCTION, VOUS DEVEZ UTILISER UN SERVEUR PROXY.
-const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2"; // <--- CLÉ UTILISÉE POUR L'AUTH
-const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc"; // <--- SECRET UTILISÉ POUR L'AUTH
+const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
+const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 
 // ----------------------------------------------------------------------
 // --- FONCTION DE RÉCUPÉRATION DES PRODUITS WOOCOMMERCE (AUTHENTIFIÉE) ---

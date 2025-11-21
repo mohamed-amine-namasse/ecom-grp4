@@ -1,10 +1,9 @@
 import "./style.css";
-function Terms() 
+function Terms() {
   return 
     <div>
 <h1>Politique de confidentialité</h1>
 
-<h2>Qui sommes-nous ?</h2>
 <p><strong>Adresse de notre site :</strong> http://localhost/wordpress-eco/wordpress</p>
 
 <h2>Commentaires</h2>
@@ -45,9 +44,82 @@ Après validation de votre commentaire, votre photo de profil sera visible publi
 <h2>Où vos données sont envoyées</h2>
 <p>Les commentaires des visiteurs peuvent être vérifiés à l’aide d’un service automatisé de détection des commentaires indésirables.</p>
 
-      
-    </div>
-  ;
 
+<h1>Politique en matière de remboursements et de retours</h1>
+
+<p>Ceci est une page d’exemple.</p>
+
+<h2>Aperçu</h2>
+<p>Notre politique de remboursement et de retour est valable pendant 30 jours. Si 30 jours se sont écoulés depuis votre achat, nous ne pouvons malheureusement pas vous offrir un remboursement complet ni un échange.</p>
+
+<p>Pour être admissible à un retour, votre article doit être inutilisé et dans le même état que vous l’avez reçu. Il doit également être dans son emballage d’origine.</p>
+
+<p>Plusieurs types de produits ne peuvent pas être retournés. Les produits périssables tels que la nourriture, les fleurs, les journaux ou les magazines ne peuvent pas être retournés. Nous n’acceptons pas non plus les produits intimes ou sanitaires, les matières dangereuses ou les liquides ou gaz inflammables.</p>
+
+<div class="refund-box">
+<h3>Articles supplémentaires non retournables :</h3>
+<ul>
+<li>Cartes cadeaux</li>
+<li>Produits logiciels téléchargeables</li>
+<li>Certains articles de santé et de soins personnels</li>
+</ul>
+</div>
+
+<p>Pour compléter votre retour, nous exigeons un reçu ou une preuve d’achat.</p>
+
+<p><strong>Veuillez ne pas renvoyer votre achat au fabricant.</strong></p>
+
+<h3>Remboursements partiels possibles :</h3>
+<ul>
+<li>Livre présentant des signes évidents d’utilisation</li>
+<li>CD, DVD, cassette VHS, logiciel, jeu vidéo, cassette audio ou vinyle ouvert</li>
+<li>Article non dans son état d’origine, endommagé ou incomplet</li>
+<li>Article retourné plus de 30 jours après la livraison</li>
+</ul>
+
+<h2>Remboursements</h2>
+<p>Une fois que votre retour est reçu et inspecté, nous vous enverrons un e-mail pour vous informer que nous avons bien reçu votre article retourné et pour vous informer de l’approbation ou du refus du remboursement.</p>
+
+<p>Si vous êtes approuvé, votre remboursement sera traité et un crédit sera automatiquement appliqué à votre méthode de paiement d’origine, dans un délai donné.</p>
+
+<h2>Remboursements en retard ou manquants</h2>
+<p>Si vous n’avez pas reçu votre remboursement :</p>
+
+<ul>
+<li>Vérifiez votre compte bancaire.</li>
+<li>Contactez votre compagnie de carte bancaire.</li>
+<li>Contactez ensuite votre banque.</li>
+</ul>
+
+<p>Si vous avez fait tout cela et que vous n’avez toujours pas reçu votre remboursement, veuillez nous contacter à <strong>{adresse e-mail}</strong>.</p>
+
+<h2>Articles en promotion</h2>
+<p>Seuls les articles au prix normal peuvent être remboursés. Les articles en promotion ne peuvent pas être remboursés.</p>
+
+<h2>Échanges</h2>
+<p>Nous remplaçons uniquement les articles défectueux ou endommagés. Si vous souhaitez échanger un produit contre le même article, contactez-nous à <strong>{adresse e-mail}</strong> et envoyez votre article à : <strong>{adresse postale}</strong>.</p>
+
+<h2>Cadeaux</h2>
+<p>Si l’article a été marqué comme cadeau lors de l’achat et vous a été envoyé directement, vous recevrez un crédit-cadeau pour la valeur de votre retour.</p>
+
+<p>Si l’article n’était pas marqué comme cadeau ou a été envoyé à la personne qui vous l’a offert, le remboursement sera adressé au donneur du cadeau.</p>
+
+<h2>Retour d’articles</h2>
+<p>Pour retourner un produit, envoyez-le à : <strong>{adresse postale}</strong>.</p>
+
+<p>Les frais de retour sont à votre charge et ne sont pas remboursables. Si vous recevez un remboursement, les frais de retour seront déduits du montant total.</p>
+
+<p>Le délai de réception d’un échange peut varier selon votre lieu de résidence.</p>
+
+<p>Pour des articles de grande valeur, nous recommandons un service d’expédition suivi ou assuré. Nous ne garantissons pas la réception de l’article retourné.</p>
+
+<h2>Besoin d’aide ?</h2>
+<p>Contactez-nous à <strong>{email}</strong> pour toute question concernant les retours et remboursements.</p>
+
+</div>
+   
+  ;
+}
 
 export default Terms;
+

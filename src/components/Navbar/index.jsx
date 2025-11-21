@@ -266,7 +266,7 @@ function NavScrollExample() {
 
   return (
     <>
-      <Navbar expand="lg" className="p-3">
+      <Navbar expand="lg" className="p-3 border-bottom border-dark">
         <Container fluid className="d-flex align-items-center">
           {" "}
           <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />

@@ -52,6 +52,31 @@
   gap: 0.5rem;
 }
 
+/* Styles pour le conteneur de recherche pour gérer la position relative */
+.search-container {
+  /* Position relative est nécessaire pour positionner la liste de suggestions */
+  position: relative;
+}
+
+/* Styles pour la liste de suggestions d'autocomplétion (desktop) */
+.suggestions-list {
+  /* Positionne la liste juste en dessous du champ de recherche */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  /* Assure que la liste est au-dessus des autres éléments de la nav */
+  z-index: 1050;
+  background-color: white;
+  /* Ombre pour un effet de pop-up */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  margin-top: 2px;
+  /* Limite la hauteur et rend le contenu défilable */
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 /* Mobile: burger left, brand next, then loupe + icons to the right;
    collapse of links will open full-width under the bar.
    Also hide the search input so only the loupe button remains. */

@@ -161,26 +161,6 @@ function NavScrollExample() {
     setError(null);
   };
 
-  // Conteneur flexible pour la recherche desktop et les suggestions
-  const searchContainerStyle = {
-    position: "relative",
-    // Le minWidth a été retiré pour corriger le problème de layout sur mobile
-  };
-
-  const suggestionsListStyle = {
-    position: "absolute",
-    top: "100%",
-    left: "0",
-    right: "0",
-    zIndex: 1050, // Au-dessus de tout sauf la modale
-    backgroundColor: "white",
-    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-    borderRadius: "0.25rem",
-    marginTop: "2px",
-    maxHeight: "300px",
-    overflowY: "auto",
-  };
-
   return (
     <Navbar expand="lg" className="p-3">
       <Container fluid className="d-flex align-items-center">
@@ -204,7 +184,7 @@ function NavScrollExample() {
           </Nav>
         </Navbar.Collapse>
         {/* search group: input hidden on < lg, only icon visible */}
-        <div style={searchContainerStyle} className="me-0 ms-auto">
+        <div className="search-container me-0 ms-auto">
           {" "}
           {/* Conteneur pour positionner la liste de suggestions */}
           <Form className="d-flex search-group align-items-center ">
@@ -232,7 +212,7 @@ function NavScrollExample() {
           {searchTerm.length >= 2 &&
             window.innerWidth >= 992 &&
             (suggestions.length > 0 || loading || error) && (
-              <ListGroup style={suggestionsListStyle}>
+              <ListGroup className="suggestions-list">
                 {loading && (
                   <ListGroup.Item className="d-flex align-items-center justify-content-center py-2">
                     <Spinner animation="border" size="sm" className="me-2" />
@@ -252,7 +232,6 @@ function NavScrollExample() {
                       key={product.id}
                       action
                       onClick={() => handleSuggestionClick(product.link)}
-                      style={{ cursor: "pointer" }}
                     >
                       {product.name}
                     </ListGroup.Item>
@@ -323,7 +302,6 @@ function NavScrollExample() {
                         key={product.id}
                         action
                         onClick={() => handleSuggestionClick(product.link)}
-                        style={{ cursor: "pointer" }}
                       >
                         {product.name}
                       </ListGroup.Item>

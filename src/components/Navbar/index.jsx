@@ -9,7 +9,7 @@ import { PiShoppingCartFill } from "react-icons/pi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { NavLink } from "react-router";
 import { IoSearchOutline } from "react-icons/io5";
-import Modal from "react-bootstrap/Modal"; // changed to react-bootstrap Modal
+import Modal from "react-bootstrap/Modal";
 import "./style.css";
 
 function NavScrollExample() {

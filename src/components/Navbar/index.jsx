@@ -23,8 +23,12 @@ import "./style.css";
 const WOOCOMMERCE_BASE_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/";
 
-const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
-const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
+// !!! ATTENTION SECURITÉ !!!
+// REMPLACEZ CES CHAÎNES DITES QUE CELA EST LA VERSION AVEC VOS VRAIES CLÉS.
+// L'UTILISATION DE CES CLÉS EN CLAIR CÔTÉ CLIENT (FRONT-END) EST DANGEREUSE EN PRODUCTION.
+// EN PRODUCTION, VOUS DEVEZ UTILISER UN SERVEUR PROXY.
+const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2"; // <--- CLÉ UTILISÉE POUR L'AUTH
+const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc"; // <--- SECRET UTILISÉ POUR L'AUTH
 
 // ----------------------------------------------------------------------
 // --- FONCTION DE RÉCUPÉRATION DES PRODUITS WOOCOMMERCE (AUTHENTIFIÉE) ---
@@ -41,7 +45,13 @@ const fetchWooCommerceProducts = async (query) => {
     return [];
   }
 
-  if (!CONSUMER_KEY || !CONSUMER_SECRET) {
+  if (
+    !CONSUMER_KEY ||
+    !CONSUMER_SECRET ||
+    CONSUMER_KEY.includes("votre_") ||
+    CONSUMER_SECRET.includes("votre_")
+  ) {
+    // Afficher l'erreur si les clés par défaut sont toujours présentes
     throw new Error(
       "Clés WooCommerce manquantes. Veuillez remplir CONSUMER_KEY et CONSUMER_SECRET."
     );
@@ -110,7 +120,7 @@ function NavScrollExample() {
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); // Utilisé uniquement pour les erreurs d'API/réseau
 
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
@@ -127,13 +137,8 @@ function NavScrollExample() {
     try {
       const fetchedSuggestions = await fetchWooCommerceProducts(query);
       setSuggestions(fetchedSuggestions);
-
-      // Si la recherche réussit mais ne trouve rien (pas d'erreur API, juste un tableau vide)
-      if (fetchedSuggestions.length === 0 && query.length >= 2) {
-        setError(`Aucun produit trouvé pour "${query}".`);
-      }
     } catch (e) {
-      // Afficher l'erreur dans l'interface utilisateur
+      // Afficher l'erreur d'API/réseau dans l'interface utilisateur
       setError(
         e.message || "Une erreur inconnue s'est produite lors de la recherche."
       );
@@ -141,11 +146,16 @@ function NavScrollExample() {
       console.error("Erreur gérée lors de la recherche:", e);
     }
 
-    setLoading(false);
+    setLoading(false); // S'assurer que le loading est désactivé APRÈS la fin de l'appel
   }, []);
 
   // Logique de Debounce: déclenche la recherche seulement après 500ms d'inactivité
   useEffect(() => {
+    // Annuler la recherche si l'utilisateur efface le terme
+    if (searchTerm.length < 2) {
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
       handleFetchSuggestions(searchTerm);
     }, 500);
@@ -184,7 +194,67 @@ function NavScrollExample() {
     setSearchTerm(""); // Réinitialise la recherche en fermant
     setSuggestions([]);
     setError(null);
+    setLoading(false); // S'assurer que tout est bien réinitialisé
   };
+
+  // ----------------------------------------------------------------------
+  // --- RENDU DES SUGGESTIONS (LOGIQUE CENTRALISÉE) ---
+  // ----------------------------------------------------------------------
+
+  // Variable pour déterminer s'il faut afficher le conteneur de suggestions.
+  const shouldShowSuggestionsContainer =
+    searchTerm.length >= 2 &&
+    (loading ||
+      error ||
+      suggestions.length > 0 ||
+      (!loading && !error && suggestions.length === 0));
+
+  const renderSuggestionsContent = (isMobile = false) => {
+    if (!shouldShowSuggestionsContainer) {
+      return null;
+    }
+
+    let content;
+
+    if (loading) {
+      content = (
+        <ListGroup.Item className="d-flex align-items-center justify-content-center py-2 text-muted">
+          <Spinner animation="border" size="sm" className="me-2" />
+          Chargement des produits...
+        </ListGroup.Item>
+      );
+    } else if (error) {
+      content = (
+        <ListGroup.Item className="text-danger text-center">
+          {error}
+        </ListGroup.Item>
+      );
+    } else if (suggestions.length === 0) {
+      // Cas où l'API est contactée avec succès mais retourne 0 résultat
+      content = (
+        <ListGroup.Item className="text-muted text-center">
+          Aucun produit trouvé pour "{searchTerm}".
+        </ListGroup.Item>
+      );
+    } else {
+      // Affichage des résultats
+      content = suggestions.map((product) => (
+        <ListGroup.Item
+          key={product.id}
+          action
+          onClick={() => handleSuggestionClick(product.link)}
+        >
+          {product.name}
+        </ListGroup.Item>
+      ));
+    }
+
+    // Le style de ListGroup diffère légèrement (pas de 'mt-3' sur desktop par exemple)
+    const listGroupClass = isMobile ? "mt-3" : "";
+
+    return <ListGroup className={listGroupClass}>{content}</ListGroup>;
+  };
+
   return (
     <Navbar expand="lg" className="p-3">
       <Container fluid className="d-flex align-items-center">

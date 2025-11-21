@@ -270,13 +270,13 @@ function NavScrollExample() {
         <Container fluid className="d-flex align-items-center">
           {" "}
           <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
-          <Navbar.Brand href="#" className="fw-bold ">
+          <Navbar.Brand as={NavLink} to="/" className="fw-bold ">
             Foot Market
           </Navbar.Brand>
           {/* liens à l'intérieur du collapse */}
           <Navbar.Collapse id="nav-links-collapse">
             <Nav className="my-2 my-lg-0 nav-links" navbarScroll>
-              <Nav.Link as={NavLink} to="/" end>
+              <Nav.Link as={NavLink} to="/">
                 Accueil
               </Nav.Link>
               <Nav.Link as={NavLink} to="/shop">

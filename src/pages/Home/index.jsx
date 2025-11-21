@@ -15,12 +15,12 @@ function Home() {
       </header>
 
       <MonCarousel />
-      <Cards />
 
       <section className="container mt-5">
         <h2 className="h4">Nouveautés cette semaine</h2>
         <p>Nos crampons du moments.</p>
       </section>
+      <Cards />
     </div>
   );
 }

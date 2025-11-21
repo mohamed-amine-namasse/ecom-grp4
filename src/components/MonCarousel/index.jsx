@@ -1,5 +1,5 @@
 import Carousel from "react-bootstrap/Carousel";
-
+import "./style.css";
 function MonCarousel() {
   return (
     <Carousel data-bs-theme="dark">
@@ -9,10 +9,7 @@ function MonCarousel() {
           alt="First slide"
           style={{ width: "100%", height: "650px", objectFit: "cover" }}
         />
-        <Carousel.Caption>
-          <h5>First slide label</h5>
-          <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-        </Carousel.Caption>
+        <Carousel.Caption className="bg-warning"></Carousel.Caption>
       </Carousel.Item>
       <Carousel.Item>
         <img

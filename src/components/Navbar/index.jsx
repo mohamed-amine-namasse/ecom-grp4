@@ -185,8 +185,7 @@ function NavScrollExample() {
     <Navbar expand="lg" className="p-3">
       <Container fluid className="d-flex align-items-center">
         {" "}
-        {/* toggler is direct child so we can reorder it with CSS on mobile */}
-        <Navbar.Toggle aria-controls="nav-links-collapse" />
+        <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
         <Navbar.Brand href="#" className="fw-bold ">
           Foot Market
         </Navbar.Brand>

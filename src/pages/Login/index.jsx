@@ -13,7 +13,6 @@ function Login() {
 
   const validate = () => {
     if (!form.username || !form.password) return "Tous les champs sont requis.";
-    if (form.password.length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";
     return null;
   };
 

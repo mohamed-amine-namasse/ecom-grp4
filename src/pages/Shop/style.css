@@ -1,8 +1,11 @@
+/* --- 1. Réinitialisation Globale --- */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+/* --- 2. Styles du Conteneur Global (Shop) --- */
 .shop-container {
   height: fit-content;
   background-color: #ffc1cc;
@@ -24,33 +27,49 @@
   font-size: 0.95rem;
 }
 
+/* --- 3. Mise en Page Globale de la Boutique (Layout) --- */
+.shop-layout {
+  display: flex;
+  gap: 30px; /* Espace entre les deux colonnes */
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1400px; /* Limiter la largeur maximale de la page */
+}
+
+/* --- 4. Barre Latérale (shop-sidebar) --- */
+.shop-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  padding-right: 20px;
+}
+
+/* --- 5. Grille des Produits (products-grid) --- */
 .products-grid {
+  flex-grow: 1;
   display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(3, 1fr);
+  /* Définir des colonnes adaptatives (par exemple, 3 ou 4 colonnes) */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px; /* Espace entre les cartes */
 }
 
-@media (max-width: 992px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* --- 6. Carte Produit Individuelle (product-card) --- */
 .product-card {
   background: #fff;
   border: 1px solid #e6e6e6;
   border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   position: relative;
+
+  /* ⭐️ ESSENTIEL pour l'alignement vertical dans la grille ⭐️ */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: box-shadow 0.2s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .product-badge {
@@ -62,6 +81,15 @@
   font-size: 0.75rem;
   padding: 4px 8px;
   border-radius: 999px;
+}
+/* --- Styles spécifiques au badge de Rupture de Stock --- */
+.product-badge.out-of-stock {
+  /* Couleur de fond rouge vif */
+  background: #dc3545; /* Couleur rouge de Bootstrap (danger) */
+  /* Couleur du texte blanc */
+  color: #fff;
+  /* Optionnel : rendre le badge plus visible (légère ombre) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .product-media {
@@ -81,33 +109,43 @@
   display: block;
 }
 
+/* --- 7. Corps de la Carte (product-body) --- */
 .product-body {
-  padding: 12px;
+  padding: 15px;
+
+  /* ⭐️ FLEXBOX pour garantir que le footer soit poussé vers le bas ⭐️ */
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1 0 auto;
+  flex-grow: 1; /* Prend l'espace vertical restant dans la carte */
 }
 
+/* --- 8. Titre du Produit --- */
 .product-title {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
   color: #111;
+  /* ⭐️ Correction : Ajout d'une marge pour séparer du prochain élément ⭐️ */
+  margin-bottom: 8px;
 }
 
+/* --- 9. Description du Produit --- */
 .product-desc {
+  /* Permet à la description de prendre tout l'espace vertical disponible */
+  flex-grow: 1;
+
+  /* ⭐️ Correction de l'espacement : Assure que l'élément vide n'a pas de marge ⭐️ */
   margin: 0;
-  color: #666;
-  font-size: 0.9rem;
-  flex: 1 0 auto;
+  padding: 0;
 }
 
+/* --- 10. Pied de Page (Footer) --- */
 .product-footer {
+  /* Pousse le footer au bas du product-body */
+  margin-top: auto;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  align-items: center;
 }
 
 .product-price {
@@ -127,4 +165,50 @@
 
 .btn-add:hover {
   background: #095bd1;
+}
+
+/* --- Styles pour les boutons désactivés --- */
+.btn-add:disabled {
+  /* Rend le bouton gris (comme fait précédemment) */
+  background: #ccc;
+  opacity: 0.8;
+
+  /* ⭐️ CORRECTION PRINCIPALE : Définit le curseur sur "non autorisé" ⭐️ */
+  cursor: not-allowed;
+}
+
+/* Assurez-vous d'annuler l'effet hover lorsque désactivé */
+.btn-add:disabled:hover {
+  background: #ccc;
+  /* Annule le hover du style normal */
+}
+
+/* --- 11. Responsive (Médiats Queries) --- */
+
+@media (max-width: 992px) {
+  /* 1. Empiler les éléments (Filtres au-dessus des produits) */
+  .shop-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* 2. La barre latérale prend toute la largeur */
+  .shop-sidebar {
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+
+  /* 3. La grille des produits s'adapte à 2 colonnes sur tablette */
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* 4. Sur très petit écran, on passe à 1 seule colonne */
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
 }

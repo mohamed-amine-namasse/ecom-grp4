@@ -262,8 +262,9 @@ function Shop() {
                 <div className="product-body">
                   <h3 className="product-title">{prod.name}</h3>
 
-                  {/* ⭐️ Rendu conditionnel optimisé : La balise <p> est ABSENTE si prod.desc est vide ⭐️ */}
-                  {prod.desc && <p className="product-desc">{prod.desc}</p>}
+                  {prod.desc && prod.desc.trim() && (
+                    <p className="product-desc">{prod.desc}</p>
+                  )}
 
                   <div className="product-footer">
                     <span className="product-price">

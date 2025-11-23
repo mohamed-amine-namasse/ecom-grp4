@@ -50,6 +50,12 @@
   /* Définir des colonnes adaptatives (par exemple, 3 ou 4 colonnes) */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px; /* Espace entre les cartes */
+
+  /* ⭐️ CORRECTION 1 : Empêche l'étirement des éléments individuels ⭐️ */
+  align-items: start;
+
+  /* ⭐️ CORRECTION FINALE : Empêche l'étirement des LIGNES de la grille ⭐️ */
+  align-content: start;
 }
 
 /* --- 6. Carte Produit Individuelle (product-card) --- */
@@ -112,8 +118,6 @@
 /* --- 7. Corps de la Carte (product-body) --- */
 .product-body {
   padding: 15px;
-
-  /* ⭐️ FLEXBOX pour garantir que le footer soit poussé vers le bas ⭐️ */
   display: flex;
   flex-direction: column;
   flex-grow: 1; /* Prend l'espace vertical restant dans la carte */
@@ -125,27 +129,26 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: #111;
-  /* ⭐️ Correction : Ajout d'une marge pour séparer du prochain élément ⭐️ */
-  margin-bottom: 8px;
 }
 
 /* --- 9. Description du Produit --- */
+
 .product-desc {
-  flex-grow: 1;
-
-  /* Correction de l'espacement : Assure que l'élément vide n'a pas de marge */
-  margin: 0;
+  flex-grow: 1; /* Il prend l'espace restant pour pousser le footer */
+  /* ⭐️ CORRECTION : Ajouter la marge sur l'élément qui peut être absent ⭐️ */
+  margin: 0 0 10px 0; /* Marge uniquement en bas pour séparer le footer */
   padding: 0;
-
-  /* ⭐️ CORRECTION CRITIQUE : Supprimer la hauteur de ligne par défaut et la hauteur minimale ⭐️ */
-  line-height: 0; /* Empêche l'élément vide d'avoir une hauteur basée sur la taille de la police */
-  min-height: 0; /* Garantit qu'aucune hauteur minimale n'est forcée */
+  line-height: 1.4;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 /* --- 10. Pied de Page (Footer) --- */
 .product-footer {
   /* Pousse le footer au bas du product-body */
   margin-top: auto;
+  padding-top: 10px; /* Utiliser padding pour éviter l'effondrement des marges */
+  border-top: 1px solid #f0f0f0; /* Une ligne de séparation visuelle pour le contraste */
   display: flex;
   justify-content: space-between;
   align-items: center;

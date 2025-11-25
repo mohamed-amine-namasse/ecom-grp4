@@ -331,7 +331,7 @@ function NavScrollExample() {
                 <Badge
                   bg="danger"
                   pill // Style rond // Positionnement absolu : petite taille, haut/droite
-                  className="position-absolute top-0 start-100 translate-middle"
+                  className="position-absolute top-90 start-70 translate-middle"
                 >
                   {cartCount}
                 </Badge>

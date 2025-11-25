@@ -60,8 +60,9 @@ function Shop() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState(initialFilters);
   const [shopOptions, setShopOptions] = useState({
-    marques: [], // Ajoutez ici d'autres options si vous voulez rendre les tailles/couleurs dynamiques aussi
+    marques: [],
     sizes: [],
+    materials: [],
   });
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
@@ -94,11 +95,10 @@ function Shop() {
 
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {
-          // ✅ MODIFICATION : Le prix affiché (sale_price si promo, sinon regular_price)
           console.log(
             "Attributs du Produit ID " + product.id + ":",
             product.attributes
-          ); // 👈 AJOUTEZ CECI TEMPORAIREMENT
+          );
           const price = product.sale_price
             ? parseFloat(product.sale_price)
             : parseFloat(product.regular_price);
@@ -114,7 +114,7 @@ function Shop() {
             product.images.length > 0
               ? product.images[0].src
               : "https://via.placeholder.com/400x300?text=Image+Manquante";
-          const brandKeyName = "brands"; // <-- REMPLACEZ "brands" par le nom exact trouvé
+          const brandKeyName = "brands";
 
           // Cherche la première marque associée au produit dans le tableau de la clé trouvée
           const firstBrand =
@@ -128,7 +128,7 @@ function Shop() {
             size:
               getAttributeValue(product.attributes, "taille/pointure") || [],
             color: getAttributeValue(product.attributes, "couleur") || "",
-            material: getAttributeValue(product.attributes, "matiere") || "",
+            material: getAttributeValue(product.attributes, "matière") || "",
             surface: getAttributeValue(product.attributes, "surface") || "",
             marque: marqueName,
           };
@@ -145,6 +145,11 @@ function Shop() {
             attributes: productAttributes,
           };
         });
+        // ⭐️ NOUVEAU : Calcul des Matières uniques
+        const allMaterials = formattedProducts
+          .map((p) => p.attributes.material)
+          .filter((m) => m && String(m).trim() !== "");
+        console.log("Matériaux bruts collectés :", allMaterials); // 👈 AJOUTEZ CECI
         // ⭐️ ÉTAPE CLÉ: Calcul des marques uniques ⭐️
         const allMarques = formattedProducts
           .map((p) => p.attributes.marque)
@@ -169,12 +174,15 @@ function Shop() {
             // Tri alphabétique par défaut (S, M, L)
             return a.localeCompare(b);
           });
+        const uniqueMaterials = Array.from(new Set(allMaterials)).sort();
+
         setProducts(formattedProducts);
         // ✅ Mise à jour de l'état des options dynamiques
         setShopOptions((prev) => ({
           ...prev,
           marques: uniqueMarques,
           sizes: uniqueSizes,
+          materials: uniqueMaterials,
         }));
         setError(null);
       } catch (err) {

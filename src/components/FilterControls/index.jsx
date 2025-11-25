@@ -10,7 +10,7 @@ const DUMMY_OPTIONS = {
   // Marques statiques laissées ici pour référence, mais non utilisées pour le rendu final
   marques: ["Adidas", "Nike", "Puma"],
   surfaces: ["Gazon Naturel", "Synthétique", "Intérieur", "Terre Battue"],
-  materials: ["Cuir", "Synthétique", "Tissu", "Gore-Tex"],
+  materials: ["Cuir", "Synthétique", "Tissu"],
 };
 
 // Mappage des noms de couleurs en hex ou mots-clés CSS pour les pastilles
@@ -31,6 +31,7 @@ function FilterControls({
   maxShopPrice,
   dynamicMarques,
   dynamicSizes,
+  dynamicMaterials,
 }) {
   // Valeur maximale du curseur : utilise la prop dynamique, sinon une valeur par défaut.
   const priceMax = maxShopPrice || DUMMY_OPTIONS.priceMax;
@@ -99,7 +100,6 @@ function FilterControls({
   return (
     <div className="filter-controls-container">
       <h3 className="filter-main-title">Filtres</h3>
-
       {/* --- BOUTON DE RÉINITIALISATION (Haut) --- */}
       <div className="d-grid mb-3">
         <button
@@ -110,9 +110,7 @@ function FilterControls({
           Effacer les filtres
         </button>
       </div>
-
       <hr className="my-3" />
-
       {/* 1. FILTRE PRIX */}
       <FilterSection title="Filtrer par Prix" name="price">
         <div className="p-2">
@@ -131,9 +129,7 @@ function FilterControls({
           />
         </div>
       </FilterSection>
-
       <hr />
-
       {/* 2. FILTRE TAILLE/POINTURE */}
       <FilterSection title="Taille / Pointure" name="sizes">
         <div className="d-flex flex-wrap gap-2 p-2">
@@ -153,9 +149,7 @@ function FilterControls({
           })}
         </div>
       </FilterSection>
-
       <hr />
-
       {/* 3. FILTRE COULEUR (Utilisation de pastilles) */}
       <FilterSection title="Couleur" name="colors">
         <div className="d-flex flex-wrap gap-2 p-2 color-swatches">
@@ -186,9 +180,7 @@ function FilterControls({
           })}
         </div>
       </FilterSection>
-
       <hr />
-
       {/* 4. FILTRE DISPONIBILITÉ */}
       <FilterSection title="Disponibilité" name="disponibility">
         <div className="p-2">
@@ -204,28 +196,28 @@ function FilterControls({
           </select>
         </div>
       </FilterSection>
-
       <hr />
-
       {/* 5. FILTRE TYPE DE MATIÈRE */}
+
       <FilterSection title="Matière" name="materials">
-        <div className="d-flex flex-column gap-1 p-2">
-          {DUMMY_OPTIONS.materials.map((material) => (
-            <label key={material} className="filter-checkbox-label">
-              <input
-                type="checkbox"
-                // ✅ Sécurisation avec || []
-                checked={(filters.material || []).includes(material)}
-                onChange={() => handleMultiSelect("material", material)}
-              />
-              {material}
-            </label>
-          ))}
+        <div className="d-flex flex-wrap gap-2 p-2">
+          {DUMMY_OPTIONS.materials.map((material) => {
+            // ✅ Sécurisation avec || []
+            const isSelected = (filters.material || []).includes(material);
+            return (
+              <button
+                key={material}
+                className={`btn-size ${isSelected ? "selected" : ""}`}
+                onClick={() => handleMultiSelect("material", material)}
+              >
+                {material}
+              </button>
+            );
+          })}
         </div>
       </FilterSection>
 
       <hr />
-
       {/* 6. MARQUES - UTILISATION DES DONNÉES DYNAMIQUES */}
       <FilterSection title="Marques" name="marques">
         <div className="p-2">
@@ -250,11 +242,9 @@ function FilterControls({
           </select>
         </div>
       </FilterSection>
-
       <hr />
-
       {/* 7. SURFACE */}
-      <FilterSection title="Surface (Crampons)" name="surfaces">
+      <FilterSection title="Surface" name="surfaces">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.surfaces.map((surface) => {
             // ✅ Sécurisation avec || []

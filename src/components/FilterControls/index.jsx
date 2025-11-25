@@ -6,8 +6,9 @@ import "./style.css";
 // En production, ces listes devraient être générées DYNAMIQUEMENT.
 const DUMMY_OPTIONS = {
   colors: ["Noir", "Rouge", "Blanc", "Marron", "Bleu", "Vert"],
-  sizes: [38, 39, 40, 41, 42, 43, 44, 45],
+  sizes: [35, 36, 37, 38, 39, 40, 41, 42],
   gammes: ["Casual", "Sport", "Performance", "Mode"],
+  // Marques statiques laissées ici pour référence, mais non utilisées pour le rendu final
   marques: ["Adidas", "Nike", "Puma"],
   surfaces: ["Gazon Naturel", "Synthétique", "Intérieur", "Terre Battue"],
   materials: ["Cuir", "Synthétique", "Tissu", "Gore-Tex"],
@@ -23,12 +24,13 @@ const colorMap = {
   Vert: "#008000",
 };
 
-// ⭐️ La prop maxShopPrice est ajoutée ici pour le prix dynamique ⭐️
+// ⭐️ AJOUT DE dynamicMarques comme prop pour les marques dynamiques ⭐️
 function FilterControls({
   filters,
   onFilterChange,
   onResetFilters,
   maxShopPrice,
+  dynamicMarques, // Reçoit un tableau de marques uniques ou []
 }) {
   // Valeur maximale du curseur : utilise la prop dynamique, sinon une valeur par défaut.
   const priceMax = maxShopPrice || DUMMY_OPTIONS.priceMax;
@@ -49,7 +51,8 @@ function FilterControls({
 
   // Gère la sélection/désélection des filtres multiples (couleur, taille, etc.)
   const handleMultiSelect = (filterName, value) => {
-    const currentArray = filters[filterName];
+    // Sécurise l'accès : s'assure que filters[filterName] est un tableau
+    const currentArray = filters[filterName] || [];
     const stringValue = String(value);
 
     if (currentArray.includes(stringValue)) {
@@ -135,7 +138,8 @@ function FilterControls({
       <FilterSection title="Taille / Pointure" name="sizes">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.sizes.map((size) => {
-            const isSelected = filters.size.includes(String(size));
+            // ✅ Sécurisation avec || []
+            const isSelected = (filters.size || []).includes(String(size));
             return (
               <button
                 key={size}
@@ -155,7 +159,8 @@ function FilterControls({
       <FilterSection title="Couleur" name="colors">
         <div className="d-flex flex-wrap gap-2 p-2 color-swatches">
           {DUMMY_OPTIONS.colors.map((color) => {
-            const isSelected = filters.color.includes(color);
+            // ✅ Sécurisation avec || []
+            const isSelected = (filters.color || []).includes(color);
             return (
               <div
                 key={color}
@@ -208,7 +213,8 @@ function FilterControls({
             <label key={gamme} className="filter-checkbox-label">
               <input
                 type="checkbox"
-                checked={filters.gamme.includes(gamme)}
+                // ✅ Sécurisation avec || []
+                checked={(filters.gamme || []).includes(gamme)}
                 onChange={() => handleMultiSelect("gamme", gamme)}
               />
               {gamme}
@@ -226,7 +232,8 @@ function FilterControls({
             <label key={material} className="filter-checkbox-label">
               <input
                 type="checkbox"
-                checked={filters.material.includes(material)}
+                // ✅ Sécurisation avec || []
+                checked={(filters.material || []).includes(material)}
                 onChange={() => handleMultiSelect("material", material)}
               />
               {material}
@@ -237,21 +244,25 @@ function FilterControls({
 
       <hr />
 
-      {/* 7. MARQUES */}
+      {/* 7. MARQUES - UTILISATION DES DONNÉES DYNAMIQUES */}
       <FilterSection title="Marques" name="marques">
         <div className="p-2">
           <select
             name="marque"
             className="form-select form-select-sm"
+            // Sécurité: Si filters.marque est undefined, utilise []
             value={(filters.marque || []).length > 0 ? filters.marque[0] : ""}
             onChange={(e) =>
               onFilterChange("marque", e.target.value ? [e.target.value] : [])
             }
           >
             <option value="">Toutes les marques</option>
-            {DUMMY_OPTIONS.marques.map((col) => (
-              <option key={col} value={col}>
-                {col}
+
+            {/* ⭐️ UTILISATION ET SÉCURISATION DES MARQUES DYNAMIQUES ⭐️ */}
+            {/* dynamicMarques devrait toujours être un tableau ([] en initial) venant de Shop.jsx */}
+            {(dynamicMarques || []).map((marque) => (
+              <option key={marque} value={marque}>
+                {marque}
               </option>
             ))}
           </select>
@@ -264,7 +275,8 @@ function FilterControls({
       <FilterSection title="Surface (Crampons)" name="surfaces">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.surfaces.map((surface) => {
-            const isSelected = filters.surface.includes(surface);
+            // ✅ Sécurisation avec || []
+            const isSelected = (filters.surface || []).includes(surface);
             return (
               <button
                 key={surface}

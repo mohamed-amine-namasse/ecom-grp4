@@ -20,11 +20,11 @@ const initialFilters = {
   size: [],
   color: [],
   gamme: [],
-  collection: [],
   surface: [],
   material: [],
   disponibility: "all",
   priceRange: [0, 500],
+  marque: [], // Doit être []
 };
 
 // Fonction utilitaire pour extraire une valeur d'attribut spécifique
@@ -60,7 +60,9 @@ function Shop() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState(initialFilters);
-
+  const [shopOptions, setShopOptions] = useState({
+    marques: [], // Ajoutez ici d'autres options si vous voulez rendre les tailles/couleurs dynamiques aussi
+  });
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -89,6 +91,12 @@ function Shop() {
         }
 
         const data = await response.json();
+        // 🛑 DÉBOGAGE : Affiche l'objet produit ENTIER 🛑
+        if (data.length > 0) {
+          console.log("--- DEBUG OBJET PRODUIT BRUT COMPLET ---"); // Affiche le premier produit dans son format brut API
+          console.log("PREMIER PRODUIT BRUT:", data[0]);
+          console.log("-----------------------------------------");
+        }
 
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {
@@ -108,15 +116,23 @@ function Shop() {
             product.images.length > 0
               ? product.images[0].src
               : "https://via.placeholder.com/400x300?text=Image+Manquante";
+          const brandKeyName = "brands"; // <-- REMPLACEZ "brands" par le nom exact trouvé
+
+          // Cherche la première marque associée au produit dans le tableau de la clé trouvée
+          const firstBrand =
+            product[brandKeyName] && product[brandKeyName].length > 0
+              ? product[brandKeyName][0]
+              : null;
+
+          const marqueName = firstBrand ? firstBrand.name.trim() : "";
 
           const productAttributes = {
             size: getAttributeValue(product.attributes, "taille") || [],
             color: getAttributeValue(product.attributes, "couleur") || "",
             gamme: getAttributeValue(product.attributes, "gamme") || "",
             material: getAttributeValue(product.attributes, "matiere") || "",
-            collection:
-              getAttributeValue(product.attributes, "collection") || "",
             surface: getAttributeValue(product.attributes, "surface") || "",
+            marque: marqueName,
           };
 
           return {
@@ -131,8 +147,15 @@ function Shop() {
             attributes: productAttributes,
           };
         });
+        // ⭐️ ÉTAPE CLÉ: Calcul des marques uniques ⭐️
+        const allMarques = formattedProducts
+          .map((p) => p.attributes.marque)
+          .filter((m) => m && m.trim() !== ""); // Élimine les vides/nulls // Crée un ensemble (Set) pour avoir des valeurs uniques, puis le reconvertit en tableau
 
+        const uniqueMarques = Array.from(new Set(allMarques)).sort();
         setProducts(formattedProducts);
+        // ✅ Mise à jour de l'état des options dynamiques
+        setShopOptions((prev) => ({ ...prev, marques: uniqueMarques }));
         setError(null);
       } catch (err) {
         console.error("Erreur de récupération des produits:", err);
@@ -191,8 +214,8 @@ function Shop() {
         filterByAttribute("size", prod.attributes.size) &&
         filterByAttribute("gamme", prod.attributes.gamme) &&
         filterByAttribute("material", prod.attributes.material) &&
-        filterByAttribute("collection", prod.attributes.collection) &&
-        filterByAttribute("surface", prod.attributes.surface)
+        filterByAttribute("surface", prod.attributes.surface) &&
+        filterByAttribute("marque", prod.attributes.marque)
     );
 
     return workingProducts;
@@ -240,6 +263,7 @@ function Shop() {
             onFilterChange={handleFilterChange}
             onResetFilters={handleResetFilters}
             maxShopPrice={maxShopPrice}
+            dynamicMarques={shopOptions.marques}
           />
         </aside>
 

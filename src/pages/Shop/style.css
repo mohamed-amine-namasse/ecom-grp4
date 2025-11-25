@@ -153,7 +153,10 @@
   justify-content: space-between;
   align-items: center;
 }
-
+.flex {
+  display: flex;
+  gap: 10px;
+}
 .product-price {
   font-weight: 700;
   color: #111;
@@ -187,6 +190,23 @@
 .btn-add:disabled:hover {
   background: #ccc;
   /* Annule le hover du style normal */
+}
+
+/* Style de l'ancien prix barré */
+.product-price.old-price {
+  /* Barre le texte */
+  text-decoration: line-through;
+  /* Rendre le texte plus discret */
+  color: #999;
+  font-size: 1.1em;
+  font-weight: normal;
+}
+
+/* Assurez-vous que le prix actuel reste en évidence */
+.product-price.current-price {
+  color: #333;
+  font-size: 1.1em;
+  font-weight: bold;
 }
 
 /* --- 11. Responsive (Médiats Queries) --- */

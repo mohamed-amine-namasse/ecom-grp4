@@ -8,7 +8,7 @@ const DUMMY_OPTIONS = {
   colors: ["Noir", "Rouge", "Blanc", "Marron", "Bleu", "Vert"],
   sizes: [38, 39, 40, 41, 42, 43, 44, 45],
   gammes: ["Casual", "Sport", "Performance", "Mode"],
-  collections: ["Autonne & Hiver", "Printemps", "Classique"],
+  marques: ["Adidas", "Nike", "Puma"],
   surfaces: ["Gazon Naturel", "Synthétique", "Intérieur", "Terre Battue"],
   materials: ["Cuir", "Synthétique", "Tissu", "Gore-Tex"],
 };
@@ -237,22 +237,19 @@ function FilterControls({
 
       <hr />
 
-      {/* 7. COLLECTIONS */}
-      <FilterSection title="Collections" name="collections">
+      {/* 7. MARQUES */}
+      <FilterSection title="Marques" name="marques">
         <div className="p-2">
           <select
-            name="collection"
+            name="marque"
             className="form-select form-select-sm"
-            value={filters.collection.length > 0 ? filters.collection[0] : ""}
+            value={(filters.marque || []).length > 0 ? filters.marque[0] : ""}
             onChange={(e) =>
-              onFilterChange(
-                "collection",
-                e.target.value ? [e.target.value] : []
-              )
+              onFilterChange("marque", e.target.value ? [e.target.value] : [])
             }
           >
-            <option value="">Toutes les collections</option>
-            {DUMMY_OPTIONS.collections.map((col) => (
+            <option value="">Toutes les marques</option>
+            {DUMMY_OPTIONS.marques.map((col) => (
               <option key={col} value={col}>
                 {col}
               </option>

@@ -92,9 +92,13 @@ function Shop() {
 
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {
+          // ✅ MODIFICATION : Le prix affiché (sale_price si promo, sinon regular_price)
           const price = product.sale_price
             ? parseFloat(product.sale_price)
             : parseFloat(product.regular_price);
+
+          // ✅ NOUVEAU : Le prix régulier (pour l'affichage barré si en promo)
+          const regularPrice = parseFloat(product.regular_price);
 
           const desc = product.short_description
             ? product.short_description.replace(/<\/?[^>]+(>|$)/g, "")
@@ -119,6 +123,8 @@ function Shop() {
             id: product.id,
             name: product.name,
             price: price || 0,
+            // ✅ NOUVEAU : Stockage du prix régulier
+            regularPrice: regularPrice || 0,
             desc: desc,
             image: imageUrl,
             stock_status: product.stock_status,
@@ -267,9 +273,20 @@ function Shop() {
                   )}
 
                   <div className="product-footer">
-                    <span className="product-price">
-                      {formatPrice(prod.price)}
-                    </span>
+                    {/* ✅ NOUVEAU : Affichage du prix régulier barré si une promotion est active */}
+                    <div className="flex">
+                      {prod.price < prod.regularPrice && (
+                        <span className="product-price old-price">
+                          {formatPrice(prod.regularPrice)}
+                        </span>
+                      )}
+
+                      {/* Prix actuel (prix de vente ou prix régulier) */}
+                      <span className="product-price current-price">
+                        {formatPrice(prod.price)}
+                      </span>
+                    </div>
+
                     <button
                       className="btn-add"
                       type="button"

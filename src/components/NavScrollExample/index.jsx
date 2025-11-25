@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useCart } from "../CartContext"; // Assurez-vous que le chemin est correct
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
@@ -11,6 +12,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import Modal from "react-bootstrap/Modal";
 import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
+import Badge from "react-bootstrap/Badge";
 import "./style.css";
 
 // ----------------------------------------------------------------------
@@ -116,7 +118,8 @@ function NavScrollExample() {
   const [error, setError] = useState(null); // Utilisé uniquement pour les erreurs d'API/réseau
   // État pour s'assurer que l'utilisateur a initié une recherche valide (>= 2 chars) et que l'appel a été fait.
   const [searchAttempted, setSearchAttempted] = useState(false);
-
+  const { getCartCount } = useCart(); // ⭐️ Récupération de la fonction de comptage
+  const cartCount = getCartCount(); // Calcul du nombre d'articles
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
     // N'appelle l'API que si le terme de recherche a au moins 2 caractères
@@ -319,8 +322,20 @@ function NavScrollExample() {
           </div>
           {/* icons restent visibles en mobile */}
           <Nav className="nav-icons">
-            <Nav.Link href="#cart" className="p-1">
+            {/* ⭐️ MODIFICATION : Ajout d'un conteneur pour positionner le badge */}
+
+            <Nav.Link href="#cart" className="p-1 position-relative">
               <PiShoppingCartFill size={30} />
+              {/* Badge de notification */}
+              {cartCount > 0 && (
+                <Badge
+                  bg="danger"
+                  pill // Style rond // Positionnement absolu : petite taille, haut/droite
+                  className="position-absolute top-0 start-100 translate-middle"
+                >
+                  {cartCount}
+                </Badge>
+              )}
             </Nav.Link>
             <Nav.Link as={NavLink} to="/login" className="p-1">
               <BiSolidUserCircle size={30} />

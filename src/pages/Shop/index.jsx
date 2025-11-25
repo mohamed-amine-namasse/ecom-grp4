@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
+import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
 
 // ----------------------------------------------------------------------
 // --- CONFIGURATION WOOCOMMERCE ---
@@ -55,6 +56,7 @@ const getMaxPrice = (products) => {
 };
 
 function Shop() {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -344,6 +346,13 @@ function Shop() {
                       type="button"
                       // Désactivation du bouton si l'article est hors stock
                       disabled={isOutOfStock}
+                      onClick={() =>
+                        addToCart({
+                          id: prod.id,
+                          name: prod.name,
+                          price: prod.price,
+                        })
+                      }
                     >
                       Ajouter
                     </button>

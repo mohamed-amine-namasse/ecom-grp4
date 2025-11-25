@@ -133,8 +133,6 @@ function Terms() {
 
       <h1>Politique en matière de remboursements et de retours</h1>
 
-      <p>Ceci est une page d’exemple.</p>
-
       <h2>Aperçu</h2>
       <p>
         Notre politique de remboursement et de retour est valable pendant 30

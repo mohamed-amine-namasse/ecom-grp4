@@ -7,7 +7,6 @@ import "./style.css";
 const DUMMY_OPTIONS = {
   colors: ["Noir", "Rouge", "Blanc", "Marron", "Bleu", "Vert"],
   sizes: [35, 36, 37, 38, 39, 40, 41, 42],
-  gammes: ["Casual", "Sport", "Performance", "Mode"],
   // Marques statiques laissées ici pour référence, mais non utilisées pour le rendu final
   marques: ["Adidas", "Nike", "Puma"],
   surfaces: ["Gazon Naturel", "Synthétique", "Intérieur", "Terre Battue"],
@@ -208,26 +207,7 @@ function FilterControls({
 
       <hr />
 
-      {/* 5. FILTRE GAMME */}
-      <FilterSection title="Gamme" name="gammes">
-        <div className="d-flex flex-column gap-1 p-2">
-          {DUMMY_OPTIONS.gammes.map((gamme) => (
-            <label key={gamme} className="filter-checkbox-label">
-              <input
-                type="checkbox"
-                // ✅ Sécurisation avec || []
-                checked={(filters.gamme || []).includes(gamme)}
-                onChange={() => handleMultiSelect("gamme", gamme)}
-              />
-              {gamme}
-            </label>
-          ))}
-        </div>
-      </FilterSection>
-
-      <hr />
-
-      {/* 6. FILTRE TYPE DE MATIÈRE */}
+      {/* 5. FILTRE TYPE DE MATIÈRE */}
       <FilterSection title="Matière" name="materials">
         <div className="d-flex flex-column gap-1 p-2">
           {DUMMY_OPTIONS.materials.map((material) => (
@@ -246,7 +226,7 @@ function FilterControls({
 
       <hr />
 
-      {/* 7. MARQUES - UTILISATION DES DONNÉES DYNAMIQUES */}
+      {/* 6. MARQUES - UTILISATION DES DONNÉES DYNAMIQUES */}
       <FilterSection title="Marques" name="marques">
         <div className="p-2">
           <select
@@ -273,7 +253,7 @@ function FilterControls({
 
       <hr />
 
-      {/* 8. SURFACE */}
+      {/* 7. SURFACE */}
       <FilterSection title="Surface (Crampons)" name="surfaces">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.surfaces.map((surface) => {

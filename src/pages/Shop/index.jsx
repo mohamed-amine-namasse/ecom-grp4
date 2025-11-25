@@ -19,7 +19,6 @@ const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${C
 const initialFilters = {
   size: [],
   color: [],
-  gamme: [],
   surface: [],
   material: [],
   disponibility: "all",
@@ -129,7 +128,6 @@ function Shop() {
             size:
               getAttributeValue(product.attributes, "taille/pointure") || [],
             color: getAttributeValue(product.attributes, "couleur") || "",
-            gamme: getAttributeValue(product.attributes, "gamme") || "",
             material: getAttributeValue(product.attributes, "matiere") || "",
             surface: getAttributeValue(product.attributes, "surface") || "",
             marque: marqueName,
@@ -234,7 +232,6 @@ function Shop() {
       (prod) =>
         filterByAttribute("color", prod.attributes.color) &&
         filterByAttribute("size", prod.attributes.size) &&
-        filterByAttribute("gamme", prod.attributes.gamme) &&
         filterByAttribute("material", prod.attributes.material) &&
         filterByAttribute("surface", prod.attributes.surface) &&
         filterByAttribute("marque", prod.attributes.marque)

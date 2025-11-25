@@ -91,12 +91,6 @@ function Shop() {
         }
 
         const data = await response.json();
-        // 🛑 DÉBOGAGE : Affiche l'objet produit ENTIER 🛑
-        if (data.length > 0) {
-          console.log("--- DEBUG OBJET PRODUIT BRUT COMPLET ---"); // Affiche le premier produit dans son format brut API
-          console.log("PREMIER PRODUIT BRUT:", data[0]);
-          console.log("-----------------------------------------");
-        }
 
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {

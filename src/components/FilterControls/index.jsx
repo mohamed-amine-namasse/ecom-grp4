@@ -30,7 +30,8 @@ function FilterControls({
   onFilterChange,
   onResetFilters,
   maxShopPrice,
-  dynamicMarques, // Reçoit un tableau de marques uniques ou []
+  dynamicMarques,
+  dynamicSizes,
 }) {
   // Valeur maximale du curseur : utilise la prop dynamique, sinon une valeur par défaut.
   const priceMax = maxShopPrice || DUMMY_OPTIONS.priceMax;
@@ -137,8 +138,9 @@ function FilterControls({
       {/* 2. FILTRE TAILLE/POINTURE */}
       <FilterSection title="Taille / Pointure" name="sizes">
         <div className="d-flex flex-wrap gap-2 p-2">
-          {DUMMY_OPTIONS.sizes.map((size) => {
-            // ✅ Sécurisation avec || []
+          {/* ⚠️ C'est ici que dynamicSizes doit être utilisé ! */}
+          {(dynamicSizes || []).map((size) => {
+            // Utilisez dynamicSizes
             const isSelected = (filters.size || []).includes(String(size));
             return (
               <button

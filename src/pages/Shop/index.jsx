@@ -62,6 +62,7 @@ function Shop() {
   const [filters, setFilters] = useState(initialFilters);
   const [shopOptions, setShopOptions] = useState({
     marques: [], // Ajoutez ici d'autres options si vous voulez rendre les tailles/couleurs dynamiques aussi
+    sizes: [],
   });
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
@@ -95,6 +96,10 @@ function Shop() {
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {
           // ✅ MODIFICATION : Le prix affiché (sale_price si promo, sinon regular_price)
+          console.log(
+            "Attributs du Produit ID " + product.id + ":",
+            product.attributes
+          ); // 👈 AJOUTEZ CECI TEMPORAIREMENT
           const price = product.sale_price
             ? parseFloat(product.sale_price)
             : parseFloat(product.regular_price);
@@ -121,7 +126,8 @@ function Shop() {
           const marqueName = firstBrand ? firstBrand.name.trim() : "";
 
           const productAttributes = {
-            size: getAttributeValue(product.attributes, "taille") || [],
+            size:
+              getAttributeValue(product.attributes, "taille/pointure") || [],
             color: getAttributeValue(product.attributes, "couleur") || "",
             gamme: getAttributeValue(product.attributes, "gamme") || "",
             material: getAttributeValue(product.attributes, "matiere") || "",
@@ -147,9 +153,31 @@ function Shop() {
           .filter((m) => m && m.trim() !== ""); // Élimine les vides/nulls // Crée un ensemble (Set) pour avoir des valeurs uniques, puis le reconvertit en tableau
 
         const uniqueMarques = Array.from(new Set(allMarques)).sort();
+        // 🚀 NOUVEAU : Calcul des tailles uniques 🚀
+        const allSizes = formattedProducts
+          .map((p) => p.attributes.size)
+          .flat() // Important : aplatir le tableau de tableaux de tailles
+          .filter((s) => s && String(s).trim() !== "");
+
+        const uniqueSizes = Array.from(new Set(allSizes))
+          .map(String)
+          .sort((a, b) => {
+            // Tente de trier numériquement pour 39, 40, 41...
+            const numA = Number(a);
+            const numB = Number(b);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return numA - numB;
+            }
+            // Tri alphabétique par défaut (S, M, L)
+            return a.localeCompare(b);
+          });
         setProducts(formattedProducts);
         // ✅ Mise à jour de l'état des options dynamiques
-        setShopOptions((prev) => ({ ...prev, marques: uniqueMarques }));
+        setShopOptions((prev) => ({
+          ...prev,
+          marques: uniqueMarques,
+          sizes: uniqueSizes,
+        }));
         setError(null);
       } catch (err) {
         console.error("Erreur de récupération des produits:", err);
@@ -258,6 +286,7 @@ function Shop() {
             onResetFilters={handleResetFilters}
             maxShopPrice={maxShopPrice}
             dynamicMarques={shopOptions.marques}
+            dynamicSizes={shopOptions.sizes}
           />
         </aside>
 

@@ -231,6 +231,7 @@ function Shop() {
             (filterVal) => attributeValue.includes(String(filterVal)) // Conversion en chaîne pour la sécurité
           );
         }
+
         // Si l'attribut est une chaîne simple (Couleur, Gamme, etc.)
         return filters[attributeName].includes(attributeValue);
       }

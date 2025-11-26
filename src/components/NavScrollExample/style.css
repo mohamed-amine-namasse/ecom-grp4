@@ -57,9 +57,10 @@
   /* Positionne la liste juste en dessous du champ de recherche */
   position: absolute;
   top: 100%;
-  /* Centrage horizontal par rapport au conteneur. La largeur sera définie ci-dessous. */
-  left: 50%;
-  transform: translateX(-50%);
+
+  /* NOUVEAU : Aligner au bord GAUCHE du conteneur parent (.search-container) */
+  left: 0;
+
   /* Assure que la liste est au-dessus des autres éléments de la nav */
   z-index: 1050;
   background-color: white;

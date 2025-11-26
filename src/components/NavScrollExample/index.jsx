@@ -305,7 +305,7 @@ function NavScrollExample() {
             </Nav>
           </Navbar.Collapse>
           {/* groupe de recherche */}
-          <div className="search-container" style={{ position: "relative" }}>
+          <div className="search-container">
             {" "}
             <Form className="d-flex search-group align-items-center ">
               <Button
@@ -332,16 +332,6 @@ function NavScrollExample() {
               <div
                 className="suggestions-list"
                 // Styles ajoutés pour simuler le CSS du fichier externe et positionner la liste
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  zIndex: 10,
-                  width: "100%",
-                  minWidth: "250px",
-                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                  marginTop: "0.25rem",
-                }}
               >
                 {renderSuggestionsContent(false)}
               </div>

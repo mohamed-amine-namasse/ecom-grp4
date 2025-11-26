@@ -119,7 +119,6 @@ function NavScrollExample() {
   // État pour s'assurer que l'utilisateur a initié une recherche valide (>= 2 chars) et que l'appel a été fait.
   const [searchAttempted, setSearchAttempted] = useState(false);
   const { getCartCount } = useCart(); // Récupération de la fonction de comptage
-  const cartCount = getCartCount(); // Calcul du nombre d'articles
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
     // N'appelle l'API que si le terme de recherche a au moins 2 caractères
@@ -327,13 +326,13 @@ function NavScrollExample() {
             <Nav.Link as={NavLink} to="/cart" className="p-1">
               <PiShoppingCartFill size={30} />
               {/* Badge de notification */}
-              {cartCount > 0 && (
+              {getCartCount > 0 && (
                 <Badge
                   bg="danger"
                   pill // Style rond // Positionnement absolu : petite taille, haut/droite
                   className="position-absolute top-90 start-70 translate-middle"
                 >
-                  {cartCount}
+                  {getCartCount}
                 </Badge>
               )}
             </Nav.Link>

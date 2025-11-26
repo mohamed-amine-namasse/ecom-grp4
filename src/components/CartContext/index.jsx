@@ -1,6 +1,12 @@
 // src/contexts/CartContext.js
 
-import React, { createContext, useState, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useMemo,
+} from "react";
 
 // Crée le Contexte du Panier
 export const CartContext = createContext();
@@ -10,49 +16,126 @@ export const useCart = () => {
   return useContext(CartContext);
 };
 
+// ------------------------------------------------------------------
+// --- LOGIQUE DE PERSISTANCE ET D'INITIALISATION
+// ------------------------------------------------------------------
+
+// Fonction pour récupérer le panier du localStorage lors de l'initialisation
+const getInitialCart = () => {
+  try {
+    const savedCart = localStorage.getItem("cartItems");
+    // Si des données existent, parsez-les. Sinon, retournez un tableau vide.
+    return savedCart ? JSON.parse(savedCart) : [];
+  } catch (e) {
+    console.error("Erreur de lecture de localStorage:", e);
+    return [];
+  }
+};
+
 // Fournisseur de Contexte (Wrapper pour l'application)
 export const CartProvider = ({ children }) => {
-  // L'état du panier est un tableau d'objets {id, name, price, quantity}
-  const [cartItems, setCartItems] = useState([]);
+  // L'état du panier est initialisé à partir du localStorage
+  const [cartItems, setCartItems] = useState(getInitialCart);
 
-  // --- Fonctions de Logique du Panier ---
-
+  // Effet pour synchroniser cartItems avec localStorage à chaque changement
+  useEffect(() => {
+    try {
+      // Sauvegarder les données dans localStorage
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    } catch (e) {
+      console.error("Erreur d'écriture dans localStorage:", e);
+    }
+  }, [cartItems]);  // ------------------------------------------------------------------ // --- FONCTIONS DE LOGIQUE DU PANIER // ------------------------------------------------------------------
   /**
    * Ajoute un produit au panier ou augmente sa quantité s'il existe déjà.
    * @param {object} product - L'objet produit à ajouter (doit avoir au moins id, name, price).
    */
-  const addToCart = (product) => {
-    // Vérifie si le produit est déjà dans le panier
-    const existingItemIndex = cartItems.findIndex(
-      (item) => item.id === product.id
-    );
 
-    if (existingItemIndex > -1) {
-      // Si l'article existe, augmente la quantité
-      const updatedCart = [...cartItems];
-      updatedCart[existingItemIndex].quantity += 1;
-      setCartItems(updatedCart);
-    } else {
-      // Sinon, ajoute le nouvel article avec une quantité de 1
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
-    }
+  const addToCart = (product) => {
+    // Sécurité : S'assurer que le prix est un nombre valide
+    const price = parseFloat(product.price) || 0;
+
+    setCartItems((prevItems) => {
+      const existingItemIndex = prevItems.findIndex(
+        (item) => item.id === product.id
+      );
+
+      let newCart;
+
+      if (existingItemIndex > -1) {
+        // Si l'article existe, augmente la quantité
+        newCart = [...prevItems];
+        newCart[existingItemIndex].quantity += 1;
+      } else {
+        // Sinon, ajoute le nouvel article avec une quantité de 1
+        newCart = [
+          ...prevItems,
+          {
+            id: product.id,
+            name: product.name,
+            price: price, // Utilisation du prix sécurisé
+            quantity: 1,
+          },
+        ];
+      }
+      return newCart;
+    });
   };
 
   /**
-   * Retourne le nombre total d'articles (pas de quantités) dans le panier.
-   * C'est la valeur pour le badge de notification.
+   * Met à jour la quantité d'un produit spécifique dans le panier.
+   * @param {number} id - L'ID du produit.
+   * @param {number} quantity - La nouvelle quantité.
    */
-  const getCartCount = () => {
+  const updateQuantity = (id, quantity) => {
+    if (quantity < 1) {
+      // Si la quantité est inférieure à 1, retire l'article
+      removeFromCart(id);
+      return;
+    }
+
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, quantity: quantity } : item
+      )
+    );
+  };
+  /**
+   * Retire complètement un produit du panier.
+   * @param {number} id - L'ID du produit à retirer.
+   */
+
+  const removeFromCart = (id) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };  // ------------------------------------------------------------------ // --- CALCULS OPTIMISÉS (useMemo) // ------------------------------------------------------------------
+  /**
+   * Retourne le nombre total d'articles (somme des quantités) dans le panier.
+   */
+
+  const getCartCount = useMemo(() => {
     // Calcul de la somme des quantités
     return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  }, [cartItems]); // Recalculé uniquement lorsque cartItems change
 
-  // L'objet valeur qui sera fourni aux composants
+  /**
+   * Calcule le montant total du panier.
+   */
+  const cartTotal = useMemo(() => {
+    return cartItems.reduce((total, item) => {
+      // Sécurité : Assurez-vous que le prix est un nombre avant le calcul
+      const price =
+        typeof item.price === "number" && !isNaN(item.price) ? item.price : 0;
+      return total + price * item.quantity;
+    }, 0);
+  }, [cartItems]); // Recalculé uniquement lorsque cartItems change // L'objet valeur qui sera fourni aux composants
+
   const contextValue = {
     cartItems,
     addToCart,
     getCartCount,
-    // Vous pouvez ajouter ici: removeFromCart, clearCart, etc.
+    updateQuantity,
+    removeFromCart,
+    cartTotal,
   };
 
   return (

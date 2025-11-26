@@ -7,7 +7,6 @@
 
 /* --- 2. Styles du Conteneur Global (Shop) --- */
 .shop-container {
-  border: red solid;
   height: fit-content;
   background-color: #ffc1cc;
   padding: 24px;
@@ -51,9 +50,7 @@
   /* Définir des colonnes adaptatives (par exemple, 3 ou 4 colonnes) */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px; /* Espace entre les cartes */
-
   align-items: start;
-  border: green solid;
   align-content: start;
 }
 
@@ -205,14 +202,12 @@
 /* --- Styles pour les informations de comptage --- */
 
 .shop-header {
-  /* Assurez-vous que l'en-tête prend toute la largeur au-dessus du layout */
-  grid-column: 1 / -1;
-  margin-bottom: 20px;
+  max-width: 1400px;
+  margin: 0 auto 20px auto; /* Centrage et marge */
+  padding: 0 20px; /* Le même padding de 20px que .shop-layout */
 }
 
 .total-products-count {
-  /* Style pour le total général, un peu plus discret */
-  border: yellow solid;
   display: flex;
   justify-content: end;
   width: 100%;

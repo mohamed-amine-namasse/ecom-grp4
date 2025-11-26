@@ -2,8 +2,6 @@
 .filter-controls-container {
   width: 100%;
   padding: 15px;
-  border: cyan solid;
-  /* Retirez les bordures/arrondis si vous voulez un look plus épuré comme Nike */
 }
 
 .filter-main-title {

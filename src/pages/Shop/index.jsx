@@ -288,7 +288,6 @@ function Shop() {
     <main className="shop-container">
       <header className="shop-header">
         <h1>Boutique</h1>
-
         {/* Affichage du nombre total de produits  */}
         <p className="total-products-count">
           {totalProducts > 0

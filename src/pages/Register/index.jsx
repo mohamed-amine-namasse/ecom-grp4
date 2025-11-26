@@ -1,129 +1,132 @@
 import React, { useState } from "react";
+import { registerUserPublic } from "../../components/Api";
 import "./style.css";
 
-export default function Register() {
-  const [formData, setFormData] = useState({
+function Register() {
+  const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
+    confirm_password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const validate = () => {
+    if (
+      !form.username ||
+      !form.email ||
+      !form.password ||
+      !form.confirm_password
+    ) {
+      return "Tous les champs sont requis.";
+    }
+    if (!/\S+@\S+\.\S+/.test(form.email)) {
+      return "Email invalide.";
+    }
+    if (form.password.length < 8) {
+      return "Le mot de passe doit contenir au moins 8 caractères.";
+    }
+    if (form.password !== form.confirm_password) {
+      return "Les mots de passe ne correspondent pas.";
+    }
+    return null;
   };
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const v = validate();
+    if (v) {
+      setMessage({ type: "error", text: v });
+      return;
+    }
 
-    console.log("Form submitted:", formData);
+    setLoading(true);
+    setMessage(null);
+    try {
+      const res = await registerUserPublic({
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      });
+
+      const successText = res?.message || "Inscription réussie !";
+      setMessage({ type: "success", text: successText });
+      setForm({ username: "", email: "", password: "", confirm_password: "" });
+    } catch (err) {
+      console.error(err);
+      let text = "Erreur d'inscription";
+      if (err.response) {
+        const data = err.response.data;
+        text =
+          data?.message ||
+          (typeof data === "string" ? data : JSON.stringify(data));
+      } else if (err.request) {
+        text =
+          "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+      } else {
+        text = err.message;
+      }
+      setMessage({ type: "error", text });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="register-page">
+    <div className="form">
       <h1>Inscription</h1>
-      <form onSubmit={handleSubmit}>
+      {message && (
+        <div className={`alert alert-${message.type}`}>{message.text}</div>
+      )}
+      <form onSubmit={onSubmit}>
         <div className="form-group">
-          <label htmlFor="firstName">Prénom :</label>
           <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastName">Nom :</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="username">Nom d'utilisateur :</label>
-          <input
-            type="text"
-            id="username"
             name="username"
-            value={formData.username}
-            onChange={handleChange}
+            placeholder="Nom d'utilisateur"
+            value={form.username}
+            onChange={onChange}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email :</label>
           <input
-            type="email"
-            id="email"
             name="email"
-            value={formData.email}
-            onChange={handleChange}
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={onChange}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Mot de passe :</label>
           <input
-            type="password"
-            id="password"
             name="password"
-            value={formData.password}
-            onChange={handleChange}
+            type="password"
+            placeholder="Mot de passe (min 8 caractères)"
+            value={form.password}
+            onChange={onChange}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="postCode">code postale :</label>
           <input
-            type="text"
-            id="postCode"
-            name="postCode"
-            value={formData.postCode}
-            onChange={handleChange}
+            name="confirm_password"
+            type="password"
+            placeholder="Confirmer le mot de passe"
+            value={form.confirm_password}
+            onChange={onChange}
             required
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="address">address :</label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="houseNumber">numéro :</label>
-          <input
-            type="text"
-            id="houseNumber"
-            name="houseNumber"
-            value={formData.houseNumber}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="city">ville :</label>
-          <input
-            type="text"
-            id="city"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">S'inscrire</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Envoi..." : "S'inscrire"}
+        </button>
       </form>
     </div>
   );
 }
+
+export default Register;

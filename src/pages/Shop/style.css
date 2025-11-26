@@ -7,6 +7,7 @@
 
 /* --- 2. Styles du Conteneur Global (Shop) --- */
 .shop-container {
+  border: red solid;
   height: fit-content;
   background-color: #ffc1cc;
   padding: 24px;
@@ -52,7 +53,7 @@
   gap: 25px; /* Espace entre les cartes */
 
   align-items: start;
-
+  border: green solid;
   align-content: start;
 }
 
@@ -211,9 +212,12 @@
 
 .total-products-count {
   /* Style pour le total général, un peu plus discret */
+  border: yellow solid;
+  display: flex;
+  justify-content: end;
+  width: 100%;
   font-size: 0.9em;
   color: #666;
-  margin-top: 10px;
 }
 
 /* Style pour l'information de comptage des produits filtrés.

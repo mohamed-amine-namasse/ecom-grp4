@@ -353,7 +353,7 @@ function NavScrollExample() {
             <Nav.Link
               as={NavLink}
               to="/cart"
-              className="p-1"
+              className="p-1 text-dark"
               style={{ position: "relative" }}
               onClick={handleCartNavigation}
             >

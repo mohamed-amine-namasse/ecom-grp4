@@ -348,7 +348,7 @@ function NavScrollExample() {
             )}
           </div>
           {/* icons restent visibles en mobile */}
-          <Nav className="nav-icons ms-4 d-flex align-items-center">
+          <Nav className="nav-icons  d-flex align-items-center">
             {/* 1. PANIER (toujours visible) */}
             <Nav.Link
               as={NavLink}

@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
-import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
+import { useCart } from "../../components/CartContext";
 
 // ----------------------------------------------------------------------
 // --- CONFIGURATION WOOCOMMERCE ---
 // ----------------------------------------------------------------------
 
-// ⚠️ IMPORTANT : L'URL complète et les clés API
 const WOOCOMMERCE_FULL_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
@@ -24,7 +23,7 @@ const initialFilters = {
   material: [],
   disponibility: "all",
   priceRange: [0, 500],
-  marque: [], // Doit être []
+  marque: [],
 };
 
 // Fonction utilitaire pour extraire une valeur d'attribut spécifique
@@ -67,10 +66,7 @@ function Shop() {
     materials: [],
   });
 
-  // ✨ ÉTAT SUPPLÉMENTAIRE POUR LE TOTAL (si vous voulez être précis)
-  // Bien que `products.length` donne le nombre de produits *récupérés*,
-  // si vous voulez le total *réel* (incluant ceux non récupérés par défaut),
-  // il faut utiliser l'en-tête X-WP-Total de l'API Woocommerce.
+  //   TOTAL
   const [totalProducts, setTotalProducts] = useState(0);
 
   const handleFilterChange = (filterName, value) => {
@@ -100,9 +96,8 @@ function Shop() {
           );
         }
 
-        // 🌟 NOUVEAU : Récupérer le total à partir des en-têtes
-        // L'en-tête X-WP-Total contient le nombre total d'articles trouvés,
-        // même si seulement 10 (par défaut) sont retournés dans le corps.
+        //  Récupérer le total à partir des en-têtes
+
         const totalCount =
           parseInt(response.headers.get("X-WP-Total"), 10) || 0;
 
@@ -156,12 +151,12 @@ function Shop() {
             attributes: productAttributes,
           };
         });
-        // ⭐️ NOUVEAU : Calcul des Matières uniques
+        // Calcul des Matières uniques
         const allMaterials = formattedProducts
           .map((p) => p.attributes.material)
           .filter((m) => m && String(m).trim() !== "");
-        console.log("Matériaux bruts collectés :", allMaterials); // 👈 AJOUTEZ CECI
-        // ⭐️ ÉTAPE CLÉ: Calcul des marques uniques ⭐️
+        console.log("Matériaux bruts collectés :", allMaterials);
+        // Calcul des marques uniques ⭐️
         const allMarques = formattedProducts
           .map((p) => p.attributes.marque)
           .filter((m) => m && m.trim() !== ""); // Élimine les vides/nulls // Crée un ensemble (Set) pour avoir des valeurs uniques, puis le reconvertit en tableau
@@ -295,19 +290,12 @@ function Shop() {
       <header className="shop-header">
         <h1>Boutique</h1>
 
-        {/* 🚀 NOUVEAU : Affichage du nombre total de produits 🚀 */}
+        {/* Affichage du nombre total de produits  */}
         <p className="total-products-count">
           {totalProducts > 0
             ? `Total des produits: ${totalProducts} `
             : "Aucun produit trouvé sur WooCommerce."}
         </p>
-        {/* Vous pouvez également utiliser products.length si vous êtes certain
-            d'avoir récupéré tous les produits avec l'appel API initial.
-            Dans le cas contraire, totalProducts est plus précis.
-        <p className="total-products-count">
-            Total de {products.length} produits (Affichés : {filteredProducts.length}).
-        </p>
-        */}
       </header>
 
       <div className="shop-layout">

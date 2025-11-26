@@ -9,6 +9,8 @@ import { PiShoppingCartFill } from "react-icons/pi";
 import { BiSolidUserCircle } from "react-icons/bi";
 import { NavLink } from "react-router";
 import { IoSearchOutline } from "react-icons/io5";
+import { PiUserCircleGearFill } from "react-icons/pi";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 import Modal from "react-bootstrap/Modal";
 import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
@@ -111,35 +113,60 @@ function NavScrollExample() {
   const [showSearchModal, setShowSearchModal] = useState(false);
   const inputRef = useRef(null);
 
+  // ÉTATS D'AUTHENTIFICATION SIMULÉE
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Mis à 'true' par défaut pour tester les 3 boutons
+
+  // Fonction pour simuler la déconnexion
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    console.log("Déconnexion simulée.");
+  };
+
+  // Fonction pour simuler la navigation (Connexion ou Profil)
+  const handleLoginOrProfileNavigation = () => {
+    if (isLoggedIn) {
+      console.log("Naviguer vers la page de Profil.");
+    } else {
+      console.log("Naviguer vers la page de Connexion. (Simuler connexion)");
+      // Optionnel: Simuler la connexion après un clic si l'utilisateur est déconnecté
+      // setIsLoggedIn(true);
+    }
+  };
+
+  // Fonction pour simuler la navigation vers le panier
+  const handleCartNavigation = () => {
+    console.log("Naviguer vers la page du Panier.");
+    // Dans une vraie app, vous utiliseriez 'navigate("/cart")'
+  };
+
+  // HOOKS : useCart non disponible, on simule le compte
+  const { getCartCount } = useCart(); // Récupération de la fonction de comptage
+
   // ÉTATS POUR L'AUTOCOMPLÉTION
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Utilisé uniquement pour les erreurs d'API/réseau
-  // État pour s'assurer que l'utilisateur a initié une recherche valide (>= 2 chars) et que l'appel a été fait.
+  const [error, setError] = useState(null);
   const [searchAttempted, setSearchAttempted] = useState(false);
-  const { getCartCount } = useCart(); // Récupération de la fonction de comptage
+
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
-    // N'appelle l'API que si le terme de recherche a au moins 2 caractères
     if (query.length < 2) {
       setSuggestions([]);
       setError(null);
-      setSearchAttempted(false); // Réinitialiser si le terme est trop court
+      setSearchAttempted(false);
       return;
     }
 
     setLoading(true);
     setError(null);
-    setSearchAttempted(true); // Marquer qu'une recherche a été tentée
+    setSearchAttempted(true);
 
     try {
       const fetchedSuggestions = await fetchWooCommerceProducts(query);
       setSuggestions(fetchedSuggestions);
-      // Important : Si l'API est réussie, même avec un tableau vide, l'erreur est null.
       setError(null);
     } catch (e) {
-      // Afficher l'erreur d'API/réseau dans l'interface utilisateur
       setError(
         e.message || "Une erreur inconnue s'est produite lors de la recherche."
       );
@@ -147,14 +174,12 @@ function NavScrollExample() {
       console.error("Erreur gérée lors de la recherche:", e);
     }
 
-    setLoading(false); // S'assurer que le loading est désactivé APRÈS la fin de l'appel
+    setLoading(false);
   }, []);
 
-  // Logique de Debounce: déclenche la recherche seulement après 500ms d'inactivité
+  // Logique de Debounce
   useEffect(() => {
-    // Annuler la recherche si l'utilisateur efface le terme
     if (searchTerm.length < 2) {
-      // Important: Nettoyer les anciens résultats et erreurs
       setSuggestions([]);
       setError(null);
       setLoading(false);
@@ -166,7 +191,6 @@ function NavScrollExample() {
       handleFetchSuggestions(searchTerm);
     }, 500);
 
-    // Nettoyage: annule l'appel précédent si l'utilisateur continue de taper
     return () => clearTimeout(timeoutId);
   }, [searchTerm, handleFetchSuggestions]);
 
@@ -178,29 +202,25 @@ function NavScrollExample() {
   // Gestionnaire de clic sur une suggestion (simule la navigation)
   const handleSuggestionClick = (link) => {
     console.log("Naviguer vers:", link);
-    // Dans une vraie app, vous utiliseriez 'navigate(link)' de react-router-dom
-
     setSearchTerm("");
     setSuggestions([]);
-    setShowSearchModal(false); // Ferme la modale mobile
+    setShowSearchModal(false);
   };
 
   const handleSearchClick = (e) => {
-    // Si mobile (< 992px), ouvre la modale
     if (window.innerWidth < 992) {
       setShowSearchModal(true);
     } else {
-      // Sur desktop, focus l'input
       inputRef.current?.focus();
     }
   };
 
   const handleModalClose = () => {
     setShowSearchModal(false);
-    setSearchTerm(""); // Réinitialise la recherche en fermant
+    setSearchTerm("");
     setSuggestions([]);
     setError(null);
-    setLoading(false); // S'assurer que tout est bien réinitialisé
+    setLoading(false);
     setSearchAttempted(false);
   };
 
@@ -208,8 +228,6 @@ function NavScrollExample() {
   // --- RENDU DES SUGGESTIONS (LOGIQUE CENTRALISÉE) ---
   // ----------------------------------------------------------------------
 
-  // Nouvelle variable pour déterminer s'il faut afficher le conteneur de suggestions.
-  // Afficher si : Terme >= 2 ET (Chargement en cours, ou Erreur, ou Tentative faite ET non-loading).
   const shouldShowSuggestionsContainer =
     searchTerm.length >= 2 && (loading || error || searchAttempted);
 
@@ -234,14 +252,12 @@ function NavScrollExample() {
         </ListGroup.Item>
       );
     } else if (!loading && !error && suggestions.length === 0) {
-      // CAS CRITIQUE : ZÉRO RÉSULTAT trouvé APRÈS UNE RECHERCHE TERMINÉE (non-loading, non-error)
       content = (
         <ListGroup.Item className="text-muted text-center">
           Aucun produit trouvé pour "{searchTerm}".
         </ListGroup.Item>
       );
     } else {
-      // Affichage des résultats
       content = suggestions.map((product) => (
         <ListGroup.Item
           key={product.id}
@@ -253,12 +269,8 @@ function NavScrollExample() {
       ));
     }
 
-    // Le style de ListGroup diffère légèrement (pas de 'mt-3' sur desktop par exemple)
     const listGroupClass = isMobile ? "mt-3" : "";
 
-    // Si nous sommes dans l'état "suggestions.length === 0", on retourne le ListGroup avec le message.
-    // Sinon, si suggestions.length > 0, on retourne le ListGroup avec les résultats.
-    // Le composant ListGroup doit toujours être retourné si shouldShowSuggestionsContainer est true.
     return <ListGroup className={listGroupClass}>{content}</ListGroup>;
   };
 
@@ -284,15 +296,17 @@ function NavScrollExample() {
               <Nav.Link as={NavLink} to="/shop">
                 Boutique
               </Nav.Link>
-              <Nav.Link as={NavLink} to="/register">
-                Inscription
-              </Nav.Link>
+              {/* CONDITIONNEL : AFFICHER INSCRIPTION SEULEMENT SI NON CONNECTÉ */}
+              {!isLoggedIn && (
+                <Nav.Link as={NavLink} to="/register">
+                  Inscription
+                </Nav.Link>
+              )}
             </Nav>
           </Navbar.Collapse>
           {/* groupe de recherche */}
-          <div className="search-container">
+          <div className="search-container" style={{ position: "relative" }}>
             {" "}
-            {/* J'ai supprimé 'me-0 ms-auto' ici, car votre CSS desktop gère l'espacement */}
             <Form className="d-flex search-group align-items-center ">
               <Button
                 variant="outline-dark"
@@ -300,6 +314,7 @@ function NavScrollExample() {
                 aria-label="Recherche"
                 onClick={handleSearchClick}
               >
+                {/* Icône de recherche corrigée */}
                 <IoSearchOutline size={25} />
               </Button>
               <Form.Control
@@ -308,37 +323,96 @@ function NavScrollExample() {
                 type="search"
                 placeholder="Rechercher un article"
                 aria-label="Search"
-                value={searchTerm} // Liaison de la valeur
-                onChange={handleSearchTermChange} // Gestionnaire de changement
+                value={searchTerm}
+                onChange={handleSearchTermChange}
               />
             </Form>
             {/* SUGGESTIONS DESKTOP */}
             {window.innerWidth >= 992 && shouldShowSuggestionsContainer && (
-              <div className="suggestions-list">
+              <div
+                className="suggestions-list"
+                // Styles ajoutés pour simuler le CSS du fichier externe et positionner la liste
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  zIndex: 10,
+                  width: "100%",
+                  minWidth: "250px",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                  marginTop: "0.25rem",
+                }}
+              >
                 {renderSuggestionsContent(false)}
               </div>
             )}
           </div>
           {/* icons restent visibles en mobile */}
-          <Nav className="nav-icons">
-            {/*  conteneur pour positionner le badge */}
-
-            <Nav.Link as={NavLink} to="/cart" className="p-1">
+          <Nav className="nav-icons ms-4 d-flex align-items-center">
+            {/* 1. PANIER (toujours visible) */}
+            <Nav.Link
+              as={NavLink}
+              to="/cart"
+              className="p-1"
+              style={{ position: "relative" }}
+              onClick={handleCartNavigation}
+            >
+              {/* Icône de panier corrigée */}
               <PiShoppingCartFill size={30} />
               {/* Badge de notification */}
               {getCartCount > 0 && (
                 <Badge
                   bg="danger"
-                  pill // Style rond // Positionnement absolu : petite taille, haut/droite
-                  className="position-absolute top-90 start-70 translate-middle"
+                  pill
+                  className="position-absolute top-0 start-100 translate-middle"
                 >
                   {getCartCount}
                 </Badge>
               )}
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/login" className="p-1">
-              <BiSolidUserCircle size={30} />
-            </Nav.Link>
+
+            {isLoggedIn ? (
+              // --- Utilisateur CONNECTÉ : PROFIL + DÉCONNEXION ---
+              <>
+                {/* 2. PROFIL (Lien vers /profile) */}
+                <Nav.Link
+                  as={NavLink}
+                  to="/profile"
+                  className="p-1 text-dark"
+                  aria-label="Profil utilisateur"
+                  title="Profil"
+                  onClick={handleLoginOrProfileNavigation}
+                >
+                  {/* Icône de profil corrigée */}
+                  <PiUserCircleGearFill size={30} />
+                </Nav.Link>
+                {/* 3. DÉCONNEXION (Action) */}
+                <Button
+                  variant="link"
+                  onClick={handleLogout}
+                  className="p-1 text-dark"
+                  aria-label="Déconnexion"
+                  title="Déconnexion"
+                >
+                  {/* Icône de déconnexion corrigée, stylisée en rouge */}
+                  <RiLogoutBoxRLine size={30} />
+                </Button>
+              </>
+            ) : (
+              // --- Utilisateur DÉCONNECTÉ : CONNEXION ---
+              // 2. CONNEXION (Lien vers /login)
+              <Nav.Link
+                as={NavLink}
+                to="/login"
+                className="p-1 text-dark"
+                aria-label="Connexion ou inscription"
+                title="Connexion"
+                onClick={handleLoginOrProfileNavigation}
+              >
+                {/* Icône de connexion corrigée */}
+                <BiSolidUserCircle size={30} />
+              </Nav.Link>
+            )}
           </Nav>
         </Container>
 
@@ -366,8 +440,8 @@ function NavScrollExample() {
                 type="search"
                 placeholder="Rechercher un article"
                 aria-label="Search"
-                value={searchTerm} // Liaison de la valeur
-                onChange={handleSearchTermChange} // Gestionnaire de changement
+                value={searchTerm}
+                onChange={handleSearchTermChange}
               />
             </Form>
 

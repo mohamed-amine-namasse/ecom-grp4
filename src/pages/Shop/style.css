@@ -209,6 +209,49 @@
   font-weight: bold;
 }
 
+/* --- Styles pour les informations de comptage --- */
+
+.shop-header {
+  /* Assurez-vous que l'en-tête prend toute la largeur au-dessus du layout */
+  grid-column: 1 / -1;
+  margin-bottom: 20px;
+}
+
+.total-products-count {
+  /* Style pour le total général, un peu plus discret */
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 10px;
+}
+
+/* Style pour l'information de comptage des produits filtrés.
+  Ceci est un ajout dans la section .products-grid pour la clarté.
+*/
+.products-grid {
+  /* La section de la grille peut avoir un petit espace en haut */
+  padding-top: 10px;
+}
+
+.filtered-count-info {
+  /* Doit s'étendre sur toute la largeur de la grille */
+  grid-column: 1 / -1;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.no-results {
+  /* Assurez-vous que le message d'absence de résultats prend toute la colonne */
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+  color: #cc0000;
+  font-style: italic;
+}
+
 /* --- 11. Responsive (Médiats Queries) --- */
 
 @media (max-width: 992px) {

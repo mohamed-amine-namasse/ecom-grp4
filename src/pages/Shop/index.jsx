@@ -14,7 +14,7 @@ const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
 const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 
 // Construction de l'URL API
-const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}&per_page=100`;
 
 // Définition des filtres initiaux (avec un prix max par défaut de 500)
 const initialFilters = {
@@ -66,6 +66,13 @@ function Shop() {
     sizes: [],
     materials: [],
   });
+
+  // ✨ ÉTAT SUPPLÉMENTAIRE POUR LE TOTAL (si vous voulez être précis)
+  // Bien que `products.length` donne le nombre de produits *récupérés*,
+  // si vous voulez le total *réel* (incluant ceux non récupérés par défaut),
+  // il faut utiliser l'en-tête X-WP-Total de l'API Woocommerce.
+  const [totalProducts, setTotalProducts] = useState(0);
+
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -93,14 +100,16 @@ function Shop() {
           );
         }
 
+        // 🌟 NOUVEAU : Récupérer le total à partir des en-têtes
+        // L'en-tête X-WP-Total contient le nombre total d'articles trouvés,
+        // même si seulement 10 (par défaut) sont retournés dans le corps.
+        const totalCount =
+          parseInt(response.headers.get("X-WP-Total"), 10) || 0;
+
         const data = await response.json();
 
         // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
         const formattedProducts = data.map((product) => {
-          console.log(
-            "Attributs du Produit ID " + product.id + ":",
-            product.attributes
-          );
           const price = product.sale_price
             ? parseFloat(product.sale_price)
             : parseFloat(product.regular_price);
@@ -179,6 +188,8 @@ function Shop() {
         const uniqueMaterials = Array.from(new Set(allMaterials)).sort();
 
         setProducts(formattedProducts);
+        // 🌟 NOUVEAU : Mettre à jour le nombre total
+        setTotalProducts(totalCount);
         // ✅ Mise à jour de l'état des options dynamiques
         setShopOptions((prev) => ({
           ...prev,
@@ -283,7 +294,20 @@ function Shop() {
     <main className="shop-container">
       <header className="shop-header">
         <h1>Boutique</h1>
-        <p className="shop-sub">Découvrez nos produits sélectionnés</p>
+
+        {/* 🚀 NOUVEAU : Affichage du nombre total de produits 🚀 */}
+        <p className="total-products-count">
+          {totalProducts > 0
+            ? `Total des produits: ${totalProducts} `
+            : "Aucun produit trouvé sur WooCommerce."}
+        </p>
+        {/* Vous pouvez également utiliser products.length si vous êtes certain
+            d'avoir récupéré tous les produits avec l'appel API initial.
+            Dans le cas contraire, totalProducts est plus précis.
+        <p className="total-products-count">
+            Total de {products.length} produits (Affichés : {filteredProducts.length}).
+        </p>
+        */}
       </header>
 
       <div className="shop-layout">
@@ -299,6 +323,13 @@ function Shop() {
         </aside>
 
         <section className="products-grid" aria-live="polite">
+          {/* Ligne d'info sur les produits filtrés (optionnel) */}
+          <p className="filtered-count-info">
+            {filteredProducts.length} produit
+            {filteredProducts.length > 1 ? "s" : ""} correspondent à vos
+            filtres.
+          </p>
+
           {filteredProducts.length === 0 && (
             <p className="no-results">
               Aucun produit ne correspond à vos critères de recherche.

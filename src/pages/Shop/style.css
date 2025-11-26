@@ -51,10 +51,8 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 25px; /* Espace entre les cartes */
 
-  /* ⭐️ CORRECTION 1 : Empêche l'étirement des éléments individuels ⭐️ */
   align-items: start;
 
-  /* ⭐️ CORRECTION FINALE : Empêche l'étirement des LIGNES de la grille ⭐️ */
   align-content: start;
 }
 
@@ -66,8 +64,6 @@
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
   position: relative;
-
-  /* ⭐️ ESSENTIEL pour l'alignement vertical dans la grille ⭐️ */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -135,7 +131,6 @@
 
 .product-desc {
   flex-grow: 1; /* Il prend l'espace restant pour pousser le footer */
-  /* ⭐️ CORRECTION : Ajouter la marge sur l'élément qui peut être absent ⭐️ */
   margin: 0 0 10px 0; /* Marge uniquement en bas pour séparer le footer */
   padding: 0;
   line-height: 1.4;
@@ -181,12 +176,9 @@
   /* Rend le bouton gris (comme fait précédemment) */
   background: #ccc;
   opacity: 0.8;
-
-  /* ⭐️ CORRECTION PRINCIPALE : Définit le curseur sur "non autorisé" ⭐️ */
   cursor: not-allowed;
 }
 
-/* Assurez-vous d'annuler l'effet hover lorsque désactivé */
 .btn-add:disabled:hover {
   background: #ccc;
   /* Annule le hover du style normal */
@@ -244,7 +236,6 @@
 }
 
 .no-results {
-  /* Assurez-vous que le message d'absence de résultats prend toute la colonne */
   grid-column: 1 / -1;
   text-align: center;
   padding: 40px 0;

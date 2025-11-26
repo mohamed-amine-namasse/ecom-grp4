@@ -109,7 +109,7 @@ function Shop() {
             ? parseFloat(product.sale_price)
             : parseFloat(product.regular_price);
 
-          // ✅ NOUVEAU : Le prix régulier (pour l'affichage barré si en promo)
+          // Le prix régulier (pour l'affichage barré si en promo)
           const regularPrice = parseFloat(product.regular_price);
 
           const desc = product.short_description
@@ -143,7 +143,6 @@ function Shop() {
             id: product.id,
             name: product.name,
             price: price || 0,
-            // ✅ NOUVEAU : Stockage du prix régulier
             regularPrice: regularPrice || 0,
             desc: desc,
             image: imageUrl,
@@ -162,7 +161,7 @@ function Shop() {
           .filter((m) => m && m.trim() !== ""); // Élimine les vides/nulls // Crée un ensemble (Set) pour avoir des valeurs uniques, puis le reconvertit en tableau
 
         const uniqueMarques = Array.from(new Set(allMarques)).sort();
-        // 🚀 NOUVEAU : Calcul des tailles uniques 🚀
+        // Calcul des tailles uniques 🚀
         const allSizes = formattedProducts
           .map((p) => p.attributes.size)
           .flat() // Important : aplatir le tableau de tableaux de tailles
@@ -183,9 +182,9 @@ function Shop() {
         const uniqueMaterials = Array.from(new Set(allMaterials)).sort();
 
         setProducts(formattedProducts);
-        // 🌟 NOUVEAU : Mettre à jour le nombre total
+        //  Mettre à jour le nombre total
         setTotalProducts(totalCount);
-        // ✅ Mise à jour de l'état des options dynamiques
+        // Mise à jour de l'état des options dynamiques
         setShopOptions((prev) => ({
           ...prev,
           marques: uniqueMarques,
@@ -347,7 +346,7 @@ function Shop() {
                   )}
 
                   <div className="product-footer">
-                    {/* ✅ NOUVEAU : Affichage du prix régulier barré si une promotion est active */}
+                    {/* Affichage du prix régulier barré si une promotion est active */}
                     <div className="flex">
                       {prod.price < prod.regularPrice && (
                         <span className="product-price old-price">

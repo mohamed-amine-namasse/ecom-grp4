@@ -118,7 +118,7 @@ function NavScrollExample() {
   const [error, setError] = useState(null); // Utilisé uniquement pour les erreurs d'API/réseau
   // État pour s'assurer que l'utilisateur a initié une recherche valide (>= 2 chars) et que l'appel a été fait.
   const [searchAttempted, setSearchAttempted] = useState(false);
-  const { getCartCount } = useCart(); // ⭐️ Récupération de la fonction de comptage
+  const { getCartCount } = useCart(); // Récupération de la fonction de comptage
   const cartCount = getCartCount(); // Calcul du nombre d'articles
   // Fonction pour appeler l'API (débounced)
   const handleFetchSuggestions = useCallback(async (query) => {
@@ -322,9 +322,9 @@ function NavScrollExample() {
           </div>
           {/* icons restent visibles en mobile */}
           <Nav className="nav-icons">
-            {/* ⭐️ MODIFICATION : Ajout d'un conteneur pour positionner le badge */}
+            {/*  conteneur pour positionner le badge */}
 
-            <Nav.Link href="#cart" className="p-1 position-relative">
+            <Nav.Link as={NavLink} to="/cart" className="p-1">
               <PiShoppingCartFill size={30} />
               {/* Badge de notification */}
               {cartCount > 0 && (

@@ -6,7 +6,7 @@ import "./style.css";
 const formatPrice = (p) =>
   p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
-function CartPage() {
+function Cart() {
   // Récupération des données et fonctions du contexte
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
 
@@ -110,4 +110,4 @@ function CartPage() {
   );
 }
 
-export default CartPage;
+export default Cart;

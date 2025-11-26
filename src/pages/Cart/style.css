@@ -19,8 +19,8 @@
 /* Contenu principal (liste d'articles + récapitulatif) */
 .cart-content {
   display: flex;
+  flex-direction: column;
   gap: 30px;
-  align-items: flex-start; /* Alignement en haut pour le sticky summary */
 }
 
 .cart-items-list {
@@ -95,13 +95,11 @@
 
 /* --- Cart Summary (Récapitulatif) --- */
 .cart-summary {
-  flex-shrink: 0;
-  width: 300px;
   padding: 20px;
   border: 1px solid #ddd;
-  background-color: #f7f7f7;
-  position: sticky; /* Reste visible lors du défilement */
-  top: 20px; /* Distance du haut */
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%;
 }
 
 .cart-summary h2 {
@@ -136,4 +134,73 @@
 
 .btn-checkout:hover {
   background-color: #0056b3;
+}
+
+/* Point de rupture pour Tablette/Desktop (ex: 992px) */
+@media (min-width: 992px) {
+  .cart-content {
+    flex-direction: row; /* Desktop : deux colonnes */
+    align-items: flex-start; /* Aligne en haut */
+  }
+
+  .cart-items-list {
+    /* Prend plus d'espace sur desktop */
+    flex: 3;
+  }
+
+  .cart-summary {
+    /* Prend moins d'espace, mais fixe */
+    flex: 1;
+    min-width: 300px;
+    position: sticky; /* Reste visible au défilement (optionnel) */
+    top: 20px;
+  }
+}
+
+/* ====================================================================== */
+/* 2. Style des cartes d'articles (cart-item-card) */
+/* ====================================================================== */
+
+.cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cart-item-card {
+  display: flex;
+  flex-wrap: wrap; /* Permet aux éléments de passer à la ligne sur mobile */
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.item-info {
+  /* Sur mobile, prend toute la largeur */
+  flex-basis: 100%;
+  margin-bottom: 10px;
+}
+
+.item-name {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+/* Responsive pour les éléments internes de la carte */
+@media (min-width: 768px) {
+  .cart-item-card {
+    flex-wrap: nowrap; /* Plus de passage à la ligne sur desktop */
+  }
+  .item-info {
+    flex-basis: 30%; /* Laisse de la place pour les contrôles */
+    margin-bottom: 0;
+  }
+  .item-subtotal {
+    min-width: 120px;
+    text-align: right;
+  }
 }

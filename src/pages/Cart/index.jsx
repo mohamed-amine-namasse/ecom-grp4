@@ -1,5 +1,5 @@
 import React from "react";
-import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
+import { useCart } from "../../components/CartContext";
 import "./style.css";
 
 // Fonction pour formater le prix en Euro (réutilisée de votre composant Shop)

@@ -325,65 +325,65 @@ function Shop() {
 
           {filteredProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
-
+            const productLink = `/produit/${prod.id}`; // Définir le lien une seule fois
             return (
-              <Link
-                to={`/produit/${prod.id}`}
-                key={prod.id}
-                className="product-card-link"
-              >
-                <article className="product-card">
-                  <div className="product-media">
+              <article className="product-card">
+                <div className="product-media" key={prod.id}>
+                  <Link to={productLink} className="product-image-link">
                     <img src={prod.image} alt={prod.name} />
-                    {/* Affichage du badge si rupture de stock */}
-                    {isOutOfStock && (
-                      <div className="product-badge out-of-stock">
-                        Rupture de Stock
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="product-body">
-                    <h3 className="product-title">{prod.name}</h3>
-
-                    {prod.desc && prod.desc.trim() && (
-                      <p className="product-desc">{prod.desc}</p>
-                    )}
-
-                    <div className="product-footer">
-                      {/* Affichage du prix régulier barré si une promotion est active */}
-                      <div className="flex">
-                        {prod.price < prod.regularPrice && (
-                          <span className="product-price old-price">
-                            {formatPrice(prod.regularPrice)}
-                          </span>
-                        )}
-
-                        {/* Prix actuel (prix de vente ou prix régulier) */}
-                        <span className="product-price current-price">
-                          {formatPrice(prod.price)}
-                        </span>
-                      </div>
-
-                      <button
-                        className="btn-add"
-                        type="button"
-                        // Désactivation du bouton si l'article est hors stock
-                        disabled={isOutOfStock}
-                        onClick={() =>
-                          addToCart({
-                            id: prod.id,
-                            name: prod.name,
-                            price: prod.price,
-                          })
-                        }
-                      >
-                        Ajouter
-                      </button>
+                  </Link>
+                  {/* Affichage du badge si rupture de stock */}
+                  {isOutOfStock && (
+                    <div className="product-badge out-of-stock">
+                      Rupture de Stock
                     </div>
+                  )}
+                </div>
+
+                <div className="product-body">
+                  <h3 className="product-title">
+                    <Link className="text-dark " to={productLink}>
+                      {prod.name}
+                    </Link>
+                  </h3>
+
+                  {prod.desc && prod.desc.trim() && (
+                    <p className="product-desc">{prod.desc}</p>
+                  )}
+
+                  <div className="product-footer">
+                    {/* Affichage du prix régulier barré si une promotion est active */}
+                    <div className="flex">
+                      {prod.price < prod.regularPrice && (
+                        <span className="product-price old-price">
+                          {formatPrice(prod.regularPrice)}
+                        </span>
+                      )}
+
+                      {/* Prix actuel (prix de vente ou prix régulier) */}
+                      <span className="product-price current-price">
+                        {formatPrice(prod.price)}
+                      </span>
+                    </div>
+
+                    <button
+                      className="btn-add"
+                      type="button"
+                      // Désactivation du bouton si l'article est hors stock
+                      disabled={isOutOfStock}
+                      onClick={() =>
+                        addToCart({
+                          id: prod.id,
+                          name: prod.name,
+                          price: prod.price,
+                        })
+                      }
+                    >
+                      Ajouter
+                    </button>
                   </div>
-                </article>
-              </Link>
+                </div>
+              </article>
             );
           })}
         </section>

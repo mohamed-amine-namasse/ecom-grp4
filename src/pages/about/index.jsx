@@ -35,7 +35,9 @@ function About() {
           </p>
 
           <div className="actions">
-            <a href="/products" className="btn">Découvrir les crampons</a>
+            <a href="/products" className="btn">
+              Découvrir les crampons
+            </a>
           </div>
         </div>
       </section>

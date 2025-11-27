@@ -44,7 +44,12 @@ function Contact() {
 
         <label>
           Message
-          <textarea name="message" value={form.message} onChange={handleChange} rows="5" />
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            rows="5"
+          />
         </label>
 
         <div className="actions">

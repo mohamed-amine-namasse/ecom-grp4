@@ -1,4 +1,3 @@
-
 :root {
   --pink-bg: #ffc1cc;
   --card: #ffffff;
@@ -15,16 +14,18 @@ body,
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* fond site rose uni et centrage vertical/horizontal */
 .contact-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
+  background: var(--pink-bg);
   padding: 24px;
   box-sizing: border-box;
 }
 
+/* carte centrée, contenu aligné à gauche pour les labels */
 .contact-card {
   width: 100%;
   max-width: 520px;
@@ -33,19 +34,27 @@ body,
   padding: 20px;
   box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
 }
 
 .contact-card h1 {
   margin: 0 0 12px 0;
   color: var(--text);
   font-size: 1.4rem;
+  text-align: center;
 }
 
+/* labels et champs pleine largeur */
 .contact-card label {
   display: block;
   font-size: 0.9rem;
   color: var(--muted);
   margin-bottom: 10px;
+  width: 100%;
 }
 
 .contact-card input,
@@ -60,13 +69,17 @@ body,
   color: var(--text);
 }
 
+/* actions et boutons centrés */
 .actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 12px;
+  width: 100%;
+  gap: 8px;
 }
 
-.actions button {
+.actions button,
+.btn {
   background: var(--accent);
   color: white;
   border: none;
@@ -76,10 +89,12 @@ body,
   font-weight: 600;
 }
 
+/* status centré */
 .status {
   margin-top: 12px;
   color: var(--muted);
   font-size: 0.95rem;
+  text-align: center;
 }
 
 /* responsive */

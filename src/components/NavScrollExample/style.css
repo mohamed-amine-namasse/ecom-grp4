@@ -1,0 +1,228 @@
+/* Navbar component styles */
+
+/* active link */
+.nav-link.active {
+  font-weight: 700;
+}
+
+/* basic search-group and button styles */
+.search-group {
+  border: 1px solid #ced4da; /* bordure extérieure */
+  border-radius: 8px;
+  overflow: hidden; /* empêche les éléments internes de dépasser les coins arrondis */
+  background: #fff;
+  padding: 2px; /* petit padding autour */
+}
+
+.search-group .btn-search {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none !important; /* supprime la bordure du bouton si outline variant l'ajoute */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* ou utiliser une couleur si souhaitée */
+  color: inherit;
+}
+
+.search-group .form-control {
+  border: none; /* masquer la bordure native de l'input */
+  box-shadow: none;
+  border-radius: 0;
+  height: 44px; /* aligner la hauteur sur le bouton */
+}
+
+.search-group .form-control:focus,
+.search-group .btn-search:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* icons block default */
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Styles pour le conteneur de recherche pour gérer la position relative */
+.search-container {
+  /* Position relative est nécessaire pour positionner la liste de suggestions */
+  position: relative;
+}
+
+/* Styles pour la liste de suggestions d'autocomplétion (desktop) */
+.suggestions-list {
+  /* Positionne la liste juste en dessous du champ de recherche */
+  position: absolute;
+  top: 100%;
+
+  /* NOUVEAU : Aligner au bord GAUCHE du conteneur parent (.search-container) */
+  left: 0;
+
+  /* Assure que la liste est au-dessus des autres éléments de la nav */
+  z-index: 1050;
+  background-color: white;
+  /* Ombre pour un effet de pop-up */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  margin-top: 2px;
+  /* Limite la hauteur et rend le contenu défilable */
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Mobile: burger left, brand next, then loupe + icons to the right;
+          collapse of links will open full-width under the bar.
+          Also hide the search input so only the loupe button remains. */
+@media (max-width: 991.98px) {
+  .navbar .container-fluid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* toggler visually first */
+  .navbar-toggler {
+    margin-right: 0.5rem;
+  }
+
+  /* search-group (only loupe visible) */
+  .search-container {
+    /* Utilisez flex pour le conteneur afin de regrouper la loupe et les icônes à droite */
+    display: flex;
+    align-items: center;
+    /* Pousser tout le groupe loupe + icons vers la droite */
+    margin-left: auto;
+  }
+
+  .search-group {
+    border: none;
+    background: transparent;
+    /* Retire le flex-grow et le margin-left: auto qui éloignait la loupe */
+    flex-grow: 0;
+    margin-left: 0;
+  }
+
+  /* hide input explicitly (in case bootstrap class missing) */
+  .search-group .form-control {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .search-group .btn-search {
+    width: 36px;
+    height: 36px;
+    background: transparent !important;
+    color: black !important;
+  }
+
+  /* icons stay inline and to the right of the search loupe */
+  .nav-icons {
+    margin-left: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.5rem;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+
+  .nav-icons .nav,
+  .nav-icons .nav > .nav-link {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* collapse with links appears below bar and is full width */
+  #nav-links-collapse {
+    order: 2;
+    width: 100%;
+    flex-basis: 100%;
+    padding-top: 0.5rem;
+    /* Pas de overflow/max-height ici, le comportement par défaut de Bootstrap est souhaité */
+    display: none; /* Bootstrap will toggle .show */
+  }
+
+  #nav-links-collapse.show {
+    display: block;
+  }
+
+  #nav-links-collapse .nav {
+    /* S'assurer que .nav n'a pas de max-height ni d'overflow qui causerait le scroll interne */
+    flex-direction: column !important;
+    background: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 6px 0;
+    overflow-y: visible !important; /* S'assurer qu'il n'y a pas de scroll interne */
+  }
+
+  #nav-links-collapse .nav-link {
+    padding: 10px 16px;
+  }
+}
+
+/* safety: increase specificity if bootstrap overrides */
+@media (max-width: 991.98px) {
+  .navbar .container-fluid > .nav-icons,
+  .navbar .container-fluid > .nav-icons .nav {
+    display: flex !important;
+    flex-direction: row !important;
+  }
+}
+
+/* ----------------------------
+          DESKTOP: equal-width layout
+          ---------------------------- */
+@media (min-width: 992px) {
+  /* give each of the four main blocks the same flex weight */
+  .navbar .container-fluid > .navbar-brand,
+  .navbar .container-fluid > #nav-links-collapse,
+  .navbar .container-fluid > .search-container,
+  .navbar .container-fluid > .nav-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* center content in each column */
+    min-width: 0;
+  }
+
+  /* Links: keep them inline and centered within their column */
+  #nav-links-collapse .nav {
+    display: inline-flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  /* Search Bar (Form) width adjustment and centering */
+  .search-group {
+    /* Définir une largeur fixe pour la barre de recherche visible */
+    width: 350px;
+    justify-content: center;
+  }
+
+  /* L'input desktop doit maintenant prendre une largeur fixe pour un look propre */
+  .search-group .form-control {
+    width: 300px;
+  }
+
+  /* Suggestion List width to match the search bar */
+  .suggestions-list {
+    width: 350px; /* Aligner la largeur sur .search-group */
+  }
+
+  /* Icons: center icons inside their column */
+  .nav-icons {
+    justify-content: center;
+    margin-left: 80px;
+  }
+
+  /* ensure collapse visible on desktop */
+  #nav-links-collapse {
+    display: flex !important;
+  }
+}

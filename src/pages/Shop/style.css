@@ -1,0 +1,273 @@
+/* --- 1. Réinitialisation Globale --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- 2. Styles du Conteneur Global (Shop) --- */
+.shop-container {
+  height: fit-content;
+  background-color: #ffc1cc;
+  padding: 24px;
+  color: #222;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial;
+}
+
+.shop-header h1 {
+  margin: 0 0 6px 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.shop-sub {
+  margin: 0 0 18px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* --- 3. Mise en Page Globale de la Boutique (Layout) --- */
+.shop-layout {
+  display: flex;
+  gap: 30px; /* Espace entre les deux colonnes */
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1400px; /* Limiter la largeur maximale de la page */
+}
+
+/* --- 4. Barre Latérale (shop-sidebar) --- */
+.shop-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  padding-right: 20px;
+}
+
+/* --- 5. Grille des Produits (products-grid) --- */
+.products-grid {
+  flex-grow: 1;
+  display: grid;
+  /* Définir des colonnes adaptatives (par exemple, 3 ou 4 colonnes) */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px; /* Espace entre les cartes */
+  align-items: start;
+  align-content: start;
+}
+
+/* --- 6. Carte Produit Individuelle (product-card) --- */
+.product-card {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: box-shadow 0.2s;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #0d6efd;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+/* --- Styles spécifiques au badge de Rupture de Stock --- */
+.product-badge.out-of-stock {
+  /* Couleur de fond rouge vif */
+  background: #dc3545; /* Couleur rouge de Bootstrap (danger) */
+  /* Couleur du texte blanc */
+  color: #fff;
+  /* Optionnel : rendre le badge plus visible (légère ombre) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.product-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* --- 7. Corps de la Carte (product-body) --- */
+.product-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Prend l'espace vertical restant dans la carte */
+}
+
+/* --- 8. Titre du Produit --- */
+.product-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111;
+}
+
+/* --- 9. Description du Produit --- */
+
+.product-desc {
+  flex-grow: 1; /* Il prend l'espace restant pour pousser le footer */
+  margin: 0 0 10px 0; /* Marge uniquement en bas pour séparer le footer */
+  padding: 0;
+  line-height: 1.4;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* --- 10. Pied de Page (Footer) --- */
+.product-footer {
+  /* Pousse le footer au bas du product-body */
+  margin-top: auto;
+  padding-top: 10px; /* Utiliser padding pour éviter l'effondrement des marges */
+  border-top: 1px solid #f0f0f0; /* Une ligne de séparation visuelle pour le contraste */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.flex {
+  display: flex;
+  gap: 10px;
+}
+.product-price {
+  font-weight: 700;
+  color: #111;
+}
+
+.btn-add {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-add:hover {
+  background: #095bd1;
+}
+
+/* --- Styles pour les boutons désactivés --- */
+.btn-add:disabled {
+  /* Rend le bouton gris (comme fait précédemment) */
+  background: #ccc;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.btn-add:disabled:hover {
+  background: #ccc;
+  /* Annule le hover du style normal */
+}
+
+/* Style de l'ancien prix barré */
+.product-price.old-price {
+  /* Barre le texte */
+  text-decoration: line-through;
+  /* Rendre le texte plus discret */
+  color: #999;
+  font-size: 1.1em;
+  font-weight: normal;
+}
+
+/* Assurez-vous que le prix actuel reste en évidence */
+.product-price.current-price {
+  color: #333;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+/* --- Styles pour les informations de comptage --- */
+
+.shop-header {
+  max-width: 1400px;
+  margin: 0 auto 20px auto; /* Centrage et marge */
+  padding: 0 20px; /* Le même padding de 20px que .shop-layout */
+}
+
+.total-products-count {
+  display: flex;
+  justify-content: end;
+  width: 100%;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Style pour l'information de comptage des produits filtrés.
+  Ceci est un ajout dans la section .products-grid pour la clarté.
+*/
+.products-grid {
+  /* La section de la grille peut avoir un petit espace en haut */
+  padding-top: 10px;
+}
+
+.filtered-count-info {
+  /* Doit s'étendre sur toute la largeur de la grille */
+  grid-column: 1 / -1;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
+  color: #cc0000;
+  font-style: italic;
+}
+
+/* --- 11. Responsive (Médiats Queries) --- */
+
+@media (max-width: 992px) {
+  /* 1. Empiler les éléments (Filtres au-dessus des produits) */
+  .shop-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* 2. La barre latérale prend toute la largeur */
+  .shop-sidebar {
+    width: 100%;
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+
+  /* 3. La grille des produits s'adapte à 2 colonnes sur tablette */
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* 4. Sur très petit écran, on passe à 1 seule colonne */
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}

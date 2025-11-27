@@ -1,0 +1,41 @@
+/* Styles CSS pour le Footer (Footer.jsx) */
+
+.footer-container {
+  /* Positionnement et apparence */
+  /*margin-top: auto; /* Pousse le footer vers le bas si .App est un flex-column */
+  padding: 30px 0px;
+  background-color: white; /* Couleur de fond sombre */
+  color: black; /* Texte blanc/gris clair */
+}
+
+.footer-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  font-size: 0.9rem;
+}
+
+.footer-content p {
+  margin: 5px 0;
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+
+nav.links {
+  display: flex;
+  flex-direction: column;
+}
+.footer-container a {
+  color: black;
+  text-decoration: none;
+}
+
+.hr-milieu {
+  margin-left: 25%;
+  margin-right: 25%;
+  border: solid gray 1px;
+}

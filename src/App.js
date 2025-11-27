@@ -1,19 +1,42 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Contact from "./pages/Contact/index.jsx";
-import About from "./pages/about/index.jsx";
-import NotFound from "./pages/notfound/index.jsx";
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import NavScrollExample from "./components/NavScrollExample";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Contact from "./pages/Contact";
+import Error from "./pages/Error";
+import Shop from "./pages/Shop";
+import Terms from "./pages/Terms";
+import About from "./pages/About";
+import Profil from "./pages/Profile";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Cart from "./pages/Cart";
+import { CartProvider } from "./components/CartContext";
+import { BrowserRouter as Router, Route, Routes } from "react-router";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/about" element={<About />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <CartProvider>
+        <NavScrollExample />
+
+        <Routes>
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/profile" element={<Profil />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<Error />} />
+        </Routes>
+      </CartProvider>
+      <Footer />
     </Router>
   );
 }
+
 export default App;

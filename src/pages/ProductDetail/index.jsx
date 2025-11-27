@@ -345,6 +345,7 @@ function ProductDetail() {
           {/* FORMULAIRE D'AJOUT D'AVIS */}
           <div className="add-review-section">
             <h3>Ajouter votre avis</h3>
+            <hr />
             {/* Messages de statut */}
             {reviewSubmitStatus === "success" && (
               <div className="alert-success">
@@ -366,6 +367,7 @@ function ProductDetail() {
                 {/* Le sélecteur d'étoiles permet de choisir entre 1 et 5 */}
 
                 <select
+                  className="w-25"
                   value={reviewForm.rating}
                   onChange={(e) =>
                     setReviewForm({

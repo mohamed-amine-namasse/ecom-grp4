@@ -1,5 +1,6 @@
-import React from "react"; // Assurez-vous d'importer React
+import React from "react";
 import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
+import { Link } from "react-router";
 import "./style.css";
 
 const formatPrice = (p) => {
@@ -68,7 +69,9 @@ function Checkout() {
                       affichez-les ici. Sinon, vous pouvez les laisser vides ou omises.
                     */}
                 <p>{item.options || "N/A"}</p>
-                <a href="#">Change</a>
+                <Link to="/cart" className="change-link">
+                  Change
+                </Link>
                 <p>({item.quantity})</p>
               </div>
               {/* Affichage du sous-total par article, 

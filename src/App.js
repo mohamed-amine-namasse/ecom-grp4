@@ -10,6 +10,7 @@ import Terms from "./pages/Terms";
 import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import ProductDetail from "./pages/ProductDetail";
@@ -25,6 +26,7 @@ function App() {
         <Routes>
           <Route path="/shop" element={<Shop />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />

@@ -1,5 +1,6 @@
 import React from "react";
 import { useCart } from "../../components/CartContext";
+import { Link } from "react-router";
 import "./style.css";
 
 // Fonction pour formater le prix en Euro (réutilisée de votre composant Shop)
@@ -99,10 +100,11 @@ function Cart() {
               <strong>Total à payer :</strong>
               <strong>{formatPrice(cartTotal)}</strong>
             </div>
-
-            <button className="btn-checkout" type="button">
-              Passer la commande
-            </button>
+            <Link to="/checkout">
+              <button className="btn-checkout" type="button">
+                Passer la commande
+              </button>
+            </Link>
           </aside>
         </div>
       )}

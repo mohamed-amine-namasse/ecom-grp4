@@ -2,17 +2,8 @@ import React from "react"; // Assurez-vous d'importer React
 import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
 import "./style.css";
 
-// Fonction pour formater le prix en Euro (comme dans votre composant Cart)
-// S'il est dans un fichier d'utilitaires, importez-le plutôt.
 const formatPrice = (p) => {
-  // Le composant original utilise des dollars et des nombres bruts,
-  // nous allons donc adapter pour afficher correctement les données du panier.
-  // J'utilise le formatage EUR basé sur votre composant Cart, mais je retire le symbole €
-  // pour coller au style du design original, qui est en $.
-  // Si le prix dans cartItems est en EUR, on peut l'afficher en EUR ici.
-  return p.toFixed(2); // Gardons deux décimales pour l'affichage, sans symbole.
-  // Si vous voulez le format Euro complet, utilisez :
-  // return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+  return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 };
 
 function Checkout() {
@@ -23,10 +14,6 @@ function Checkout() {
   const subtotal = formatPrice(cartTotal);
   // Pour l'affichage Total, qui sera le même au début sans frais de port
   const totalDisplay = formatPrice(cartTotal);
-
-  // Note: Votre composant de panier formatte en EUR, mais le HTML initial utilise "$".
-  // J'utilise le formatage numérique ici, mais vous devrez décider de la devise finale.
-  const currencySymbol = "$"; // Gardons le $ pour coller au design initial, modifiez si EUR.
 
   return (
     <div className="checkout-container">
@@ -87,10 +74,7 @@ function Checkout() {
               {/* Affichage du sous-total par article, 
                   en utilisant la quantité et le prix unitaire.
                 */}
-              <p className="price">
-                {currencySymbol}
-                {formatPrice(item.price * item.quantity)}
-              </p>
+              <p className="price">{formatPrice(item.price * item.quantity)}</p>
             </div>
           ))
         )}
@@ -98,10 +82,7 @@ function Checkout() {
         <div className="summary">
           <div className="line">
             <span>Subtotal</span>
-            <span>
-              {currencySymbol}
-              {subtotal}
-            </span>
+            <span>{subtotal}</span>
           </div>
           <div className="line">
             <span>Shipping</span>
@@ -109,10 +90,7 @@ function Checkout() {
           </div>
           <div className="total">
             <span>Total</span>
-            <span>
-              {currencySymbol}
-              {totalDisplay}
-            </span>
+            <span>{totalDisplay}</span>
           </div>
         </div>
       </div>

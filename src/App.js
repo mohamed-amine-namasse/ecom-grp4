@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Cart from "./pages/Cart";
+import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./components/CartContext";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/produit/:id" element={<ProductDetail />} />
           <Route path="/" element={<Home />} />
           <Route path="*" element={<Error />} />
         </Routes>

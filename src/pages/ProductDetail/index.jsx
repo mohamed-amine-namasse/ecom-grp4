@@ -367,7 +367,6 @@ function ProductDetail() {
                 {/* Le sélecteur d'étoiles permet de choisir entre 1 et 5 */}
 
                 <select
-                  className="w-25"
                   value={reviewForm.rating}
                   onChange={(e) =>
                     setReviewForm({

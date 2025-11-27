@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom"; // Assurez-vous d'importer Link de 'react-router-dom'
 import { useCart } from "../../components/CartContext";
 import "./style.css";
 
@@ -13,6 +13,7 @@ const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 // Fonction utilitaire pour le formatage du prix
 const formatPrice = (p) =>
   p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+
 // Nouveau composant : Affiche les étoiles de notation
 const RatingStars = ({ rating }) => {
   // Crée un tableau de 5 éléments. Remplit les X premières avec une étoile pleine (★) et le reste avec une étoile vide (☆).
@@ -34,6 +35,8 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  // --- ÉTAT POUR LE MESSAGE FLASH ---
+  const [showFlash, setShowFlash] = useState(false);
   // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
@@ -42,11 +45,12 @@ function ProductDetail() {
     rating: 5, // Note par défaut 5 étoiles
   });
   const [reviewSubmitStatus, setReviewSubmitStatus] = useState(null); // 'success', 'error', 'submitting', null
-  //  État pour gérer l'onglet actif ('description' ou 'additional_info')
+  //  État pour gérer l'onglet actif ('description' ou 'additional_info')
   const [activeTab, setActiveTab] = useState("description");
   // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
-  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 2. Définition de la fonction de récupération des avis (hors useEffect)
+  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
 
+  // 2. Définition de la fonction de récupération des avis (hors useEffect)
   const fetchReviews = async () => {
     try {
       const response = await fetch(API_REVIEWS_URL);
@@ -84,8 +88,16 @@ function ProductDetail() {
         price: product.price,
         image: product.image,
       });
+      // MIS À JOUR : Afficher le message flash, sans timeout
+      setShowFlash(true);
     }
   };
+
+  // NOUVEAU : Fonction pour fermer le flash manuellement
+  const handleCloseFlash = () => {
+    setShowFlash(false);
+  };
+
   // Fonction pour gérer l'envoi du formulaire d'avis
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -418,13 +430,34 @@ function ProductDetail() {
     }
 
     return null; // Onglet non reconnu
-  }; // Rendu des détails
+  };
 
+  // Rendu des détails
   return (
     <main className="product-detail-container">
       <Link to="/shop" className="back-link">
         &larr; Retour à la boutique
       </Link>
+
+      {/* Message Flash d'ajout au panier avec bouton de fermeture */}
+      {showFlash && (
+        <div className="flash-message-cart">
+          <p>✅ Le produit **{product.name}** a été ajouté à votre panier.</p>
+          <div className="flash-actions">
+            <Link to="/cart" className="btn-view-cart">
+              Voir le panier
+            </Link>
+            <button
+              className="btn-close-flash"
+              onClick={handleCloseFlash}
+              aria-label="Fermer la notification d'ajout au panier"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+      {/* FIN MESSAGE FLASH */}
 
       <div className="product-content">
         <div className="product-image-area">

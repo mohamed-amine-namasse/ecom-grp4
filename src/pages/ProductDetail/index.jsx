@@ -397,13 +397,14 @@ function ProductDetail() {
                   }
                   required
                   rows="5"
+                  className="w-50"
                   placeholder="Écrivez votre commentaire ici..."
                 />
               </div>
               <button
                 type="submit"
                 disabled={reviewSubmitStatus === "submitting"}
-                className="btn-submit-review"
+                className="btn-submit-review "
               >
                 {reviewSubmitStatus === "submitting"
                   ? "Envoi..."

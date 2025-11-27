@@ -249,8 +249,15 @@
 
 /* --- En-têtes des onglets --- */
 .tab-headers {
+  /* Utilise Flexbox pour aligner les boutons horizontalement */
   display: flex;
-  border-bottom: 2px solid #e9ecef;
+  /* Permet le défilement horizontal si les onglets débordent sur mobile */
+  overflow-x: auto;
+  /* Cache la barre de défilement pour un look plus propre, si besoin */
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap; /* Empêche le retour à la ligne automatique */
+
+  border-bottom: 2px solid #ddd; /* Ligne sous les onglets */
 }
 
 .tab-header {
@@ -323,21 +330,24 @@
   font-style: italic;
   color: #888;
 }
-
+.btn-submit-review {
+  width: fit-content !important;
+}
 /* --- Responsive pour les onglets --- */
 @media (max-width: 576px) {
   .tab-headers {
-    overflow-x: auto; /* Permet le défilement horizontal si l'écran est trop petit */
-    white-space: nowrap;
+    flex-direction: column;
+    overflow-x: hidden;
+    white-space: normal;
   }
-
   .tab-header {
-    padding: 10px 15px;
-    font-size: 1em;
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid #eee;
   }
-
-  .tab-content-wrapper {
-    padding: 15px;
+  .tab-header.active {
+    border-left: 5px solid #007bff;
+    border-bottom: 1px solid #eee;
   }
 }
 

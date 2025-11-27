@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
     } catch (e) {
       console.error("Erreur d'écriture dans localStorage:", e);
     }
-  }, [cartItems]);  // ------------------------------------------------------------------ // --- FONCTIONS DE LOGIQUE DU PANIER // ------------------------------------------------------------------
+  }, [cartItems]); // ------------------------------------------------------------------ // --- FONCTIONS DE LOGIQUE DU PANIER // ------------------------------------------------------------------
   /**
    * Ajoute un produit au panier ou augmente sa quantité s'il existe déjà.
    * @param {object} product - L'objet produit à ajouter (doit avoir au moins id, name, price).
@@ -75,6 +75,7 @@ export const CartProvider = ({ children }) => {
             name: product.name,
             price: price, // Utilisation du prix sécurisé
             quantity: 1,
+            image: product.image,
           },
         ];
       }
@@ -107,7 +108,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };  // ------------------------------------------------------------------ // --- CALCULS OPTIMISÉS (useMemo) // ------------------------------------------------------------------
+  }; // ------------------------------------------------------------------ // --- CALCULS OPTIMISÉS (useMemo) // ------------------------------------------------------------------
   /**
    * Retourne le nombre total d'articles (somme des quantités) dans le panier.
    */

@@ -1,4 +1,3 @@
-import React from "react";
 import Carousel from "react-bootstrap/Carousel";
 
 function MonCarousel() {
@@ -6,9 +5,9 @@ function MonCarousel() {
     <Carousel data-bs-theme="dark">
       <Carousel.Item>
         <img
-          className="d-block w-12 "
-          src="/images/logo192.png"
+          src="/images/morgan--landstrom-y-asllani.jpg"
           alt="First slide"
+          style={{ width: "100%", height: "650px", objectFit: "cover" }}
         />
         <Carousel.Caption>
           <h5>First slide label</h5>
@@ -17,9 +16,9 @@ function MonCarousel() {
       </Carousel.Item>
       <Carousel.Item>
         <img
-          className="d-block w-100"
-          src="holder.js/800x400?text=Second slide&bg=eee"
+          src="/images/NZGQQ65S4RAWZHSC3ZANEREVJM.png"
           alt="Second slide"
+          style={{ width: "100%", height: "650px", objectFit: "cover" }}
         />
         <Carousel.Caption>
           <h5>Second slide label</h5>
@@ -28,9 +27,9 @@ function MonCarousel() {
       </Carousel.Item>
       <Carousel.Item>
         <img
-          className="d-block w-100"
-          src="holder.js/800x400?text=Third slide&bg=e5e5e5"
+          src="/images/edca6.jpg"
           alt="Third slide"
+          style={{ width: "100%", height: "650px", objectFit: "cover" }}
         />
         <Carousel.Caption>
           <h5>Third slide label</h5>
@@ -42,5 +41,4 @@ function MonCarousel() {
     </Carousel>
   );
 }
-
 export default MonCarousel;

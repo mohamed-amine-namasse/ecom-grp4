@@ -9,7 +9,7 @@ function Footer() {
       <div className="footer-content">
         <div className="container">
           <div>
-            <h5>A propos</h5>
+            <h5>Entreprise</h5>
             <nav className="links">
               <NavLink
                 to="/about"
@@ -17,7 +17,7 @@ function Footer() {
                   isActive ? "footer-link active" : "footer-link"
                 }
               >
-                Qui sommes-nous ?
+                A propos
               </NavLink>
               <NavLink
                 to="/terms"
@@ -61,9 +61,7 @@ function Footer() {
 
         <hr className="hr-milieu" />
 
-        <p>
-          &copy; {currentYear} Mon Blog WordPress / React. Tous droits réservés.
-        </p>
+        <p>&copy; {currentYear} Foot Market. Tous droits réservés.</p>
       </div>
     </footer>
   );

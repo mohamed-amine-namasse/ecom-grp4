@@ -90,7 +90,7 @@ const fetchWooCommerceProducts = async (query) => {
       id: product.id,
       name: product.name,
       // Utilisation du permalink retourné par l'API pour la redirection
-      link: product.permalink || `/shop/${product.slug}`,
+      link: `/product/${product.id}`,
     }));
   } catch (error) {
     // Si la requête fetch elle-même échoue (erreur réseau, CORS, timeout)
@@ -261,8 +261,11 @@ function NavScrollExample() {
       content = suggestions.map((product) => (
         <ListGroup.Item
           key={product.id}
-          action
+          action // Ajout pour le style de survol Bootstrap
+          as={NavLink}
+          to={product.link} // Utilise le lien local: /produit/id
           onClick={() => handleSuggestionClick(product.link)}
+          className="text-decoration-none text-dark text-start"
         >
           {product.name}
         </ListGroup.Item>

@@ -325,7 +325,7 @@ function Shop() {
 
           {filteredProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
-            const productLink = `/produit/${prod.id}`; // Définir le lien une seule fois
+            const productLink = `/product/${prod.id}`; // Définir le lien une seule fois
             return (
               <article className="product-card">
                 <div className="product-media" key={prod.id}>

@@ -51,9 +51,10 @@ export const CartProvider = ({ children }) => {
    * @param {object} product - L'objet produit à ajouter (doit avoir au moins id, name, price).
    */
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantityToAdd = 1) => {
     const price = parseFloat(product.price) || 0; // Utilise le prix du produit passé
-
+    // S'assurer que la quantité est au moins 1 si elle vient d'une source externe
+    const finalQuantity = Math.max(1, quantityToAdd);
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (item) => item.id === product.id
@@ -69,7 +70,7 @@ export const CartProvider = ({ children }) => {
         newCart[existingItemIndex] = {
           ...existingItem, // 1. Garder les anciennes propriétés (et la quantité actuelle)
           ...product, // 2. Écraser/ajouter les nouvelles propriétés (comme 'image')
-          quantity: existingItem.quantity + 1, // 3. Augmenter la quantité
+          quantity: existingItem.quantity + finalQuantity, // 3. Augmenter la quantité
           price: price, // 4. Assurer l'utilisation du prix sécurisé
         };
       } else {
@@ -81,7 +82,7 @@ export const CartProvider = ({ children }) => {
             id: product.id,
             name: product.name,
             price: price, // Prix sécurisé
-            quantity: 1,
+            quantity: finalQuantity,
             image: product.image || "/img/default.jpg", // 🚨 FORCER L'IMAGE ICI
           },
         ];

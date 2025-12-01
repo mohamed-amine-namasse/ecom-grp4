@@ -459,3 +459,21 @@ select {
   opacity: 1;
   color: #0c3d19; /* Vert très foncé */
 }
+
+.quantity-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espace entre le label et l'input */
+  margin-bottom: 20px; /* Espace avant le bouton Ajouter au panier */
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.quantity-input {
+  width: 80px; /* Taille fixe pour le champ de quantité */
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}

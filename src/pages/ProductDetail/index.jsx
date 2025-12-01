@@ -37,6 +37,7 @@ function ProductDetail() {
   const [error, setError] = useState(null);
   // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
@@ -81,6 +82,9 @@ function ProductDetail() {
 
   // Fonction pour ajouter au panier
   const handleAddToCart = () => {
+    // S'assurer que la quantité est un nombre valide (minimum 1)
+    const quantityToAdd = Math.max(1, parseInt(quantity, 10));
+
     if (product) {
       const itemToAdd = {
         id: product.id,
@@ -89,7 +93,9 @@ function ProductDetail() {
         image: product.image,
       };
       addToCart(itemToAdd);
-      // MIS À JOUR : Afficher le message flash, sans timeout
+      // Optionnel : Réinitialiser le champ à 1 après l'ajout au panier
+      setQuantity(1); // MIS À JOUR : Afficher le message flash
+
       setShowFlash(true);
     }
   };
@@ -477,7 +483,6 @@ function ProductDetail() {
               <span className="review-count">({totalReviews} avis)</span>
             </div>
           )}
-
           <div className="price-section">
             {product.price < product.regularPrice && (
               <span className="old-price">
@@ -493,10 +498,28 @@ function ProductDetail() {
               dangerouslySetInnerHTML={{ __html: product.displayDescription }}
             />
           )}
+          {/* 🚨 NOUVEAU : Champ de sélection de quantité 🚨 */}
+          {!product.isOutOfStock && (
+            <div className="quantity-selector-group">
+              <label htmlFor="product-quantity">Quantité :</label>
+              <input
+                id="product-quantity"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => {
+                  // S'assurer que la valeur est un nombre et au moins 1
+                  const val = parseInt(e.target.value, 10);
+                  setQuantity(val > 0 ? val : 1);
+                }}
+                className="quantity-input"
+              />
+            </div>
+          )}
           <button
             className="btn-add-to-cart"
             type="button"
-            disabled={product.isOutOfStock}
+            disabled={product.isOutOfStock || quantity < 1}
             onClick={handleAddToCart}
           >
             {product.isOutOfStock ? "Indisponible" : "Ajouter au panier"}

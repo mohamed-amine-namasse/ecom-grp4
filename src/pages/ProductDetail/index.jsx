@@ -92,9 +92,7 @@ function ProductDetail() {
         price: product.price,
         image: product.image,
       };
-      addToCart(itemToAdd);
-      // Optionnel : Réinitialiser le champ à 1 après l'ajout au panier
-      setQuantity(1); // MIS À JOUR : Afficher le message flash
+      addToCart(itemToAdd, quantityToAdd);
 
       setShowFlash(true);
     }
@@ -449,7 +447,12 @@ function ProductDetail() {
       {/* Message Flash d'ajout au panier avec bouton de fermeture */}
       {showFlash && (
         <div className="flash-message-cart">
-          <p>✅ Le produit **{product.name}** a été ajouté à votre panier.</p>
+          <p>
+            {quantity > 1
+              ? `${quantity} x "${product.name}" ont été ajoutés `
+              : ` "${product.name}" a été ajouté `}
+            à votre panier.
+          </p>
           <div className="flash-actions">
             <Link to="/cart" className="btn-view-cart">
               Voir le panier
@@ -522,7 +525,9 @@ function ProductDetail() {
             disabled={product.isOutOfStock || quantity < 1}
             onClick={handleAddToCart}
           >
-            {product.isOutOfStock ? "Indisponible" : "Ajouter au panier"}
+            {product.isOutOfStock
+              ? "Indisponible"
+              : `Ajouter ${quantity} au panier`}
           </button>
         </div>
       </div>

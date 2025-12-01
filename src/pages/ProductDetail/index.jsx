@@ -22,8 +22,7 @@ const RatingStars = ({ rating }) => {
 
   return (
     <span className="rating-stars">
-      {"★".repeat(fullStars)}
-      {"☆".repeat(emptyStars)}
+      {"★".repeat(fullStars)} {"☆".repeat(emptyStars)}
     </span>
   );
 };
@@ -34,32 +33,25 @@ function ProductDetail() {
   const [reviews, setReviews] = useState([]);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // --- ÉTAT POUR LE MESSAGE FLASH ---
+  const [error, setError] = useState(null); // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  // 🚨 NOUVEAUX ÉTATS POUR LE MESSAGE FLASH D'ERREUR DE STOCK
+  const [quantity, setQuantity] = useState(1); // 🚨 NOUVEAUX ÉTATS POUR LE MESSAGE FLASH D'ERREUR DE STOCK
   const [showStockFlash, setShowStockFlash] = useState(false);
-  const [stockFlashMessage, setStockFlashMessage] = useState("");
-  // NOUVELLE FONCTION pour fermer le flash de stock
+  const [stockFlashMessage, setStockFlashMessage] = useState(""); // NOUVELLE FONCTION pour fermer le flash de stock
   const handleCloseStockFlash = () => {
     setShowStockFlash(false);
     setStockFlashMessage("");
-  };
-  // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
+  }; // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
     reviewer_email: "",
     review: "",
     rating: 5, // Note par défaut 5 étoiles
   });
-  const [reviewSubmitStatus, setReviewSubmitStatus] = useState(null); // 'success', 'error', 'submitting', null
-  //  État pour gérer l'onglet actif ('description' ou 'additional_info')
-  const [activeTab, setActiveTab] = useState("description");
-  // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
-  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+  const [reviewSubmitStatus, setReviewSubmitStatus] = useState(null); // 'success', 'error', 'submitting', null //  État pour gérer l'onglet actif ('description' ou 'additional_info')
+  const [activeTab, setActiveTab] = useState("description"); // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
+  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 2. Définition de la fonction de récupération des avis (hors useEffect)
 
-  // 2. Définition de la fonction de récupération des avis (hors useEffect)
   const fetchReviews = async () => {
     try {
       const response = await fetch(API_REVIEWS_URL);
@@ -86,20 +78,17 @@ function ProductDetail() {
       console.error("Erreur lors de la récupération des avis:", err);
       setReviews([]);
     }
-  };
-  // 3. Fonction pour obtenir la quantité actuelle dans le panier
+  }; // 3. Fonction pour obtenir la quantité actuelle dans le panier
   const getProductQuantityInCart = (productId) => {
     const item = cartItems.find((item) => item.id === productId);
     return item ? item.quantity : 0;
-  };
+  }; // Fonction pour ajouter au panier
 
-  // Fonction pour ajouter au panier
   const handleAddToCart = () => {
     // 1. Fermer les messages flash précédents
     handleCloseFlash(); // Ferme le flash de succès
-    handleCloseStockFlash(); // Ferme le flash d'erreur de stock
+    handleCloseStockFlash(); // Ferme le flash d'erreur de stock // S'assurer que la quantité est un nombre valide (minimum 1)
 
-    // S'assurer que la quantité est un nombre valide (minimum 1)
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
@@ -107,19 +96,28 @@ function ProductDetail() {
       const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
 
       const maxStock = product.stockQuantity;
-      const manageStock = product.manageStock;
+      const manageStock = product.manageStock; // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
 
-      // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
       if (manageStock && maxStock !== null && quantityAfterAdd > maxStock) {
         // Cas d'erreur : stock dépassé
-        setStockFlashMessage(
-          `L'ajout de ${quantityToAdd} article(s) dépasse le stock maximal disponible (${maxStock}). Vous avez déjà ${currentQuantityInCart} dans votre panier.`
-        );
+
+        // --- 🚨 MESSAGE D'ERREUR PERSONNALISÉ SELON LA DEMANDE ---
+        let message = `Vous ne pouvez pas ajouter cette quantité dans le panier.`;
+
+        // Si la quantité déjà dans le panier est égale ou supérieure au max
+        if (currentQuantityInCart >= maxStock) {
+          message = `Vous avez déjà atteint le maximum ! Nous en avons ${maxStock} en stock et vous en avez déjà ${currentQuantityInCart} dans votre panier.`;
+        } else {
+          // Si l'ajout dépasse le stock
+          const remainingStock = maxStock - currentQuantityInCart;
+          message = `Vous ne pouvez pas ajouter ${quantityToAdd} article(s) dans le panier. Nous avons ${maxStock} en stock et vous en avez déjà ${currentQuantityInCart}. Vous pouvez encore ajouter ${remainingStock} de cet article.`;
+        }
+
+        setStockFlashMessage(message);
         setShowStockFlash(true);
         return; // Bloquer l'ajout
-      }
+      } // Si le stock est suffisant (ou non géré), continuer l'ajout
 
-      // Si le stock est suffisant (ou non géré), continuer l'ajout
       const itemToAdd = {
         id: product.id,
         name: product.name,
@@ -134,14 +132,12 @@ function ProductDetail() {
 
       setShowFlash(true);
     }
-  };
+  }; // NOUVEAU : Fonction pour fermer le flash manuellement
 
-  // NOUVEAU : Fonction pour fermer le flash manuellement
   const handleCloseFlash = () => {
     setShowFlash(false);
-  };
+  }; // Fonction pour gérer l'envoi du formulaire d'avis
 
-  // Fonction pour gérer l'envoi du formulaire d'avis
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     setReviewSubmitStatus("submitting");
@@ -151,8 +147,7 @@ function ProductDetail() {
       setError("Veuillez remplir tous les champs et donner une note.");
       setReviewSubmitStatus(null);
       return;
-    }
-    // Générer un nom d'utilisateur anonyme unique si le champ est vide
+    } // Générer un nom d'utilisateur anonyme unique si le champ est vide
     const reviewerNameToSend = reviewForm.reviewer
       ? reviewForm.reviewer
       : `Anonyme #${Math.floor(Math.random() * 10000)}`;
@@ -196,9 +191,8 @@ function ProductDetail() {
       setError("Impossible d'envoyer l'avis. Veuillez réessayer.");
       setReviewSubmitStatus("error");
     }
-  };
+  }; // --- APPEL API POUR UN PRODUIT SPÉCIFIQUE ---
 
-  // --- APPEL API POUR UN PRODUIT SPÉCIFIQUE ---
   useEffect(() => {
     if (!id) {
       setError("ID de produit manquant.");
@@ -206,17 +200,15 @@ function ProductDetail() {
       return;
     }
 
-    const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+    const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 1. Récupération du Produit
 
-    // 1. Récupération du Produit
     const fetchProduct = async () => {
       try {
         const response = await fetch(API_PRODUCT_URL);
         if (response.status === 404) throw new Error("Produit non trouvé.");
         if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-        const data = await response.json();
+        const data = await response.json(); // ... (Mapping des données produit, inchangé)
 
-        // ... (Mapping des données produit, inchangé)
         const price = data.sale_price
           ? parseFloat(data.sale_price)
           : parseFloat(data.regular_price);
@@ -226,11 +218,9 @@ function ProductDetail() {
           : "<p>Aucune description détaillée disponible.</p>";
         const shortDescription = data.short_description
           ? data.short_description
-          : "";
-        // LOGIQUE DE DESCRIPTION AFFICHÉE (à côté du produit)
-        let displayDescription = shortDescription;
+          : ""; // LOGIQUE DE DESCRIPTION AFFICHÉE (à côté du produit)
+        let displayDescription = shortDescription; // Si la description courte est vide, on utilise un extrait de la description longue
 
-        // Si la description courte est vide, on utilise un extrait de la description longue
         if (!displayDescription || displayDescription === "<p></p>\n") {
           // Supprimer les balises HTML de la description longue pour obtenir un extrait de texte propre
           const plainTextDescription = fullDescription.replace(
@@ -241,8 +231,7 @@ function ProductDetail() {
           if (plainTextDescription.length > 10) {
             // Prendre les 150 premiers caractères et ajouter des points de suspension
             displayDescription =
-              plainTextDescription.substring(0, 1000).trim() + "[...]";
-            // Remettre le texte dans un paragraphe pour le style
+              plainTextDescription.substring(0, 1000).trim() + "[...]"; // Remettre le texte dans un paragraphe pour le style
             displayDescription = `<p>${displayDescription}</p>`;
           } else {
             displayDescription = "";
@@ -281,9 +270,8 @@ function ProductDetail() {
           attributes,
           stockQuantity: stockQuantity,
           manageStock: manageStock,
-        });
+        }); // 2. Récupération des Avis (après avoir récupéré le produit avec succès)
 
-        // 2. Récupération des Avis (après avoir récupéré le produit avec succès)
         await fetchReviews();
 
         setError(null);
@@ -318,16 +306,14 @@ function ProductDetail() {
         </div>
       </main>
     );
-  }
-  // Calcul de la note moyenne et du nombre d'avis
+  } // Calcul de la note moyenne et du nombre d'avis
   const totalReviews = reviews.length;
 
   let averageRating = 0;
   if (totalReviews > 0) {
     const sumRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
     averageRating = sumRatings / totalReviews;
-  }
-  // --- RENDU DU CONTENU DE L'ONGLET ACTIF ---
+  } // --- RENDU DU CONTENU DE L'ONGLET ACTIF ---
   const renderTabContent = () => {
     if (activeTab === "description") {
       // Description : utilisation de dangerouslySetInnerHTML pour le HTML de WooCommerce
@@ -337,9 +323,8 @@ function ProductDetail() {
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
       );
-    }
+    } // 2. Onglet INFORMATIONS COMPLÉMENTAIRES
 
-    // 2. Onglet INFORMATIONS COMPLÉMENTAIRES
     if (activeTab === "additional_info") {
       // Cas où il n'y a pas d'attributs
       if (product.attributes.length === 0) {
@@ -351,26 +336,23 @@ function ProductDetail() {
             </p>
           </div>
         );
-      }
+      } // Cas où il y a des attributs à afficher
 
-      // Cas où il y a des attributs à afficher
       return (
         <div className="tab-content additional-info-content">
           <table className="attributes-table">
             <tbody>
               {product.attributes.map((attr, index) => (
                 <tr key={index}>
-                  <th>{attr.name}</th>
-                  <td>{attr.options}</td>
+                  <th>{attr.name}</th> <td>{attr.options}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       );
-    }
+    } // 3. Onglet AVIS (DOIT ÊTRE AU NIVEAU RACINE)
 
-    // 3. Onglet AVIS (DOIT ÊTRE AU NIVEAU RACINE)
     if (activeTab === "reviews") {
       return (
         <div className="tab-content reviews-content">
@@ -394,9 +376,11 @@ function ProductDetail() {
                     <span className="reviewer-name">
                       {review.reviewerName ? review.reviewerName : "Guest"}
                     </span>
+
                     <span className="review-date">- le {review.date}</span>
                     <RatingStars rating={review.rating} />
                   </div>
+
                   <div
                     className="review-body"
                     dangerouslySetInnerHTML={{ __html: review.review }}
@@ -408,8 +392,7 @@ function ProductDetail() {
           {/* FORMULAIRE D'AJOUT D'AVIS */}
           <div className="add-review-section">
             <h3>Ajouter votre avis</h3>
-            <hr />
-            {/* Messages de statut */}
+            <hr /> {/* Messages de statut */}
             {reviewSubmitStatus === "success" && (
               <div className="alert-success">
                 Merci pour votre avis ! Il a été publié avec succès.
@@ -424,7 +407,7 @@ function ProductDetail() {
               {/* 1. NOTATION ÉTOILES */}
               <div className="form-group review-rating">
                 <label>
-                  Votre note : <span className="required-star">*</span>
+                  Votre note :<span className="required-star">*</span>
                 </label>
 
                 {/* Le sélecteur d'étoiles permet de choisir entre 1 et 5 */}
@@ -449,7 +432,8 @@ function ProductDetail() {
               {/* 2. CHAMP AVIS (COMMENTAIRE) */}
               <div className="form-group">
                 <label htmlFor="review_content">
-                  Votre avis <span className="required-star">*</span>
+                  Votre avis
+                  <span className="required-star">*</span>
                 </label>
 
                 <textarea
@@ -480,28 +464,28 @@ function ProductDetail() {
     }
 
     return null; // Onglet non reconnu
-  };
+  }; // Rendu des détails
 
-  // Rendu des détails
   return (
     <main className="product-detail-container">
       <Link to="/shop" className="back-link">
         &larr; Retour à la boutique
       </Link>
-
-      {/* Message Flash d'ajout au panier avec bouton de fermeture */}
+      {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */} 
       {showFlash && (
-        <div className="flash-message-cart">
+        <div className="flash-message-cart flash-success">
           <p>
             {quantity > 1
               ? `${quantity} x "${product.name}" ont été ajoutés `
               : ` "${product.name}" a été ajouté `}
             à votre panier.
           </p>
+
           <div className="flash-actions">
             <Link to="/cart" className="btn-view-cart">
               Voir le panier
             </Link>
+
             <button
               className="btn-close-flash"
               onClick={handleCloseFlash}
@@ -512,8 +496,18 @@ function ProductDetail() {
           </div>
         </div>
       )}
-      {/* FIN MESSAGE FLASH */}
-
+      {showStockFlash && (
+        <div className="flash-message-cart flash-error">
+          <p>❌ {stockFlashMessage}</p>
+          <button
+            className="btn-close-flash"
+            onClick={handleCloseStockFlash}
+            aria-label="Fermer la notification d'erreur de stock"
+          >
+            &times;
+          </button>
+        </div>
+      )}
       <div className="product-content">
         <div className="product-image-area">
           <img src={product.image} alt={product.name} />
@@ -521,7 +515,6 @@ function ProductDetail() {
             <div className="product-badge out-of-stock">Rupture de Stock</div>
           )}
         </div>
-
         <div className="product-info-area">
           <h1 className="product-name">{product.name}</h1>
           {totalReviews > 0 && (
@@ -540,7 +533,6 @@ function ProductDetail() {
 
             <span className="current-price">{formatPrice(product.price)}</span>
           </div>
-
           {product.displayDescription && (
             <div
               className="product-excerpt-description" // Utilisation d'une nouvelle classe claire
@@ -550,23 +542,21 @@ function ProductDetail() {
           {/* 🚨 NOUVEAU : Champ de sélection de quantité 🚨 */}
           {!product.isOutOfStock && (
             <div className="quantity-selector-group">
-              <label htmlFor="product-quantity">Quantité :</label>
+              <label htmlFor="product-quantity">Quantité :</label>{" "}
               <input
                 id="product-quantity"
                 type="number"
                 min="1"
                 value={quantity}
                 onChange={(e) => {
-                  let val = parseInt(e.target.value, 10);
-                  // Déterminer le max pour la validation côté client
+                  let val = parseInt(e.target.value, 10); // Déterminer le max pour la validation côté client
                   const maxStock =
                     product.manageStock && product.stockQuantity !== null
                       ? product.stockQuantity
                       : Infinity; // S'assurer que la valeur est au moins 1
 
-                  val = Math.max(1, val);
+                  val = Math.max(1, val); // S'assurer que la valeur ne dépasse pas le stock maximal
 
-                  // S'assurer que la valeur ne dépasse pas le stock maximal
                   val = Math.min(val, maxStock);
 
                   setQuantity(val);
@@ -575,6 +565,7 @@ function ProductDetail() {
               />
             </div>
           )}
+
           {product.manageStock &&
             !product.isOutOfStock &&
             product.stockQuantity !== null && (
@@ -590,13 +581,11 @@ function ProductDetail() {
             disabled={product.isOutOfStock || quantity < 1}
             onClick={handleAddToCart}
           >
-            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}
+            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}       
           </button>
         </div>
       </div>
-      {/* Section des onglets (Tabs) */}
       <div className="product-tabs-section">
-        {/* En-têtes des onglets */}
         <div className="tab-headers">
           <button
             className={`tab-header ${
@@ -623,7 +612,6 @@ function ProductDetail() {
             Avis ({reviews.length})
           </button>
         </div>
-
         <div className="tab-content-wrapper">{renderTabContent()}</div>
       </div>
     </main>

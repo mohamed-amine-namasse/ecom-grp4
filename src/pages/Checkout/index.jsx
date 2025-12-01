@@ -58,16 +58,7 @@ function Checkout() {
           // Mapping des articles du panier
           cartItems.map((item) => (
             <div key={item.id} className="product">
-              {/* Assurez-vous que item.image est le bon chemin. 
-                  Votre composant Cart ne montre pas l'image, vérifiez que 'item' 
-                  contient bien cette propriété (ou utilisez une image par défaut).
-                */}
-              <img
-                src={
-                  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-content/uploads/2023/image_produit.jpg"
-                }
-                alt={item.name}
-              />
+              <img src={item.image || "/img/default.jpg"} alt={item.name} />
               <div>
                 <p className="title">{item.name}</p>
                 {/* Si les options (taille/couleur) sont dans l'objet item, 

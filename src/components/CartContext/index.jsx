@@ -77,10 +77,12 @@ export const CartProvider = ({ children }) => {
         newCart = [
           ...prevItems,
           {
-            ...product, // 👈 UTILISEZ LE SPREAD POUR TOUT INCLURE
-            price: price, // Utilise le prix parsé/sécurisé
+            // Nous listons explicitement les propriétés essentielles pour forcer l'inclusion de l'image
+            id: product.id,
+            name: product.name,
+            price: price, // Prix sécurisé
             quantity: 1,
-            // Note : Vous n'avez pas besoin de lister 'id', 'name', 'image' individuellement ici grâce à ...product
+            image: product.image || "/img/default.jpg", // 🚨 FORCER L'IMAGE ICI
           },
         ];
       }

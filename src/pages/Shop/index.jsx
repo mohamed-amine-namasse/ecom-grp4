@@ -430,6 +430,7 @@ function Shop() {
                           id: prod.id,
                           name: prod.name,
                           price: prod.price,
+                          image: prod.image,
                           manageStock: prod.manageStock,
                           stockQuantity: prod.stockQuantity,
                         })

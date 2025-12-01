@@ -82,12 +82,13 @@ function ProductDetail() {
   // Fonction pour ajouter au panier
   const handleAddToCart = () => {
     if (product) {
-      addToCart({
+      const itemToAdd = {
         id: product.id,
         name: product.name,
         price: product.price,
         image: product.image,
-      });
+      };
+      addToCart(itemToAdd);
       // MIS À JOUR : Afficher le message flash, sans timeout
       setShowFlash(true);
     }

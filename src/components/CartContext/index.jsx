@@ -52,8 +52,7 @@ export const CartProvider = ({ children }) => {
    */
 
   const addToCart = (product) => {
-    // Sécurité : S'assurer que le prix est un nombre valide
-    const price = parseFloat(product.price) || 0;
+    const price = parseFloat(product.price) || 0; // Utilise le prix du produit passé
 
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
@@ -63,19 +62,25 @@ export const CartProvider = ({ children }) => {
       let newCart;
 
       if (existingItemIndex > -1) {
-        // Si l'article existe, augmente la quantité
+        // Cas où l'article existe déjà : on met à jour l'article existant
         newCart = [...prevItems];
-        newCart[existingItemIndex].quantity += 1;
+        const existingItem = newCart[existingItemIndex];
+
+        newCart[existingItemIndex] = {
+          ...existingItem, // 1. Garder les anciennes propriétés (et la quantité actuelle)
+          ...product, // 2. Écraser/ajouter les nouvelles propriétés (comme 'image')
+          quantity: existingItem.quantity + 1, // 3. Augmenter la quantité
+          price: price, // 4. Assurer l'utilisation du prix sécurisé
+        };
       } else {
-        // Sinon, ajoute le nouvel article avec une quantité de 1
+        // Cas où l'article est NOUVEAU : on ajoute le produit complet
         newCart = [
           ...prevItems,
           {
-            id: product.id,
-            name: product.name,
-            price: price, // Utilisation du prix sécurisé
+            ...product, // 👈 UTILISEZ LE SPREAD POUR TOUT INCLURE
+            price: price, // Utilise le prix parsé/sécurisé
             quantity: 1,
-            image: product.image,
+            // Note : Vous n'avez pas besoin de lister 'id', 'name', 'image' individuellement ici grâce à ...product
           },
         ];
       }

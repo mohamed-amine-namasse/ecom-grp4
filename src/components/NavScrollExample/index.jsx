@@ -357,7 +357,7 @@ function NavScrollExample() {
                 <Badge
                   bg="danger"
                   pill
-                  className="position-absolute top-0 start-100 translate-middle"
+                  className="position-absolute top-10 start-80 translate-middle"
                 >
                   {getCartCount}
                 </Badge>

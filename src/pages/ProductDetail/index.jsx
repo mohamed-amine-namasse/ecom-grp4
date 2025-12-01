@@ -210,6 +210,11 @@ function ProductDetail() {
             displayDescription = "";
           }
         }
+        const stockQuantity =
+          data.stock_quantity !== null
+            ? parseInt(data.stock_quantity, 10)
+            : null;
+        const manageStock = data.manage_stock;
         const imageUrl =
           data.images.length > 0
             ? data.images[0].src
@@ -236,6 +241,8 @@ function ProductDetail() {
           stock_status: data.stock_status,
           isOutOfStock,
           attributes,
+          stockQuantity: stockQuantity,
+          manageStock: manageStock,
         });
 
         // 2. Récupération des Avis (après avoir récupéré le produit avec succès)
@@ -495,6 +502,7 @@ function ProductDetail() {
 
             <span className="current-price">{formatPrice(product.price)}</span>
           </div>
+
           {product.displayDescription && (
             <div
               className="product-excerpt-description" // Utilisation d'une nouvelle classe claire
@@ -511,23 +519,40 @@ function ProductDetail() {
                 min="1"
                 value={quantity}
                 onChange={(e) => {
-                  // S'assurer que la valeur est un nombre et au moins 1
-                  const val = parseInt(e.target.value, 10);
-                  setQuantity(val > 0 ? val : 1);
+                  let val = parseInt(e.target.value, 10);
+                  // Déterminer le max pour la validation côté client
+                  const maxStock =
+                    product.manageStock && product.stockQuantity !== null
+                      ? product.stockQuantity
+                      : Infinity; // S'assurer que la valeur est au moins 1
+
+                  val = Math.max(1, val);
+
+                  // S'assurer que la valeur ne dépasse pas le stock maximal
+                  val = Math.min(val, maxStock);
+
+                  setQuantity(val);
                 }}
                 className="quantity-input"
               />
             </div>
           )}
+          {product.manageStock &&
+            !product.isOutOfStock &&
+            product.stockQuantity !== null && (
+              <p className="stock-info">
+                {product.stockQuantity === 0
+                  ? "Rupture de stock (0 disponible)"
+                  : `${product.stockQuantity} articles en stock`}
+              </p>
+            )}
           <button
             className="btn-add-to-cart"
             type="button"
             disabled={product.isOutOfStock || quantity < 1}
             onClick={handleAddToCart}
           >
-            {product.isOutOfStock
-              ? "Indisponible"
-              : `Ajouter ${quantity} au panier`}
+            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}
           </button>
         </div>
       </div>

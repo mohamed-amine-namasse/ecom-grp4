@@ -171,8 +171,8 @@
 }
 
 .btn-add-to-cart:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  background-color: #ffc107;
+  cursor: default;
 }
 
 /* =====================================

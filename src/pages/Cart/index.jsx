@@ -1,6 +1,6 @@
 import React from "react";
 import { useCart } from "../../components/CartContext";
-import { Link } from "react-router";
+import { Link } from "react-router-dom"; // Assurez-vous d'utiliser "react-router-dom"
 import "./style.css";
 
 // Fonction pour formater le prix en Euro
@@ -9,16 +9,12 @@ const formatPrice = (p) =>
 
 function Cart() {
   // Récupération des données et fonctions du contexte
-  const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart(); // Fonction pour gérer l'augmentation de la quantité
 
-  // Fonction pour gérer l'augmentation de la quantité
-  // L'augmentation est appelée uniquement si le bouton n'est pas désactivé.
   const handleIncrease = (item) => {
-    // La vérification de la quantité maximale est gérée par l'attribut 'disabled' du bouton
     updateQuantity(item.id, item.quantity + 1);
-  };
+  }; // Fonction pour gérer la diminution de la quantité
 
-  // Fonction pour gérer la diminution de la quantité
   const handleDecrease = (item) => {
     if (item.quantity > 1) {
       updateQuantity(item.id, item.quantity - 1);
@@ -26,27 +22,20 @@ function Cart() {
       // Si la quantité est 1 et qu'on diminue, on retire l'article
       removeFromCart(item.id);
     }
-  };
-
-  // ----------------------------------------------------------------------
-  // --- RENDU
-  // ----------------------------------------------------------------------
+  }; // ---------------------------------------------------------------------- // --- RENDU // ----------------------------------------------------------------------
 
   return (
     <main className="cart-container">
       <h1>Votre Panier</h1>
-
       {cartItems.length === 0 ? (
         <div className="cart-empty-state">
           <p>
-            Votre panier est vide. Commencez vos achats dans la{" "}
+            Votre panier est vide. Commencez vos achats dans la
             <a href="/shop">Boutique</a> !
           </p>
         </div>
       ) : (
         <div className="cart-content">
-          {/* NOTE: Le message flash d'erreur de stock a été retiré. */}
-
           <section className="cart-items-list">
             {cartItems.map((item) => {
               // Calcul pour déterminer si le bouton doit être désactivé
@@ -55,25 +44,30 @@ function Cart() {
               const isMaxQuantityReached =
                 isStockManaged && item.quantity >= item.stockQuantity;
 
+              // 🚨 LOGIQUE POUR RÉCUPÉRER ET AFFICHER LES OPTIONS
+              const optionsArray = [];
+
+              if (item.selectedColor) {
+                optionsArray.push(`Couleur: ${item.selectedColor}`);
+              }
+              if (item.selectedSize) {
+                optionsArray.push(`Pointure: ${item.selectedSize}`);
+              }
+
+              const optionsDisplay = optionsArray.join(" | "); // Ex: "Couleur: Rouge | Pointure: 42"
+
               return (
                 <article key={item.id} className="cart-item-card">
                   <div className="item-info">
                     <h2 className="item-name">{item.name}</h2>
-                    {/* Affichage optionnel du stock restant pour information */}
-                    {isStockManaged && (
-                      <p
-                        className={`item-stock-info ${
-                          isMaxQuantityReached ? "stock-limit-reached" : ""
-                        }`}
-                      >
-                        Stock disponible : **{item.stockQuantity}**
-                      </p>
+                    {/* 🚨 AFFICHAGE DES OPTIONS (COULEUR/POINTURE) */}
+                    {optionsDisplay && (
+                      <p className="item-options-info">{optionsDisplay}</p>
                     )}
                     <p className="item-price">
-                      Prix unitaire : {formatPrice(item.price)}
+                      Prix unitaire :{formatPrice(item.price)}
                     </p>
                   </div>
-
                   <div className="item-quantity-controls">
                     <button
                       className="btn-quantity decrease"
@@ -86,20 +80,18 @@ function Cart() {
                     <button
                       className="btn-quantity increase"
                       onClick={() => handleIncrease(item)}
-                      aria-label="Augmenter la quantité"
-                      // 🚀 Désactivation conditionnelle si le stock est géré ET que la quantité maximale est atteinte
+                      aria-label="Augmenter la quantité" // Désactivation conditionnelle si le stock est géré ET que la quantité maximale est atteinte
                       disabled={isMaxQuantityReached}
                     >
                       +
                     </button>
                   </div>
-
                   <div className="item-subtotal">
                     <p>
-                      Sous-total : **{formatPrice(item.price * item.quantity)}**
+                      Sous-total : **
+                      {formatPrice(item.price * item.quantity)}**
                     </p>
                   </div>
-
                   <button
                     className="btn-remove"
                     onClick={() => removeFromCart(item.id)}
@@ -119,11 +111,11 @@ function Cart() {
               <span>Articles ({cartItems.length}) :</span>
               <span>{formatPrice(cartTotal)}</span>
             </div>
-            {/* Vous pouvez ajouter ici les frais de port, taxes, etc. */}
             <div className="summary-line total">
               <strong>Total à payer :</strong>
               <strong>{formatPrice(cartTotal)}</strong>
             </div>
+
             <Link to="/checkout">
               <button className="btn-checkout" type="button">
                 Passer la commande

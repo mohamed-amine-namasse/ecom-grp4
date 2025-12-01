@@ -1,22 +1,19 @@
-import React from "react";
-import { useCart } from "../../components/CartContext"; // Assurez-vous que le chemin est correct
-import { useState } from "react";
-import { Link } from "react-router";
+import React, { useState } from "react";
+import { useCart } from "../../components/CartContext";
+import { Link } from "react-router-dom"; // Assurez-vous d'utiliser "react-router-dom" si vous utilisez React Router v6+
 import "./style.css";
 
+// Fonction utilitaire pour le formatage du prix
 const formatPrice = (p) => {
   return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 };
 
 function Checkout() {
-  const { cartItems, cartTotal } = useCart();
+  const { cartItems, cartTotal } = useCart(); // Calcul du sous-total (peut-être déjà fait dans cartTotal, mais on s'assure d'avoir la donnée)
 
-  // Calcul du sous-total (peut-être déjà fait dans cartTotal, mais on s'assure d'avoir la donnée)
-  // En utilisant le prix formaté du composant original (sans symbole €)
-  const subtotal = formatPrice(cartTotal);
-  // Pour l'affichage Total, qui sera le même au début sans frais de port
-  const totalDisplay = formatPrice(cartTotal);
-  // 1. NOUVEAU STATE : Pour stocker les données du formulaire d'adresse
+  const subtotal = formatPrice(cartTotal); // Pour l'affichage Total, qui sera le même au début sans frais de port
+  const totalDisplay = formatPrice(cartTotal); // 1. STATE : Pour stocker les données du formulaire d'adresse
+
   const [shippingAddress, setShippingAddress] = useState({
     firstName: "",
     lastName: "",
@@ -33,14 +30,16 @@ function Checkout() {
       ...prev,
       [name]: value,
     }));
-  }; // 3. Logique pour déterminer si l'étape SHIPPING est "faite" (au moins un champ rempli) // Vous pouvez ajuster cette logique pour qu'elle soit plus stricte (tous les champs non vides)
+  }; // 3. Logique pour déterminer si l'étape SHIPPING est "faite"
 
   const isShippingCompleted = Object.values(shippingAddress).some(
     (val) => val.trim() !== ""
   ); // 4. Logique pour déterminer si on peut passer à l'étape PAYMENT (tous les champs sont remplis)
+
   const isAllShippingFieldsFilled = Object.values(shippingAddress).every(
     (val) => val.trim() !== ""
   );
+
   return (
     <div className="checkout-container ">
       <div className="checkout-left ">
@@ -49,10 +48,11 @@ function Checkout() {
           <span className="active">INFORMATION</span>
           <span className={isShippingCompleted ? "completed" : ""}>
             SHIPPING
-          </span>{" "}
+          </span>
+
           <span className={isAllShippingFieldsFilled ? "completed" : ""}>
             PAYMENT
-          </span>{" "}
+          </span>
         </div>
         <div className="section">
           <h3>CONTACT INFO</h3>
@@ -61,6 +61,7 @@ function Checkout() {
             <input type="text" placeholder="Phone" />
           </div>
         </div>
+
         <div className="section">
           <h3>SHIPPING ADDRESS</h3>
           <div className="row">
@@ -106,7 +107,6 @@ function Checkout() {
               onChange={handleShippingChange}
             />
           </div>
-
           <div className="row">
             <input
               type="text"
@@ -116,7 +116,6 @@ function Checkout() {
               onChange={handleShippingChange}
             />
           </div>
-
           <div className="row">
             <input
               type="text"
@@ -126,7 +125,6 @@ function Checkout() {
               onChange={handleShippingChange}
             />
           </div>
-
           <button className="next-btn" disabled={!isAllShippingFieldsFilled}>
             Shipping →
           </button>
@@ -139,28 +137,41 @@ function Checkout() {
           <p>Votre panier est vide.</p>
         ) : (
           // Mapping des articles du panier
-          cartItems.map((item) => (
-            <div key={item.id} className="product">
-              <img src={item.image || "/img/default.jpg"} alt={item.name} />
-              <div>
-                <p className="title">{item.name}</p>
-                {/* Si les options (taille/couleur) sont dans l'objet item, 
-                      affichez-les ici. Sinon, vous pouvez les laisser vides ou omises.
-                    */}
-                <p>{item.options || "N/A"}</p>
-                <Link to="/cart" className="change-link">
-                  Change
-                </Link>
-                <p>({item.quantity})</p>
-              </div>
-              {/* Affichage du sous-total par article, 
-                  en utilisant la quantité et le prix unitaire.
-                */}
-              <p className="price">{formatPrice(item.price * item.quantity)}</p>
-            </div>
-          ))
-        )}
+          cartItems.map((item) => {
+            // 🚨 LOGIQUE POUR RÉCUPÉRER ET AFFICHER LES OPTIONS
+            const optionsArray = [];
 
+            if (item.selectedColor) {
+              optionsArray.push(`Couleur: ${item.selectedColor}`);
+            }
+            if (item.selectedSize) {
+              optionsArray.push(`Pointure: ${item.selectedSize}`);
+            }
+
+            const optionsDisplay = optionsArray.join(" | "); // Ex: "Couleur: Rouge | Pointure: 42"
+
+            return (
+              <div key={item.id} className="product">
+                <img src={item.image || "/img/default.jpg"} alt={item.name} />
+                <div>
+                  <p className="title">{item.name}</p>
+
+                  {/* Affichage des options seulement si elles existent */}
+                  {optionsDisplay && (
+                    <p className="product-options">{optionsDisplay}</p>
+                  )}
+                  <Link to="/cart" className="change-link">
+                    Change
+                  </Link>
+                  <p>({item.quantity})</p>
+                </div>
+                <p className="price">
+                  {formatPrice(item.price * item.quantity)}
+                </p>
+              </div>
+            );
+          })
+        )}
         <div className="summary">
           <div className="line">
             <span>Subtotal</span>

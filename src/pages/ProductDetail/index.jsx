@@ -35,8 +35,14 @@ function ProductDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null); // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
-  const [quantity, setQuantity] = useState(1); // 🚨 NOUVEAUX ÉTATS POUR LE MESSAGE FLASH D'ERREUR DE STOCK
+  const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState("");
+  //  ÉTAT POUR LES OPTIONS DE POINTURE DISPONIBLES
+  const [availableSizes, setAvailableSizes] = useState([]);
   const [showStockFlash, setShowStockFlash] = useState(false);
+  // ÉTAT POUR LA COULEUR
+  const [selectedColor, setSelectedColor] = useState("");
+  const [availableColors, setAvailableColors] = useState([]);
   const [stockFlashMessage, setStockFlashMessage] = useState(""); // NOUVELLE FONCTION pour fermer le flash de stock
   const handleCloseStockFlash = () => {
     setShowStockFlash(false);
@@ -92,6 +98,20 @@ function ProductDetail() {
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
+      if (availableColors.length > 0 && !selectedColor) {
+        setStockFlashMessage(
+          "Veuillez sélectionner une couleur avant d'ajouter au panier."
+        );
+        setShowStockFlash(true);
+        return;
+      }
+      if (availableSizes.length > 0 && !selectedSize) {
+        setStockFlashMessage(
+          "Veuillez sélectionner une pointure avant d'ajouter au panier."
+        );
+        setShowStockFlash(true);
+        return; // Bloquer l'ajout
+      }
       const currentQuantityInCart = getProductQuantityInCart(product.id);
       const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
 
@@ -123,7 +143,8 @@ function ProductDetail() {
         name: product.name,
         price: product.price,
         image: product.image,
-
+        selectedSize: selectedSize,
+        selectedColor: selectedColor,
         manageStock: manageStock,
         stockQuantity: maxStock,
       };
@@ -255,7 +276,38 @@ function ProductDetail() {
             name: attr.name,
             options: attr.options.join(", "),
           }));
+        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE COULEUR
+        const colorAttribute = data.attributes.find(
+          (attr) =>
+            attr.name.toLowerCase().includes("couleur") ||
+            attr.name.toLowerCase().includes("color")
+        );
 
+        let colors = [];
+        if (colorAttribute && colorAttribute.options) {
+          colors = colorAttribute.options;
+        }
+
+        setAvailableColors(colors); // Pré-sélectionner la première couleur s'il y en a
+        if (colors.length > 0) {
+          setSelectedColor(colors[0]);
+        } else {
+          setSelectedColor("");
+        }
+        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE POINTURE (TAILLE)
+        const sizeAttribute = data.attributes.find((attr) =>
+          attr.name.toLowerCase().includes("pointure")
+        );
+
+        let sizes = [];
+        if (sizeAttribute && sizeAttribute.options) {
+          sizes = sizeAttribute.options.sort(); // Tri des tailles pour un affichage propre
+        }
+
+        setAvailableSizes(sizes); // Pré-sélectionner la première taille s'il y en a, sinon laisser vide
+        if (sizes.length > 0) {
+          setSelectedSize(sizes[0]);
+        }
         setProduct({
           id: data.id,
           name: data.name,
@@ -270,6 +322,7 @@ function ProductDetail() {
           attributes,
           stockQuantity: stockQuantity,
           manageStock: manageStock,
+          availableSizes: sizes,
         }); // 2. Récupération des Avis (après avoir récupéré le produit avec succès)
 
         await fetchReviews();
@@ -539,6 +592,58 @@ function ProductDetail() {
               dangerouslySetInnerHTML={{ __html: product.displayDescription }}
             />
           )}
+          {/* 🚨 NOUVEAU : SÉLECTEUR DE COULEUR 🚨 */}
+          {availableColors.length > 0 && !product.isOutOfStock && (
+            <div className="color-selector-group">
+              <label htmlFor="product-color">
+                Couleur :<span className="required-star">*</span>
+              </label>
+
+              <select
+                id="product-color"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                required
+                className="color-select-input"
+              >
+                <option value="" disabled>
+                  Choisir une couleur...
+                </option>
+
+                {availableColors.map((color) => (
+                  <option key={color} value={color}>
+                    {color}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {/* 🚨 NOUVEAU : SÉLECTEUR DE POINTURE 🚨 */}
+          {availableSizes.length > 0 && !product.isOutOfStock && (
+            <div className="size-selector-group">
+              <label htmlFor="product-size">
+                Pointure :<span className="required-star">*</span>
+              </label>
+
+              <select
+                id="product-size"
+                value={selectedSize}
+                onChange={(e) => setSelectedSize(e.target.value)}
+                required
+                className="size-select-input"
+              >
+                <option value="" disabled>
+                  Choisir une taille...
+                </option>
+
+                {availableSizes.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {/* 🚨 NOUVEAU : Champ de sélection de quantité 🚨 */}
           {!product.isOutOfStock && (
             <div className="quantity-selector-group">
@@ -565,7 +670,6 @@ function ProductDetail() {
               />
             </div>
           )}
-
           {product.manageStock &&
             !product.isOutOfStock &&
             product.stockQuantity !== null && (
@@ -581,7 +685,7 @@ function ProductDetail() {
             disabled={product.isOutOfStock || quantity < 1}
             onClick={handleAddToCart}
           >
-            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}       
+            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}
           </button>
         </div>
       </div>

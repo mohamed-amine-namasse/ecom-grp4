@@ -477,3 +477,83 @@ select {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+/* --- STYLES POUR LA SÉLECTION DE POINTURE --- */
+
+/* Conteneur de la taille/quantité */
+.size-selector-group,
+.quantity-selector-group {
+  display: flex; /* Aligne l'étiquette et le champ */
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Style général pour le champ de sélection (select) */
+.size-select-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.size-select-input:hover {
+  border-color: #999;
+}
+
+.size-select-input:focus {
+  border-color: #007bff; /* Couleur de focus claire */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+/* Assurer que le champ de quantité a un style cohérent */
+.quantity-input {
+  width: 60px; /* Taille fixée pour l'input de quantité */
+  text-align: center;
+  padding: 8px 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* ---  Style pour l'astérisque obligatoire --- */
+.required-star {
+  color: #ff0000; /* Rouge */
+  margin-left: 4px;
+  font-size: 0.9em;
+}
+
+/* --- NOUVEAUX STYLES POUR LA SÉLECTION DE COULEUR --- */
+
+/* Utilise les mêmes propriétés que le sélecteur de taille pour l'alignement */
+.color-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Utilise les mêmes propriétés que le sélecteur de taille pour le style du select */
+.color-select-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.color-select-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}

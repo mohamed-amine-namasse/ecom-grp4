@@ -101,7 +101,9 @@ export const CartProvider = ({ children }) => {
             name: product.name,
             price: price,
             quantity: finalQuantity,
-            image: product.image || "/img/default.jpg", // ✅ S'ASSURER QUE LES DONNÉES DE STOCK SONT SAUVEGARDÉES
+            image: product.image || "/img/default.jpg",
+            selectedSize: product.selectedSize,
+            selectedColor: product.selectedColor,
             manageStock: manageStock,
             stockQuantity: maxStock,
           },

@@ -46,8 +46,8 @@ body {
 
 .steps .active {
   font-weight: bold;
-  color: #333;
-  border-bottom: 2px solid #007bff; /* Couleur d'accentuation pour l'étape active */
+  color: #007bff;
+  border-bottom: 007bff;
 }
 
 /* Sections du formulaire */
@@ -68,12 +68,13 @@ body {
 .section input[type="text"],
 .section input[type="email"],
 .section input[type="tel"] {
-  width: 100%;
   padding: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 0; /* Important: La marge sera gérée par le .row */
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur */
+  box-sizing: border-box;
+  /* Pour l'alignement, nous mettons flex: 1 sur tous les inputs */
+  flex: 1;
 }
 
 .section input:focus {
@@ -86,6 +87,7 @@ body {
 .row {
   display: flex;
   gap: 15px;
+  margin-bottom: 15px;
 }
 
 .row input {
@@ -202,6 +204,51 @@ body {
   font-size: 1.2em;
   font-weight: bold;
   color: #333;
+}
+
+/* DANS src/pages/Checkout/style.css */
+
+/* Style de base des étapes */
+.checkout-left .steps span {
+  position: relative;
+  padding-bottom: 5px; /* Espace pour le trait */
+  margin: 0 10px;
+  font-weight: 500;
+  cursor: default;
+  /* Ajoutez une transition pour un effet fluide */
+  transition: color 0.3s ease;
+}
+
+/* Base du trait (barre de progression) */
+.checkout-left .steps span::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0; /* Commence à 0 de largeur */
+  height: 3px;
+  background-color: #007bff; /* Couleur de votre trait actif (ajustez si nécessaire) */
+  transition: width 0.3s ease; /* Animation pour l'apparition du trait */
+}
+
+/* État Actif/Actuel (INFORMATION) */
+.checkout-left .steps span.active {
+  color: 007bff;
+}
+
+.checkout-left .steps span.active::after {
+  width: 100%; /* Le trait est complet pour l'étape active */
+}
+
+/* 🚨 NOUVEL ÉTAT COMPLÉTÉ (SHIPPING, PAYMENT) 🚨 */
+.checkout-left .steps span.completed {
+  color: green; /* Change la couleur du texte pour indiquer la complétion */
+}
+
+.checkout-left .steps span.completed::after {
+  /* Le trait est complet pour l'étape terminée, peut être vert ou la couleur active */
+  width: 100%;
+  background-color: green; /* Ou laissez #007bff si vous voulez juste le trait rempli */
 }
 
 /* Media Query pour la réactivité */

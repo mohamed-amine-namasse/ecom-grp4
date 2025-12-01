@@ -1,5 +1,3 @@
-// src/contexts/CartContext.js
-
 import React, {
   createContext,
   useState,
@@ -23,8 +21,7 @@ export const useCart = () => {
 // Fonction pour récupérer le panier du localStorage lors de l'initialisation
 const getInitialCart = () => {
   try {
-    const savedCart = localStorage.getItem("cartItems");
-    // Si des données existent, parsez-les. Sinon, retournez un tableau vide.
+    const savedCart = localStorage.getItem("cartItems"); // Si des données existent, parsez-les. Sinon, retournez un tableau vide.
     return savedCart ? JSON.parse(savedCart) : [];
   } catch (e) {
     console.error("Erreur de lecture de localStorage:", e);
@@ -35,9 +32,8 @@ const getInitialCart = () => {
 // Fournisseur de Contexte (Wrapper pour l'application)
 export const CartProvider = ({ children }) => {
   // L'état du panier est initialisé à partir du localStorage
-  const [cartItems, setCartItems] = useState(getInitialCart);
+  const [cartItems, setCartItems] = useState(getInitialCart); // Effet pour synchroniser cartItems avec localStorage à chaque changement
 
-  // Effet pour synchroniser cartItems avec localStorage à chaque changement
   useEffect(() => {
     try {
       // Sauvegarder les données dans localStorage
@@ -45,16 +41,24 @@ export const CartProvider = ({ children }) => {
     } catch (e) {
       console.error("Erreur d'écriture dans localStorage:", e);
     }
-  }, [cartItems]); // ------------------------------------------------------------------ // --- FONCTIONS DE LOGIQUE DU PANIER // ------------------------------------------------------------------
+  }, [cartItems]);
   /**
    * Ajoute un produit au panier ou augmente sa quantité s'il existe déjà.
-   * @param {object} product - L'objet produit à ajouter (doit avoir au moins id, name, price).
+   * Cette fonction inclut désormais la vérification du stock maximal.
+   * @param {object} product - L'objet produit (doit inclure manageStock et stockQuantity).
    */
 
+  // ------------------------------------------------------------------
+  // --- FONCTIONS DE LOGIQUE DU PANIER
+  // ------------------------------------------------------------------
+
   const addToCart = (product, quantityToAdd = 1) => {
-    const price = parseFloat(product.price) || 0; // Utilise le prix du produit passé
-    // S'assurer que la quantité est au moins 1 si elle vient d'une source externe
-    const finalQuantity = Math.max(1, quantityToAdd);
+    const price = parseFloat(product.price) || 0;
+    const maxStock = product.stockQuantity;
+    const manageStock = product.manageStock; // S'assurer que la quantité est au moins 1
+
+    const initialQuantity = Math.max(1, quantityToAdd);
+
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (item) => item.id === product.id
@@ -63,80 +67,115 @@ export const CartProvider = ({ children }) => {
       let newCart;
 
       if (existingItemIndex > -1) {
-        // Cas où l'article existe déjà : on met à jour l'article existant
+        // Cas où l'article existe déjà
         newCart = [...prevItems];
         const existingItem = newCart[existingItemIndex];
+        let newQuantity = existingItem.quantity + initialQuantity; // 🚨 PLAFONNEMENT À L'AJOUT
+
+        if (manageStock && maxStock !== null && newQuantity > maxStock) {
+          newQuantity = maxStock;
+        } // Si la quantité n'a pas changé à cause du plafonnement, ne pas mettre à jour
+
+        if (existingItem.quantity === newQuantity) {
+          return prevItems;
+        }
 
         newCart[existingItemIndex] = {
-          ...existingItem, // 1. Garder les anciennes propriétés (et la quantité actuelle)
-          ...product, // 2. Écraser/ajouter les nouvelles propriétés (comme 'image')
-          quantity: existingItem.quantity + finalQuantity, // 3. Augmenter la quantité
-          price: price, // 4. Assurer l'utilisation du prix sécurisé
+          ...existingItem,
+          ...product,
+          quantity: newQuantity,
+          price: price,
         };
       } else {
-        // Cas où l'article est NOUVEAU : on ajoute le produit complet
+        // Cas où l'article est NOUVEAU
+        let finalQuantity = initialQuantity; // 🚨 PLAFONNEMENT À LA CRÉATION
+
+        if (manageStock && maxStock !== null && finalQuantity > maxStock) {
+          finalQuantity = maxStock;
+        }
+
         newCart = [
           ...prevItems,
           {
-            // Nous listons explicitement les propriétés essentielles pour forcer l'inclusion de l'image
             id: product.id,
             name: product.name,
-            price: price, // Prix sécurisé
+            price: price,
             quantity: finalQuantity,
-            image: product.image || "/img/default.jpg", // 🚨 FORCER L'IMAGE ICI
+            image: product.image || "/img/default.jpg", // ✅ S'ASSURER QUE LES DONNÉES DE STOCK SONT SAUVEGARDÉES
+            manageStock: manageStock,
+            stockQuantity: maxStock,
           },
         ];
       }
       return newCart;
     });
   };
-
   /**
-   * Met à jour la quantité d'un produit spécifique dans le panier.
+   * Met à jour la quantité d'un produit spécifique, en plafonnant au stock max.
    * @param {number} id - L'ID du produit.
-   * @param {number} quantity - La nouvelle quantité.
+   * @param {number} newQuantity - La nouvelle quantité souhaitée.
    */
-  const updateQuantity = (id, quantity) => {
-    if (quantity < 1) {
-      // Si la quantité est inférieure à 1, retire l'article
-      removeFromCart(id);
-      return;
-    }
 
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: quantity } : item
-      )
-    );
+  const updateQuantity = (id, newQuantity) => {
+    setCartItems((prevItems) => {
+      return prevItems.map((item) => {
+        if (item.id === id) {
+          const maxStock = item.stockQuantity;
+          const manageStock = item.manageStock;
+          let finalQuantity = newQuantity; // 🚨 VÉRIFICATION ET PLAFONNEMENT DU STOCK (C'EST LE FIX)
+
+          if (manageStock && maxStock !== null) {
+            // Plafonner si la nouvelle quantité dépasse le stock
+            if (newQuantity > maxStock) {
+              finalQuantity = maxStock;
+            }
+          } // S'assurer que la quantité est au moins 1
+
+          if (finalQuantity < 1) {
+            // Si c'est l'intention (gérée dans Cart.js), on peut appeler removeFromCart
+            // Mais ici, on se contente de la mettre à 1 si on veut la garder dans le panier.
+            // Cependant, votre Cart.js gère le retrait si < 1, donc on laisse 1 ici pour la sécurité.
+            finalQuantity = 1;
+          }
+
+          // Si la quantité n'a pas changé après vérification/plafonnement, on retourne l'item inchangé
+          if (item.quantity === finalQuantity) {
+            return item;
+          }
+
+          return { ...item, quantity: finalQuantity };
+        }
+        return item;
+      });
+    });
   };
   /**
    * Retire complètement un produit du panier.
-   * @param {number} id - L'ID du produit à retirer.
    */
-
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  }; // ------------------------------------------------------------------ // --- CALCULS OPTIMISÉS (useMemo) // ------------------------------------------------------------------
+  };
   /**
-   * Retourne le nombre total d'articles (somme des quantités) dans le panier.
+   * Retourne le nombre total d'articles (somme des quantités) dans le panier (pour le badge).
    */
 
+  // ------------------------------------------------------------------
+  // --- CALCULS OPTIMISÉS (useMemo)
+  // ------------------------------------------------------------------
   const getCartCount = useMemo(() => {
-    // Calcul de la somme des quantités
     return cartItems.reduce((total, item) => total + item.quantity, 0);
-  }, [cartItems]); // Recalculé uniquement lorsque cartItems change
-
+  }, [cartItems]);
   /**
    * Calcule le montant total du panier.
    */
+
   const cartTotal = useMemo(() => {
     return cartItems.reduce((total, item) => {
-      // Sécurité : Assurez-vous que le prix est un nombre avant le calcul
       const price =
         typeof item.price === "number" && !isNaN(item.price) ? item.price : 0;
       return total + price * item.quantity;
     }, 0);
-  }, [cartItems]); // Recalculé uniquement lorsque cartItems change // L'objet valeur qui sera fourni aux composants
+  }, [cartItems]);
 
   const contextValue = {
     cartItems,

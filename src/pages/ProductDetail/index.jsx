@@ -30,7 +30,7 @@ const RatingStars = ({ rating }) => {
 
 function ProductDetail() {
   const { id } = useParams();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [reviews, setReviews] = useState([]);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +38,14 @@ function ProductDetail() {
   // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  // 🚨 NOUVEAUX ÉTATS POUR LE MESSAGE FLASH D'ERREUR DE STOCK
+  const [showStockFlash, setShowStockFlash] = useState(false);
+  const [stockFlashMessage, setStockFlashMessage] = useState("");
+  // NOUVELLE FONCTION pour fermer le flash de stock
+  const handleCloseStockFlash = () => {
+    setShowStockFlash(false);
+    setStockFlashMessage("");
+  };
   // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
@@ -79,19 +87,49 @@ function ProductDetail() {
       setReviews([]);
     }
   };
+  // 3. Fonction pour obtenir la quantité actuelle dans le panier
+  const getProductQuantityInCart = (productId) => {
+    const item = cartItems.find((item) => item.id === productId);
+    return item ? item.quantity : 0;
+  };
 
   // Fonction pour ajouter au panier
   const handleAddToCart = () => {
+    // 1. Fermer les messages flash précédents
+    handleCloseFlash(); // Ferme le flash de succès
+    handleCloseStockFlash(); // Ferme le flash d'erreur de stock
+
     // S'assurer que la quantité est un nombre valide (minimum 1)
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
+      const currentQuantityInCart = getProductQuantityInCart(product.id);
+      const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
+
+      const maxStock = product.stockQuantity;
+      const manageStock = product.manageStock;
+
+      // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
+      if (manageStock && maxStock !== null && quantityAfterAdd > maxStock) {
+        // Cas d'erreur : stock dépassé
+        setStockFlashMessage(
+          `L'ajout de ${quantityToAdd} article(s) dépasse le stock maximal disponible (${maxStock}). Vous avez déjà ${currentQuantityInCart} dans votre panier.`
+        );
+        setShowStockFlash(true);
+        return; // Bloquer l'ajout
+      }
+
+      // Si le stock est suffisant (ou non géré), continuer l'ajout
       const itemToAdd = {
         id: product.id,
         name: product.name,
         price: product.price,
         image: product.image,
+
+        manageStock: manageStock,
+        stockQuantity: maxStock,
       };
+
       addToCart(itemToAdd, quantityToAdd);
 
       setShowFlash(true);

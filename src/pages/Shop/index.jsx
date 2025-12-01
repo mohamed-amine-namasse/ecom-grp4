@@ -56,7 +56,7 @@ const getMaxPrice = (products) => {
 };
 
 function Shop() {
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,7 +69,13 @@ function Shop() {
 
   //   TOTAL
   const [totalProducts, setTotalProducts] = useState(0);
-
+  // 🚨 NOUVEAUX ÉTATS POUR LE MESSAGE FLASH D'ERREUR DE STOCK
+  const [showStockFlash, setShowStockFlash] = useState(false);
+  const [stockFlashMessage, setStockFlashMessage] = useState("");
+  const handleCloseStockFlash = () => {
+    setShowStockFlash(false);
+    setStockFlashMessage("");
+  };
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -139,7 +145,12 @@ function Shop() {
             surface: getAttributeValue(product.attributes, "surface") || "",
             marque: marqueName,
           };
-
+          // 🚨 AJOUT DES DONNÉES DE STOCK WOOCOMMERCE
+          const manageStock = product.manage_stock;
+          const stockQuantity =
+            product.stock_quantity !== null
+              ? parseInt(product.stock_quantity, 10)
+              : null;
           return {
             id: product.id,
             name: product.name,
@@ -149,6 +160,8 @@ function Shop() {
             image: imageUrl,
             stock_status: product.stock_status,
             attributes: productAttributes,
+            manageStock: manageStock,
+            stockQuantity: stockQuantity,
           };
         });
         // Calcul des Matières uniques
@@ -256,7 +269,33 @@ function Shop() {
 
     return workingProducts;
   }, [products, filters]);
+  // 3. Fonction pour obtenir la quantité actuelle dans le panier
+  const getProductQuantityInCart = (productId) => {
+    const item = cartItems.find((item) => item.id === productId);
+    return item ? item.quantity : 0;
+  };
+  // 🚨 FONCTION POUR GÉRER L'AJOUT ET LA VÉRIFICATION DU STOCK 🚨
+  const handleStockedAddToCart = (productData) => {
+    const currentQuantity = getProductQuantityInCart(productData.id);
+    const quantityToRequest = currentQuantity + 1; // La nouvelle quantité après le clic
+    const maxStock = productData.stockQuantity; // Fermer tout message flash précédent
+    handleCloseStockFlash(); // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE // Vérifie si le stock est géré, s'il y a une quantité max, et si la requête dépasse cette max.
 
+    if (
+      productData.manageStock &&
+      maxStock !== null &&
+      quantityToRequest > maxStock
+    ) {
+      // Cas d'erreur : stock dépassé
+      setStockFlashMessage(
+        `La quantité maximum de « ${productData.name} » autorisée dans le panier est de ${maxStock}`
+      );
+      setShowStockFlash(true);
+      return; // Bloquer l'ajout
+    } // Si en stock ou stock non géré, ajouter l'article
+
+    addToCart(productData, 1);
+  };
   // 4. Gérer l'affichage du chargement et des erreurs
   if (isLoading) {
     return (
@@ -296,6 +335,19 @@ function Shop() {
             : "Aucun produit trouvé sur WooCommerce."}
         </p>
       </header>
+      {/* 🚨 MESSAGE FLASH D'ERREUR DE STOCK 🚨 */}
+      {showStockFlash && (
+        <div className="flash-message-cart flash-error">
+          <p>❌ {stockFlashMessage}</p> 
+          <button
+            className="btn-close-flash"
+            onClick={handleCloseStockFlash}
+            aria-label="Fermer la notification d'erreur de stock"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       <div className="shop-layout">
         <aside className="shop-sidebar">
@@ -326,6 +378,7 @@ function Shop() {
           {filteredProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
             const productLink = `/product/${prod.id}`; // Définir le lien une seule fois
+            const quantityInCart = getProductQuantityInCart(prod.id);
             return (
               <article className="product-card">
                 <div className="product-media" key={prod.id}>
@@ -372,14 +425,21 @@ function Shop() {
                       // Désactivation du bouton si l'article est hors stock
                       disabled={isOutOfStock}
                       onClick={() =>
-                        addToCart({
+                        // 🚀 Utiliser la fonction de vérification
+                        handleStockedAddToCart({
                           id: prod.id,
                           name: prod.name,
                           price: prod.price,
+                          manageStock: prod.manageStock,
+                          stockQuantity: prod.stockQuantity,
                         })
                       }
                     >
-                      Ajouter
+                      {isOutOfStock
+                        ? "Rupture de Stock"
+                        : quantityInCart > 0
+                        ? `${quantityInCart} dans le panier`
+                        : "Ajouter au panier"}
                     </button>
                   </div>
                 </div>

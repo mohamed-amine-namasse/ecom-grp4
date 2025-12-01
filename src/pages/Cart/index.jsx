@@ -3,7 +3,7 @@ import { useCart } from "../../components/CartContext";
 import { Link } from "react-router";
 import "./style.css";
 
-// Fonction pour formater le prix en Euro (réutilisée de votre composant Shop)
+// Fonction pour formater le prix en Euro
 const formatPrice = (p) =>
   p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
@@ -12,11 +12,13 @@ function Cart() {
   const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
 
   // Fonction pour gérer l'augmentation de la quantité
+  // L'augmentation est appelée uniquement si le bouton n'est pas désactivé.
   const handleIncrease = (item) => {
+    // La vérification de la quantité maximale est gérée par l'attribut 'disabled' du bouton
     updateQuantity(item.id, item.quantity + 1);
   };
 
-  // Fonction pour gérer la diminution de la quantité (avec suppression si elle atteint zéro)
+  // Fonction pour gérer la diminution de la quantité
   const handleDecrease = (item) => {
     if (item.quantity > 1) {
       updateQuantity(item.id, item.quantity - 1);
@@ -43,49 +45,71 @@ function Cart() {
         </div>
       ) : (
         <div className="cart-content">
+          {/* NOTE: Le message flash d'erreur de stock a été retiré. */}
+
           <section className="cart-items-list">
-            {cartItems.map((item) => (
-              <article key={item.id} className="cart-item-card">
-                <div className="item-info">
-                  <h2 className="item-name">{item.name}</h2>
-                  <p className="item-price">
-                    Prix unitaire : {formatPrice(item.price)}
-                  </p>
-                </div>
+            {cartItems.map((item) => {
+              // Calcul pour déterminer si le bouton doit être désactivé
+              const isStockManaged =
+                item.manageStock && item.stockQuantity !== null;
+              const isMaxQuantityReached =
+                isStockManaged && item.quantity >= item.stockQuantity;
 
-                <div className="item-quantity-controls">
+              return (
+                <article key={item.id} className="cart-item-card">
+                  <div className="item-info">
+                    <h2 className="item-name">{item.name}</h2>
+                    {/* Affichage optionnel du stock restant pour information */}
+                    {isStockManaged && (
+                      <p
+                        className={`item-stock-info ${
+                          isMaxQuantityReached ? "stock-limit-reached" : ""
+                        }`}
+                      >
+                        Stock disponible : **{item.stockQuantity}**
+                      </p>
+                    )}
+                    <p className="item-price">
+                      Prix unitaire : {formatPrice(item.price)}
+                    </p>
+                  </div>
+
+                  <div className="item-quantity-controls">
+                    <button
+                      className="btn-quantity decrease"
+                      onClick={() => handleDecrease(item)}
+                      aria-label="Diminuer la quantité"
+                    >
+                      -
+                    </button>
+                    <span className="item-quantity">{item.quantity}</span>
+                    <button
+                      className="btn-quantity increase"
+                      onClick={() => handleIncrease(item)}
+                      aria-label="Augmenter la quantité"
+                      // 🚀 Désactivation conditionnelle si le stock est géré ET que la quantité maximale est atteinte
+                      disabled={isMaxQuantityReached}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div className="item-subtotal">
+                    <p>
+                      Sous-total : **{formatPrice(item.price * item.quantity)}**
+                    </p>
+                  </div>
+
                   <button
-                    className="btn-quantity decrease"
-                    onClick={() => handleDecrease(item)}
-                    aria-label="Diminuer la quantité"
+                    className="btn-remove"
+                    onClick={() => removeFromCart(item.id)}
+                    aria-label="Retirer l'article du panier"
                   >
-                    -
+                    &times; Retirer
                   </button>
-                  <span className="item-quantity">{item.quantity}</span>
-                  <button
-                    className="btn-quantity increase"
-                    onClick={() => handleIncrease(item)}
-                    aria-label="Augmenter la quantité"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <div className="item-subtotal">
-                  <p>
-                    Sous-total : **{formatPrice(item.price * item.quantity)}**
-                  </p>
-                </div>
-
-                <button
-                  className="btn-remove"
-                  onClick={() => removeFromCart(item.id)}
-                  aria-label="Retirer l'article du panier"
-                >
-                  &times; Retirer
-                </button>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </section>
 
           <aside className="cart-summary">

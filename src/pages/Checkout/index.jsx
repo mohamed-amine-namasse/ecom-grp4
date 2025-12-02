@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useCart } from "../../components/CartContext";
-import { Link } from "react-router-dom"; // Assurez-vous d'utiliser "react-router-dom" si vous utilisez React Router v6+
+import { Link } from "react-router";
 import "./style.css";
 
 // Fonction utilitaire pour le formatage du prix

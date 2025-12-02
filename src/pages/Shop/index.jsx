@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
-import { Link } from "react-router-dom"; // Assurez-vous d'utiliser react-router-dom
+import { Link } from "react-router";
 
 // ----------------------------------------------------------------------
 // --- CONFIGURATION WOOCOMMERCE ---

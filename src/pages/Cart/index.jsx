@@ -1,6 +1,6 @@
 import React from "react";
 import { useCart } from "../../components/CartContext";
-import { Link } from "react-router-dom"; // Assurez-vous d'utiliser "react-router-dom"
+import { Link } from "react-router";
 import "./style.css";
 
 // Fonction pour formater le prix en Euro

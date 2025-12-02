@@ -22,7 +22,7 @@ const initialFilters = {
   surface: [],
   material: [],
   disponibility: "all",
-  priceRange: [0, 500],
+  priceRange: [0, 250],
   marque: [],
 };
 

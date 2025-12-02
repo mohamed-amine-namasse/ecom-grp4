@@ -73,6 +73,11 @@
   overflow-y: auto;
 }
 
+.navbar-logo {
+  height: 70px;
+
+  margin-right: 1rem;
+}
 /* Mobile: burger left, brand next, then loupe + icons to the right;
           collapse of links will open full-width under the bar.
           Also hide the search input so only the loupe button remains. */

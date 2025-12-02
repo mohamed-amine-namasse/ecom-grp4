@@ -288,8 +288,19 @@ function NavScrollExample() {
         <Container fluid className="d-flex align-items-center">
           {" "}
           <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
-          <Navbar.Brand as={NavLink} to="/" className="fw-bold ">
-            Foot Market
+          <Navbar.Brand
+            as={(props) => <a href="/" {...props} />}
+            to="/"
+            className=" d-flex align-items-center"
+          >
+            {/* ---------------------------------------------------- */}
+            {/* L'image de votre logo est ajoutée ici */}
+            {/* ---------------------------------------------------- */}
+            <img
+              src="../images/LOGO.jpg" // REMPLACEZ CETTE URL PAR L'URL DE VOTRE LOGO HEBERGÉ
+              alt="Foot Market Logo"
+              className="navbar-logo" // Classe pour le style
+            />
           </Navbar.Brand>
           {/* liens à l'intérieur du collapse */}
           <Navbar.Collapse id="nav-links-collapse">

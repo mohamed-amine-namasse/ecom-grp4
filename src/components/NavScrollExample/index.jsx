@@ -11,6 +11,7 @@ import { NavLink } from "react-router";
 import { IoSearchOutline } from "react-icons/io5";
 import { PiUserCircleGearFill } from "react-icons/pi";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import { FaShippingFast } from "react-icons/fa";
 import Modal from "react-bootstrap/Modal";
 import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
@@ -367,7 +368,17 @@ function NavScrollExample() {
             {isLoggedIn ? (
               // --- Utilisateur CONNECTÉ : PROFIL + DÉCONNEXION ---
               <>
-                {/* 2. PROFIL (Lien vers /profile) */}
+                {/* 2. Livraison */}
+                <Nav.Link
+                  as={NavLink}
+                  to="/shipping"
+                  className="p-1 text-dark"
+                  aria-label="Livraison utilisateur"
+                  title="Livraison"
+                >
+                  <FaShippingFast size={30} />
+                </Nav.Link>
+                {/* 3. PROFIL (Lien vers /profile) */}
                 <Nav.Link
                   as={NavLink}
                   to="/profile"
@@ -379,7 +390,8 @@ function NavScrollExample() {
                   {/* Icône de profil corrigée */}
                   <PiUserCircleGearFill size={30} />
                 </Nav.Link>
-                {/* 3. DÉCONNEXION (Action) */}
+
+                {/* 4. DÉCONNEXION (Action) */}
                 <Button
                   variant="link"
                   onClick={handleLogout}

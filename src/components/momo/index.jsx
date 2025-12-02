@@ -18,8 +18,8 @@ function ProductCards() {
     },
     {
       title: "Puma Future",
-      description: "Agilité et confort pour vos mouvements les plus rapides.",
-      image: "images/puma.jpg",
+      description: "Agilité et confort pour vos mouvements les plus rapides.", 
+      image: "images/nike-présente-la-phantom-luna-une-nouvelle-chaussure-de-foot-pensée-pour-les-femmes.avif",
     },
     {
       title: "Nike Phantom",
@@ -38,10 +38,6 @@ function ProductCards() {
               src={product.image}
               style={{ height: "200px", objectFit: "cover" }}
             />
-            <Card.Body>
-             
-              
-            </Card.Body>
           </Card>
         </Col>
       ))}

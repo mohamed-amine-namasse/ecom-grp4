@@ -46,9 +46,9 @@ const getAttributeValue = (attributes, name) => {
 const getMaxPrice = (products) => {
   if (!products || products.length === 0) return 300; // Trouver le prix maximum
 
-  const max = Math.max(...products.map((p) => p.price)); // Arrondir au multiple de 10 supérieur (ou 500 minimum)
+  const max = Math.max(...products.map((p) => p.price)); // Arrondir au multiple de 10 supérieur (ou 250 minimum)
 
-  return Math.max(500, Math.ceil(max / 10) * 10);
+  return Math.max(250, Math.ceil(max / 10) * 10);
 };
 
 function Shop() {

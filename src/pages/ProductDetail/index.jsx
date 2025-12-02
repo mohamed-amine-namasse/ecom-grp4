@@ -631,30 +631,27 @@ function ProductDetail() {
               </select>
             </div>
           )}
-          {/* 🚨 NOUVEAU : SÉLECTEUR DE POINTURE 🚨 */}
+          {/* 🚨 NOUVEAU : SÉLECTEUR DE POINTURE EN CARRÉS 🚨 */}
           {availableSizes.length > 0 && !product.isOutOfStock && (
             <div className="size-selector-group">
-              <label htmlFor="product-size">
-                Pointure :<span className="required-star">*</span>
+              <label>
+                Pointure sélectionnée :<span className="required-star">*</span>
               </label>
 
-              <select
-                id="product-size"
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value)}
-                required
-                className="size-select-input"
-              >
-                <option value="" disabled>
-                  Choisir une taille...
-                </option>
-
+              <div className="size-buttons-container">
                 {availableSizes.map((size) => (
-                  <option key={size} value={size}>
+                  <button
+                    key={size}
+                    type="button"
+                    className={`size-button ${
+                      selectedSize === size ? "selected" : ""
+                    }`}
+                    onClick={() => setSelectedSize(size)}
+                  >
                     {size}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
           )}
           {/* 🚨 NOUVEAU : Champ de sélection de quantité 🚨 */}

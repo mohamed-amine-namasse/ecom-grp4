@@ -478,40 +478,6 @@ select {
   box-sizing: border-box;
 }
 
-/* --- STYLES POUR LA SÉLECTION DE POINTURE --- */
-
-/* Conteneur de la taille/quantité */
-.size-selector-group,
-.quantity-selector-group {
-  display: flex; /* Aligne l'étiquette et le champ */
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-/* Style général pour le champ de sélection (select) */
-.size-select-input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  background-color: #f9f9f9;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.size-select-input:hover {
-  border-color: #999;
-}
-
-.size-select-input:focus {
-  border-color: #007bff; /* Couleur de focus claire */
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-  outline: none;
-}
-
 /* Assurer que le champ de quantité a un style cohérent */
 .quantity-input {
   width: 60px; /* Taille fixée pour l'input de quantité */
@@ -539,6 +505,7 @@ select {
   margin-bottom: 15px;
   font-size: 1.1rem;
   font-weight: 500;
+  font-weight: bold;
 }
 
 /* Utilise les mêmes propriétés que le sélecteur de taille pour le style du select */
@@ -556,4 +523,58 @@ select {
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
   outline: none;
+}
+
+/* --- Styles pour le sélecteur de pointure en carrés --- */
+
+/* Conteneur des boutons de taille */
+.size-buttons-container {
+  display: flex;
+  flex-wrap: wrap; /* Permet le retour à la ligne si trop de tailles */
+  gap: 8px; /* Espace entre les boutons */
+  margin-top: 10px;
+}
+
+/* Style de base pour un bouton de taille */
+.size-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45px; /* Largeur du carré */
+  height: 45px; /* Hauteur du carré */
+  border: 1px solid #ccc; /* Bordure par défaut */
+  background-color: #f7f7f7;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px; /* Un léger arrondi */
+  padding: 0; /* Important pour que width/height définissent la taille réelle */
+  font-size: 14px;
+}
+
+/* État au survol (hover) */
+.size-button:hover:not(.selected) {
+  border-color: #000;
+  background-color: #eee;
+}
+
+/* État sélectionné */
+.size-button.selected {
+  border-color: #000; /* Bordure noire pour la taille sélectionnée */
+  background-color: #000;
+  color: #fff; /* Texte blanc sur fond noir */
+  font-weight: 700;
+}
+
+/* Assurez-vous d'ajouter ce style pour le label si vous utilisez une balise <label> seule */
+.size-selector-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.size-selector-group {
+  margin-bottom: 15px;
 }

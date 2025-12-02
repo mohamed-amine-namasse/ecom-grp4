@@ -364,20 +364,20 @@ function NavScrollExample() {
                 </Badge>
               )}
             </Nav.Link>
+            {/* 2. Livraison */}
+            <Nav.Link
+              as={NavLink}
+              to="/shipping"
+              className="p-1 text-dark"
+              aria-label="Livraison utilisateur"
+              title="Livraison"
+            >
+              <FaShippingFast size={30} />
+            </Nav.Link>
 
             {isLoggedIn ? (
               // --- Utilisateur CONNECTÉ : PROFIL + DÉCONNEXION ---
               <>
-                {/* 2. Livraison */}
-                <Nav.Link
-                  as={NavLink}
-                  to="/shipping"
-                  className="p-1 text-dark"
-                  aria-label="Livraison utilisateur"
-                  title="Livraison"
-                >
-                  <FaShippingFast size={30} />
-                </Nav.Link>
                 {/* 3. PROFIL (Lien vers /profile) */}
                 <Nav.Link
                   as={NavLink}

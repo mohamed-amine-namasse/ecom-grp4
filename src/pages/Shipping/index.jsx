@@ -2,48 +2,62 @@ import React, { useState } from "react";
 import "./style.css";
 
 function Shipping() {
-  const [tracking, setTracking] = useState("");
-  const [status, setStatus] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [orderData, setOrderData] = useState(null); // Pour stocker les données de la commande
   const [loading, setLoading] = useState(false);
+
   const WOOCOMMERCE_FULL_URL =
     "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
   const CONSUMER_KEY = "ck_aa9a985d1afe4839d747e479a02fb4120116df9b";
   const CONSUMER_SECRET = "cs_aa80e9a2a76467d2dd9b5f49ae0ab17f51b7a407";
 
-  // Construction de l'URL API
-  const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}&per_page=100`;
   async function handleTrack(e) {
     e.preventDefault();
-    setStatus("");
-    if (!tracking.trim()) {
-      setStatus("Veuillez saisir un numéro de suivi.");
+    setStatusMessage("");
+    setOrderData(null); // Réinitialiser les données précédentes
+
+    if (!orderId.trim()) {
+      setStatusMessage("Veuillez saisir un numéro de commande.");
       return;
     }
 
     setLoading(true);
+
+    // 1. Point d'accès corrigé : cibler une commande spécifique par son ID (orderId)
+    // 2. Les clés doivent être dans l'URL pour la méthode GET
+    const ORDER_API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/orders/${orderId.trim()}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+
     try {
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tracking: tracking.trim() }),
+      const res = await fetch(ORDER_API_URL, {
+        method: "GET",
       });
 
       if (!res.ok) {
+        // La commande n'a pas été trouvée ou une erreur d'API s'est produite
         const err = await res.json().catch(() => ({}));
-        setStatus(err.message || "Erreur serveur lors du suivi.");
+
+        // WooCommerce renvoie un code 404 (Not Found) si la commande n'existe pas
+        if (res.status === 404) {
+          setStatusMessage(`Commande ${orderId.trim()} introuvable.`);
+        } else {
+          setStatusMessage(
+            err.message ||
+              `Erreur serveur (${res.status}) lors de la recherche.`
+          );
+        }
       } else {
         const data = await res.json();
-        // attendre le format renvoyé par WP ; ici on affiche message / details
-        if (data && data.found) {
-          setStatus(`Statut : ${data.status} — ${data.message || ""}`);
-        } else {
-          setStatus(data.message || `Aucun résultat pour : ${tracking}`);
-        }
+
+        // 3. Afficher les informations pertinentes de la commande
+        setOrderData(data); // Stocker toutes les données de la commande
+        setStatusMessage(
+          `Commande trouvée ! Statut : ${data.status} (Total: ${data.total} ${data.currency})`
+        );
       }
     } catch (error) {
-      setStatus("Impossible de contacter le serveur de suivi.");
+      console.error("Erreur de fetch:", error);
+      setStatusMessage("Impossible de contacter le serveur WooCommerce.");
     } finally {
       setLoading(false);
     }
@@ -63,12 +77,12 @@ function Shipping() {
         <h2>Suivi de commande</h2>
         <form onSubmit={handleTrack} style={{ marginTop: 8 }}>
           <label>
-            Numéro de suivi
+            Numéro de commande (ID)
             <input
-              name="tracking"
-              value={tracking}
-              onChange={(e) => setTracking(e.target.value)}
-              placeholder="Ex. ABC123456789"
+              name="orderId"
+              value={orderId}
+              onChange={(e) => setOrderId(e.target.value)}
+              placeholder="Ex. 123" // Exemple d'ID de commande
             />
           </label>
 
@@ -79,7 +93,45 @@ function Shipping() {
           </div>
         </form>
 
-        {status && <p className="status">{status}</p>}
+        {statusMessage && <p className="status">{statusMessage}</p>}
+
+        {/* Affichage des détails de la commande */}
+        {orderData && (
+          <div
+            style={{ marginTop: 20, border: "1px solid #ccc", padding: "10px" }}
+          >
+            <h3>Détails de la commande #{orderData.id}</h3>
+            <ul>
+              <li>**Statut :** {orderData.status}</li>
+              <li>
+                **Date de la commande :**{" "}
+                {new Date(orderData.date_created).toLocaleDateString()}
+              </li>
+              <li>
+                **Total :** {orderData.total} {orderData.currency}
+              </li>
+              {orderData.billing && (
+                <li>
+                  **Client :** {orderData.billing.first_name}{" "}
+                  {orderData.billing.last_name} ({orderData.billing.email})
+                </li>
+              )}
+              {/* Vous pouvez ajouter plus de détails ici, par exemple la liste des produits */}
+              {orderData.line_items && orderData.line_items.length > 0 && (
+                <li>
+                  **Articles :**
+                  <ul>
+                    {orderData.line_items.map((item) => (
+                      <li key={item.id}>
+                        {item.quantity} x {item.name}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
 
         <h2 style={{ marginTop: 18 }}>Délais & retours</h2>
         <p className="lead">

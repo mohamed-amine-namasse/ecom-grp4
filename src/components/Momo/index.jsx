@@ -38,7 +38,6 @@ function Momo() {
               src={product.image}
               style={{ height: "200px", objectFit: "cover" }}
             />
-            <Card.Body></Card.Body>
           </Card>
         </Col>
       ))}

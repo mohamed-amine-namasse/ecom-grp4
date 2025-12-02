@@ -50,14 +50,14 @@ function Home() {
 
         <Figures />
 
-        <section className="container mt-5 mb-6">
-          <h2 className="h5">Notre approche</h2>
-          <p>
-            Chez Foot Market, nous allions créativité et savoir-faire pour créer
-            des crampons uniques. Chaque modèle est confectionné avec minutie,
-            garantissant une finition d'une qualité exceptionnelle.
-          </p>
+        <section className=" container mt-5 mb-5">
+          <h2 className="h4 ">Notre approche</h2>
         </section>
+        <p className=" container">
+          Chez Foot Market, nous allions créativité et savoir-faire pour créer
+          des crampons uniques. Chaque modèle est confectionné avec minutie,
+          garantissant une finition d'une qualité exceptionnelle.
+        </p>
 
         <Momo />
       </div>

@@ -22,7 +22,8 @@ const RatingStars = ({ rating }) => {
 
   return (
     <span className="rating-stars">
-      {"★".repeat(fullStars)} {"☆".repeat(emptyStars)}
+      {"★".repeat(fullStars)}
+      {"☆".repeat(emptyStars)}
     </span>
   );
 };
@@ -36,6 +37,8 @@ function ProductDetail() {
   const [error, setError] = useState(null); // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [productVariations, setProductVariations] = useState([]);
+  const [selectedVariation, setSelectedVariation] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   //  ÉTAT POUR LES OPTIONS DE POINTURE DISPONIBLES
   const [availableSizes, setAvailableSizes] = useState([]);
@@ -98,6 +101,8 @@ function ProductDetail() {
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
+      // 🚀 Utiliser la variation sélectionnée
+      const stockSource = selectedVariation || product;
       if (availableColors.length > 0 && !selectedColor) {
         setStockFlashMessage(
           "Veuillez sélectionner une couleur avant d'ajouter au panier."
@@ -114,7 +119,6 @@ function ProductDetail() {
       }
       const currentQuantityInCart = getProductQuantityInCart(product.id);
       const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
-
       const maxStock = product.stockQuantity;
       const manageStock = product.manageStock; // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
 
@@ -222,7 +226,7 @@ function ProductDetail() {
     }
 
     const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 1. Récupération du Produit
-
+    const API_VARIATIONS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
     const fetchProduct = async () => {
       try {
         const response = await fetch(API_PRODUCT_URL);
@@ -256,6 +260,15 @@ function ProductDetail() {
             displayDescription = `<p>${displayDescription}</p>`;
           } else {
             displayDescription = "";
+          }
+        }
+        //  Récupération des Variations (s'il est variable)
+        let variationsData = [];
+        if (data.variations && data.variations.length > 0) {
+          const variationsResponse = await fetch(API_VARIATIONS_URL);
+          if (variationsResponse.ok) {
+            variationsData = await variationsResponse.json();
+            setProductVariations(variationsData); // ⭐️ STOCKER LES VARIATIONS
           }
         }
         const stockQuantity =
@@ -524,7 +537,7 @@ function ProductDetail() {
       <Link to="/shop" className="back-link">
         &larr; Retour à la boutique
       </Link>
-      {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */} 
+      {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */}
       {showFlash && (
         <div className="flash-message-cart flash-success">
           <p>

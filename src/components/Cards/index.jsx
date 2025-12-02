@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
+import { Link } from "react-router";
 
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
@@ -60,6 +61,8 @@ function Cards() {
       >
         {currentItems.map((p) => {
           const hover = hoverId === p.id;
+          // 1. Définir le chemin vers la page de détails
+          const detailPath = `/product/${p.id}`;
           return (
             <Card
               key={p.id}
@@ -88,6 +91,8 @@ function Cards() {
               />
 
               <Button
+                as={Link}
+                to={detailPath}
                 variant="primary"
                 style={{
                   position: "absolute",

@@ -75,7 +75,7 @@ function Shipping() {
         </p>
 
         <h2>Suivi de commande</h2>
-        <form onSubmit={handleTrack} style={{ marginTop: 8 }}>
+        <form onSubmit={handleTrack}>
           <label>
             Numéro de commande (ID)
             <input

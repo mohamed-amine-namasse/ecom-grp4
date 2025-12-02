@@ -30,14 +30,8 @@ function Login() {
       const data = await loginUser(form.username, form.password);
       setMessage({ type: "success", text: data?.message || "Connexion réussie." });
 
-      // Stocker les données utilisateur
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("email", data.email);
-
-      // Redirection vers Shop après 1 seconde
       setTimeout(() => {
-        navigate("/shop");
+        navigate("/profile");
       }, 1000);
 
       setForm({ username: "", password: "" });

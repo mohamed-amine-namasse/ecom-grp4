@@ -74,7 +74,7 @@ function Shipping() {
           le suivi.
         </p>
 
-        <h2>Suivi de commande</h2>
+        <h4>Suivi de commande</h4>
         <form onSubmit={handleTrack} style={{ marginTop: 8 }}>
           <label>
             Numéro de commande (ID)
@@ -133,7 +133,7 @@ function Shipping() {
           </div>
         )}
 
-        <h2 style={{ marginTop: 18 }}>Délais & retours</h2>
+        <h4 style={{ marginTop: 18 }}>Délais & retours</h4>
         <p className="lead">
           France: 2–5 jours. Retours possibles sous 14 jours.
         </p>

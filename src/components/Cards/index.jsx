@@ -91,7 +91,7 @@ function Cards() {
                 variant="primary"
                 style={{
                   position: "absolute",
-                  bottom: "20px",
+                  bottom: "50%",
                   left: "50%",
                   transform: "translateX(-50%)",
                   opacity: hover ? 1 : 0,

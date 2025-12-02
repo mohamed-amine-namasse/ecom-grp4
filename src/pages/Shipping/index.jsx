@@ -66,15 +66,15 @@ function Shipping() {
   return (
     <main className="contact-page">
       <section className="contact-card">
-        <h1>Livraison · Football Market</h1>
+        <h1>Livraison · Foot Market</h1>
 
-        <p className="lead">
+        <p>
           Nous expédions des crampons pour joueuses partout. Retrouvez
           ci‑dessous les informations principales sur les délais, les frais et
           le suivi.
         </p>
 
-        <h4>Suivi de commande</h4>
+        <h2>Suivi de commande</h2>
         <form onSubmit={handleTrack} style={{ marginTop: 8 }}>
           <label>
             Numéro de commande (ID)
@@ -87,7 +87,7 @@ function Shipping() {
           </label>
 
           <div className="actions">
-            <button type="submit" className="btn" disabled={loading}>
+            <button type="submit" className=" btn " disabled={loading}>
               {loading ? "Recherche…" : "Rechercher"}
             </button>
           </div>
@@ -133,10 +133,8 @@ function Shipping() {
           </div>
         )}
 
-        <h4 style={{ marginTop: 18 }}>Délais & retours</h4>
-        <p className="lead">
-          France: 2–5 jours. Retours possibles sous 14 jours.
-        </p>
+        <h2 style={{ marginTop: 18 }}>Délais & retours</h2>
+        <p>France: 2–5 jours. Retours possibles sous 14 jours.</p>
 
         <div className="actions" style={{ marginTop: 14 }}>
           <a href="/contact" className="btn">

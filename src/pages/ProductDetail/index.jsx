@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link } from "react-router-dom";
 import { useCart } from "../../components/CartContext";
 import "./style.css";
 
@@ -34,33 +34,49 @@ function ProductDetail() {
   const [reviews, setReviews] = useState([]);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null); // --- ÉTAT POUR LE MESSAGE FLASH ---
+  const [error, setError] = useState(null);
+
+  // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [productVariations, setProductVariations] = useState([]);
-  const [selectedVariation, setSelectedVariation] = useState(null);
+  const [selectedVariation, setSelectedVariation] = useState(null); // Variation complète sélectionnée
+
   const [selectedSize, setSelectedSize] = useState("");
-  //  ÉTAT POUR LES OPTIONS DE POINTURE DISPONIBLES
   const [availableSizes, setAvailableSizes] = useState([]);
-  const [showStockFlash, setShowStockFlash] = useState(false);
-  // ÉTAT POUR LA COULEUR
+
   const [selectedColor, setSelectedColor] = useState("");
   const [availableColors, setAvailableColors] = useState([]);
-  const [stockFlashMessage, setStockFlashMessage] = useState(""); // NOUVELLE FONCTION pour fermer le flash de stock
+
+  const [showStockFlash, setShowStockFlash] = useState(false);
+  const [stockFlashMessage, setStockFlashMessage] = useState("");
+
+  // ⭐️ ÉTATS POUR LE PRIX D'AFFICHAGE (MAINTENANT FIXE) ⭐️
+  const [displayPrice, setDisplayPrice] = useState(null);
+  const [displayRegularPrice, setDisplayRegularPrice] = useState(null);
+
+  // NOUVELLE FONCTION pour fermer le flash de stock
   const handleCloseStockFlash = () => {
     setShowStockFlash(false);
     setStockFlashMessage("");
-  }; // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
+  };
+
+  // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
     reviewer_email: "",
     review: "",
-    rating: 5, // Note par défaut 5 étoiles
+    rating: 5,
   });
-  const [reviewSubmitStatus, setReviewSubmitStatus] = useState(null); // 'success', 'error', 'submitting', null //  État pour gérer l'onglet actif ('description' ou 'additional_info')
-  const [activeTab, setActiveTab] = useState("description"); // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
-  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 2. Définition de la fonction de récupération des avis (hors useEffect)
+  const [reviewSubmitStatus, setReviewSubmitStatus] = useState(null); // 'success', 'error', 'submitting', null
 
+  //  État pour gérer l'onglet actif ('description' ou 'additional_info')
+  const [activeTab, setActiveTab] = useState("description");
+
+  // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
+  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+
+  // 2. Définition de la fonction de récupération des avis (hors useEffect)
   const fetchReviews = async () => {
     try {
       const response = await fetch(API_REVIEWS_URL);
@@ -72,7 +88,7 @@ function ProductDetail() {
         setReviews([]);
         return;
       }
-      const data = await response.json(); // Mapper les données d'avis
+      const data = await response.json();
 
       const formattedReviews = data.map((review) => ({
         id: review.id,
@@ -87,22 +103,28 @@ function ProductDetail() {
       console.error("Erreur lors de la récupération des avis:", err);
       setReviews([]);
     }
-  }; // 3. Fonction pour obtenir la quantité actuelle dans le panier
+  };
+
+  // 3. Fonction pour obtenir la quantité actuelle dans le panier
   const getProductQuantityInCart = (productId) => {
     const item = cartItems.find((item) => item.id === productId);
     return item ? item.quantity : 0;
-  }; // Fonction pour ajouter au panier
+  };
 
+  // Fonction pour ajouter au panier
   const handleAddToCart = () => {
     // 1. Fermer les messages flash précédents
-    handleCloseFlash(); // Ferme le flash de succès
-    handleCloseStockFlash(); // Ferme le flash d'erreur de stock // S'assurer que la quantité est un nombre valide (minimum 1)
+    handleCloseFlash();
+    handleCloseStockFlash();
 
+    // S'assurer que la quantité est un nombre valide (minimum 1)
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
-      // 🚀 Utiliser la variation sélectionnée
+      // 🚀 Utiliser la variation sélectionnée pour le stock et l'ID
       const stockSource = selectedVariation || product;
+
+      // Vérification des sélections obligatoires
       if (availableColors.length > 0 && !selectedColor) {
         setStockFlashMessage(
           "Veuillez sélectionner une couleur avant d'ajouter au panier."
@@ -115,38 +137,60 @@ function ProductDetail() {
           "Veuillez sélectionner une pointure avant d'ajouter au panier."
         );
         setShowStockFlash(true);
-        return; // Bloquer l'ajout
+        return;
       }
-      const currentQuantityInCart = getProductQuantityInCart(product.id);
-      const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
-      const maxStock = product.stockQuantity;
-      const manageStock = product.manageStock; // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
+      // Si le produit est variable et qu'aucune variation n'est sélectionnée, c'est une erreur de logique
+      if (
+        productVariations.length > 0 &&
+        !selectedVariation &&
+        (availableColors.length > 0 || availableSizes.length > 0)
+      ) {
+        setStockFlashMessage(
+          "La combinaison Couleur/Pointure sélectionnée n'est pas disponible en stock ou n'existe pas."
+        );
+        setShowStockFlash(true);
+        return;
+      }
 
+      // Récupération des données de stock de la source
+      const currentQuantityInCart = getProductQuantityInCart(stockSource.id);
+      const quantityAfterAdd = currentQuantityInCart + quantityToAdd;
+      const maxStock = stockSource.stock_quantity;
+      const manageStock = stockSource.manage_stock;
+
+      // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
       if (manageStock && maxStock !== null && quantityAfterAdd > maxStock) {
         // Cas d'erreur : stock dépassé
-
-        // --- 🚨 MESSAGE D'ERREUR PERSONNALISÉ SELON LA DEMANDE ---
         let message = `Vous ne pouvez pas ajouter cette quantité dans le panier.`;
 
-        // Si la quantité déjà dans le panier est égale ou supérieure au max
         if (currentQuantityInCart >= maxStock) {
           message = `Vous avez déjà atteint le maximum ! Nous en avons ${maxStock} en stock et vous en avez déjà ${currentQuantityInCart} dans votre panier.`;
         } else {
-          // Si l'ajout dépasse le stock
           const remainingStock = maxStock - currentQuantityInCart;
           message = `Vous ne pouvez pas ajouter ${quantityToAdd} article(s) dans le panier. Nous avons ${maxStock} en stock et vous en avez déjà ${currentQuantityInCart}. Vous pouvez encore ajouter ${remainingStock} de cet article.`;
         }
 
         setStockFlashMessage(message);
         setShowStockFlash(true);
-        return; // Bloquer l'ajout
-      } // Si le stock est suffisant (ou non géré), continuer l'ajout
+        return;
+      }
 
+      // Si le stock est suffisant (ou non géré), continuer l'ajout
       const itemToAdd = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
+        // ⭐️ UTILISER L'ID DE LA VARIATION SI DISPONIBLE ⭐️
+        id: stockSource.id,
+        // Créer un nom plus précis pour le panier
+        name:
+          product.name +
+          (selectedColor ? ` - ${selectedColor}` : "") +
+          (selectedSize ? ` / ${selectedSize}` : ""),
+        // ⭐️ UTILISER LE PRIX D'AFFICHAGE ACTUEL (qui est fixe) ⭐️
+        price: displayPrice || product.price,
+        // Utiliser l'image de la variation si elle existe
+        image:
+          stockSource.image && stockSource.image.src
+            ? stockSource.image.src
+            : product.image,
         selectedSize: selectedSize,
         selectedColor: selectedColor,
         manageStock: manageStock,
@@ -157,22 +201,27 @@ function ProductDetail() {
 
       setShowFlash(true);
     }
-  }; // NOUVEAU : Fonction pour fermer le flash manuellement
+  };
 
+  // NOUVEAU : Fonction pour fermer le flash manuellement
   const handleCloseFlash = () => {
     setShowFlash(false);
-  }; // Fonction pour gérer l'envoi du formulaire d'avis
+  };
 
+  // Fonction pour gérer l'envoi du formulaire d'avis
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     setReviewSubmitStatus("submitting");
-    setError(null); // Vérification des champs obligatoires
+    setError(null);
 
+    // Vérification des champs obligatoires
     if (!reviewForm.review || !reviewForm.rating) {
       setError("Veuillez remplir tous les champs et donner une note.");
       setReviewSubmitStatus(null);
       return;
-    } // Générer un nom d'utilisateur anonyme unique si le champ est vide
+    }
+
+    // Générer un nom d'utilisateur anonyme unique si le champ est vide
     const reviewerNameToSend = reviewForm.reviewer
       ? reviewForm.reviewer
       : `Anonyme #${Math.floor(Math.random() * 10000)}`;
@@ -187,7 +236,7 @@ function ProductDetail() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            product_id: id, // L'ID du produit
+            product_id: id,
             review: reviewForm.review,
             reviewer: reviewerNameToSend,
             reviewer_email: reviewForm.reviewer_email,
@@ -201,9 +250,9 @@ function ProductDetail() {
         throw new Error(
           `Erreur lors de l'envoi de l'avis: ${response.statusText}`
         );
-      } // L'avis a été soumis (il sera probablement en statut "en attente" dans WP)
+      }
 
-      setReviewSubmitStatus("success"); // OPTIONNEL : Réinitialiser le formulaire après succès
+      setReviewSubmitStatus("success");
       await fetchReviews();
       setReviewForm({
         reviewer: "",
@@ -216,8 +265,9 @@ function ProductDetail() {
       setError("Impossible d'envoyer l'avis. Veuillez réessayer.");
       setReviewSubmitStatus("error");
     }
-  }; // --- APPEL API POUR UN PRODUIT SPÉCIFIQUE ---
+  };
 
+  // --- APPEL API POUR UN PRODUIT SPÉCIFIQUE (CHARGEMENT INITIAL) ---
   useEffect(() => {
     if (!id) {
       setError("ID de produit manquant.");
@@ -225,62 +275,89 @@ function ProductDetail() {
       return;
     }
 
-    const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`; // 1. Récupération du Produit
+    const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
     const API_VARIATIONS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+
     const fetchProduct = async () => {
       try {
         const response = await fetch(API_PRODUCT_URL);
         if (response.status === 404) throw new Error("Produit non trouvé.");
         if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-        const data = await response.json(); // ... (Mapping des données produit, inchangé)
+        const data = await response.json();
 
-        const price = data.sale_price
+        // 1. Récupération des Variations (Nécessaire pour la sélection de stock)
+        let variationsData = [];
+        if (data.variations && data.variations.length > 0) {
+          const variationsResponse = await fetch(API_VARIATIONS_URL);
+          if (variationsResponse.ok) {
+            variationsData = await variationsResponse.json();
+            setProductVariations(variationsData);
+          }
+        }
+
+        // 2. Détermination du prix FIXE (utilise toujours le prix du produit parent)
+        const fixedSalePrice = data.sale_price
           ? parseFloat(data.sale_price)
-          : parseFloat(data.regular_price);
-        const regularPrice = parseFloat(data.regular_price);
+          : null;
+        const fixedRegularPrice = parseFloat(data.regular_price) || 0;
+
+        // Le prix affiché sera le prix de solde s'il existe, sinon le prix normal
+        const fixedDisplayPrice =
+          fixedSalePrice !== null ? fixedSalePrice : fixedRegularPrice;
+
+        // ⭐️ DÉFINIR LE PRIX INITIAL FIXE ⭐️
+        setDisplayPrice(fixedDisplayPrice);
+        setDisplayRegularPrice(fixedRegularPrice);
+
+        // --- DÉTERMINATION DE LA VARIATION PAR DÉFAUT (Pour stock/image initial) ---
+        let defaultVariation = null;
+        if (variationsData.length > 0) {
+          // Trouver la première variation qui n'est pas en rupture de stock
+          defaultVariation =
+            variationsData.find((v) => v.stock_status !== "outofstock") ||
+            variationsData[0];
+
+          // Mise à jour immédiate du selectedVariation pour le stock/l'image au premier rendu
+          setSelectedVariation(defaultVariation);
+        }
+
+        // --- LOGIQUE DE DESCRIPTION/ATTRIBUTS/TAILLES (inchangée) ---
         const fullDescription = data.description
           ? data.description
           : "<p>Aucune description détaillée disponible.</p>";
         const shortDescription = data.short_description
           ? data.short_description
-          : ""; // LOGIQUE DE DESCRIPTION AFFICHÉE (à côté du produit)
-        let displayDescription = shortDescription; // Si la description courte est vide, on utilise un extrait de la description longue
+          : "";
+        let displayDescription = shortDescription;
 
         if (!displayDescription || displayDescription === "<p></p>\n") {
-          // Supprimer les balises HTML de la description longue pour obtenir un extrait de texte propre
           const plainTextDescription = fullDescription.replace(
             /<[^>]*>?/gm,
             " "
           );
 
           if (plainTextDescription.length > 10) {
-            // Prendre les 150 premiers caractères et ajouter des points de suspension
             displayDescription =
-              plainTextDescription.substring(0, 1000).trim() + "[...]"; // Remettre le texte dans un paragraphe pour le style
+              plainTextDescription.substring(0, 1000).trim() + "[...]";
             displayDescription = `<p>${displayDescription}</p>`;
           } else {
             displayDescription = "";
           }
         }
-        //  Récupération des Variations (s'il est variable)
-        let variationsData = [];
-        if (data.variations && data.variations.length > 0) {
-          const variationsResponse = await fetch(API_VARIATIONS_URL);
-          if (variationsResponse.ok) {
-            variationsData = await variationsResponse.json();
-            setProductVariations(variationsData); // ⭐️ STOCKER LES VARIATIONS
-          }
-        }
+
+        // Le stock et le statut de stock sont initialement ceux du parent
         const stockQuantity =
           data.stock_quantity !== null
             ? parseInt(data.stock_quantity, 10)
             : null;
         const manageStock = data.manage_stock;
+
         const imageUrl =
           data.images.length > 0
             ? data.images[0].src
             : "https://via.placeholder.com/600x450?text=Image+Manquante";
         const isOutOfStock = data.stock_status === "outofstock";
+
         const attributes = data.attributes
           .filter(
             (attr) => attr.visible && attr.options && attr.options.length > 0
@@ -289,7 +366,8 @@ function ProductDetail() {
             name: attr.name,
             options: attr.options.join(", "),
           }));
-        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE COULEUR
+
+        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE COULEUR/TAILLE
         const colorAttribute = data.attributes.find(
           (attr) =>
             attr.name.toLowerCase().includes("couleur") ||
@@ -301,31 +379,47 @@ function ProductDetail() {
           colors = colorAttribute.options;
         }
 
-        setAvailableColors(colors); // Pré-sélectionner la première couleur s'il y en a
-        if (colors.length > 0) {
+        setAvailableColors(colors);
+
+        // 🚨 Si des variations existent, on sélectionne la première couleur/taille de la variation par défaut
+        if (defaultVariation) {
+          // Utiliser les ATTRIBUTS de la variation pour initialiser les sélections
+          const defaultColorAttr = defaultVariation.attributes.find(
+            (attr) =>
+              attr.name.toLowerCase().includes("couleur") ||
+              attr.name.toLowerCase().includes("color")
+          );
+          const defaultSizeAttr = defaultVariation.attributes.find(
+            (attr) =>
+              attr.name.toLowerCase().includes("pointure") ||
+              attr.name.toLowerCase().includes("taille")
+          );
+
+          setSelectedColor(defaultColorAttr ? defaultColorAttr.option : "");
+          setSelectedSize(defaultSizeAttr ? defaultSizeAttr.option : "");
+        } else if (colors.length > 0) {
           setSelectedColor(colors[0]);
         } else {
           setSelectedColor("");
         }
-        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE POINTURE (TAILLE)
+
         const sizeAttribute = data.attributes.find((attr) =>
           attr.name.toLowerCase().includes("pointure")
         );
 
         let sizes = [];
         if (sizeAttribute && sizeAttribute.options) {
-          sizes = sizeAttribute.options.sort(); // Tri des tailles pour un affichage propre
+          sizes = sizeAttribute.options.sort();
         }
 
-        setAvailableSizes(sizes); // Pré-sélectionner la première taille s'il y en a, sinon laisser vide
-        if (sizes.length > 0) {
-          setSelectedSize(sizes[0]);
-        }
+        setAvailableSizes(sizes);
+
         setProduct({
           id: data.id,
           name: data.name,
-          price: price || 0,
-          regularPrice: regularPrice || 0,
+          // ⭐️ Utiliser les prix fixes pour l'objet product ⭐️
+          price: fixedDisplayPrice,
+          regularPrice: fixedRegularPrice,
           description: fullDescription,
           shortDescription: shortDescription,
           displayDescription: displayDescription,
@@ -336,7 +430,7 @@ function ProductDetail() {
           stockQuantity: stockQuantity,
           manageStock: manageStock,
           availableSizes: sizes,
-        }); // 2. Récupération des Avis (après avoir récupéré le produit avec succès)
+        });
 
         await fetchReviews();
 
@@ -353,6 +447,77 @@ function ProductDetail() {
 
     fetchProduct();
   }, [id]);
+
+  // ⭐️ EFFECT CONSERVÉ : Recherche de variation, mise à jour du STOCK et de l'IMAGE (mais pas du prix) ⭐️
+  useEffect(() => {
+    // Ne s'exécute que si le produit est chargé et qu'il y a des variations à chercher
+    if (!product || productVariations.length === 0) {
+      return;
+    }
+
+    // Fonction pour trouver une variation spécifique
+    const findVariation = (color, size) => {
+      // Si toutes les options ne sont pas sélectionnées, on ne cherche pas encore de variation spécifique
+      if (availableColors.length > 0 && !color) return null;
+      if (availableSizes.length > 0 && !size) return null;
+
+      return productVariations.find((variation) => {
+        let colorMatch = false;
+        let sizeMatch = false;
+
+        // Si le produit n'utilise pas de couleur/taille, les considérer comme "matchés" par défaut
+        if (availableColors.length === 0) colorMatch = true;
+        if (availableSizes.length === 0) sizeMatch = true;
+
+        // ⭐️ PARCOURIR TOUS LES ATTRIBUTS DE CETTE VARIATION ⭐️
+        variation.attributes.forEach((attr) => {
+          const name = attr.name.toLowerCase();
+          const option = attr.option;
+
+          // 1. VÉRIFICATION DE LA COULEUR (NORMALISATION EN MINUSCULE)
+          if (
+            (name.includes("couleur") || name.includes("color")) &&
+            availableColors.length > 0
+          ) {
+            colorMatch = option.toLowerCase() === color.toLowerCase(); // Correction: comparaison normalisée
+          }
+
+          // 2. VÉRIFICATION DE LA POINTURE/TAILLE (NORMALISATION EN MINUSCULE)
+          else if (
+            (name.includes("pointure") || name.includes("taille")) &&
+            availableSizes.length > 0
+          ) {
+            sizeMatch = option.toLowerCase() === size.toLowerCase(); // Correction: comparaison normalisée
+          }
+          // Les autres attributs (surface, matière, etc.) sont ignorés
+        });
+
+        // La condition est vraie si TOUS les critères nécessaires (couleur ET taille) sont remplis
+        return colorMatch && sizeMatch;
+      });
+    };
+
+    // Cherche une variation basée sur les sélections actuelles
+    const foundVariation = findVariation(selectedColor, selectedSize);
+
+    if (foundVariation) {
+      setSelectedVariation(foundVariation);
+      setQuantity(1); // Réinitialiser la quantité à 1 lors du changement de variation
+
+      // ❌ PRIX RETIRÉS : Le prix est maintenant fixe, nous ne mettons pas à jour displayPrice/displayRegularPrice.
+    } else {
+      // Si aucune variation correspondante n'est trouvée (combo inexistant ou OOS)
+      setSelectedVariation(null);
+      // ❌ PRIX RETIRÉS : Le prix est fixe, nous ne le réinitialisons pas.
+    }
+  }, [
+    selectedColor,
+    selectedSize,
+    product,
+    productVariations,
+    availableColors,
+    availableSizes,
+  ]); // Dépendances importantes
 
   if (isLoading) {
     return (
@@ -372,27 +537,36 @@ function ProductDetail() {
         </div>
       </main>
     );
-  } // Calcul de la note moyenne et du nombre d'avis
+  }
+
+  // Calcul de la note moyenne et du nombre d'avis
   const totalReviews = reviews.length;
 
   let averageRating = 0;
   if (totalReviews > 0) {
     const sumRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
     averageRating = sumRatings / totalReviews;
-  } // --- RENDU DU CONTENU DE L'ONGLET ACTIF ---
+  }
+
+  // Détermination du stock à afficher (utilise la variation si elle existe, sinon le parent)
+  const stockSource = selectedVariation || product;
+  const currentStockQuantity = stockSource.stock_quantity;
+  const isVariationOutOfStock =
+    stockSource.stock_status === "outofstock" ||
+    (stockSource.manage_stock && currentStockQuantity === 0);
+  const displayStock = stockSource.manage_stock; // Indique si la gestion de stock est activée pour cette source
+
+  // --- RENDU DU CONTENU DE L'ONGLET ACTIF ---
   const renderTabContent = () => {
     if (activeTab === "description") {
-      // Description : utilisation de dangerouslySetInnerHTML pour le HTML de WooCommerce
       return (
         <div
           className="tab-content description-content"
           dangerouslySetInnerHTML={{ __html: product.description }}
         />
       );
-    } // 2. Onglet INFORMATIONS COMPLÉMENTAIRES
-
+    }
     if (activeTab === "additional_info") {
-      // Cas où il n'y a pas d'attributs
       if (product.attributes.length === 0) {
         return (
           <div className="tab-content no-additional-info">
@@ -402,8 +576,7 @@ function ProductDetail() {
             </p>
           </div>
         );
-      } // Cas où il y a des attributs à afficher
-
+      }
       return (
         <div className="tab-content additional-info-content">
           <table className="attributes-table">
@@ -417,15 +590,13 @@ function ProductDetail() {
           </table>
         </div>
       );
-    } // 3. Onglet AVIS (DOIT ÊTRE AU NIVEAU RACINE)
-
+    }
     if (activeTab === "reviews") {
       return (
         <div className="tab-content reviews-content">
           <h2>Avis ({reviews.length})</h2>
           <hr />
           {reviews.length === 0 ? (
-            // CAS 1 : Aucune revue n'existe
             <div className="no-reviews-prompt">
               <p>
                 Il n’y a pas encore d’avis. Soyez le premier à laisser votre
@@ -434,7 +605,6 @@ function ProductDetail() {
               </p>
             </div>
           ) : (
-            // CAS 2 : Les revues existent, on les affiche
             <div className="reviews-list">
               {reviews.map((review) => (
                 <div key={review.id} className="review-item">
@@ -458,7 +628,7 @@ function ProductDetail() {
           {/* FORMULAIRE D'AJOUT D'AVIS */}
           <div className="add-review-section">
             <h3>Ajouter votre avis</h3>
-            <hr /> {/* Messages de statut */}
+            <hr />
             {reviewSubmitStatus === "success" && (
               <div className="alert-success">
                 Merci pour votre avis ! Il a été publié avec succès.
@@ -475,8 +645,6 @@ function ProductDetail() {
                 <label>
                   Votre note :<span className="required-star">*</span>
                 </label>
-
-                {/* Le sélecteur d'étoiles permet de choisir entre 1 et 5 */}
 
                 <select
                   value={reviewForm.rating}
@@ -528,9 +696,8 @@ function ProductDetail() {
         </div>
       );
     }
-
-    return null; // Onglet non reconnu
-  }; // Rendu des détails
+    return null;
+  };
 
   return (
     <main className="product-detail-container">
@@ -576,37 +743,42 @@ function ProductDetail() {
       )}
       <div className="product-content">
         <div className="product-image-area">
-          <img src={product.image} alt={product.name} />
-          {product.isOutOfStock && (
-            <div className="product-badge out-of-stock">Rupture de Stock</div>
-          )}
+          {/* ⭐️ Utiliser l'image de la variation sélectionnée si elle existe, sinon l'image du produit parent ⭐️ */}
+          <img
+            src={stockSource.image?.src || product.image}
+            alt={product.name}
+          />
+          {(product.isOutOfStock && productVariations.length === 0) ||
+            (isVariationOutOfStock && (
+              <div className="product-badge out-of-stock">Rupture de Stock</div>
+            ))}
         </div>
         <div className="product-info-area">
           <h1 className="product-name">{product.name}</h1>
           {totalReviews > 0 && (
             <div className="product-header-reviews">
-              {/* Utilisation du composant RatingStars avec la note moyenne calculée */}
               <RatingStars rating={averageRating} />
               <span className="review-count">({totalReviews} avis)</span>
             </div>
           )}
           <div className="price-section">
-            {product.price < product.regularPrice && (
+            {/* ⭐️ AFFICHAGE FIXE DU PRIX DU PARENT ⭐️ */}
+            {displayPrice < displayRegularPrice && (
               <span className="old-price">
-                {formatPrice(product.regularPrice)}
+                {formatPrice(displayRegularPrice)}
               </span>
             )}
 
-            <span className="current-price">{formatPrice(product.price)}</span>
+            <span className="current-price">{formatPrice(displayPrice)}</span>
           </div>
           {product.displayDescription && (
             <div
-              className="product-excerpt-description" // Utilisation d'une nouvelle classe claire
+              className="product-excerpt-description"
               dangerouslySetInnerHTML={{ __html: product.displayDescription }}
             />
           )}
-          {/* 🚨 NOUVEAU : SÉLECTEUR DE COULEUR 🚨 */}
-          {availableColors.length > 0 && !product.isOutOfStock && (
+          {/* 🚨 SÉLECTEUR DE COULEUR 🚨 */}
+          {availableColors.length > 0 && (
             <div className="color-selector-group">
               <label htmlFor="product-color">
                 Couleur :<span className="required-star">*</span>
@@ -631,8 +803,8 @@ function ProductDetail() {
               </select>
             </div>
           )}
-          {/* 🚨 NOUVEAU : SÉLECTEUR DE POINTURE EN CARRÉS 🚨 */}
-          {availableSizes.length > 0 && !product.isOutOfStock && (
+          {/* 🚨 SÉLECTEUR DE POINTURE EN CARRÉS 🚨 */}
+          {availableSizes.length > 0 && (
             <div className="size-selector-group">
               <label>
                 Pointure sélectionnée :<span className="required-star">*</span>
@@ -647,6 +819,7 @@ function ProductDetail() {
                       selectedSize === size ? "selected" : ""
                     }`}
                     onClick={() => setSelectedSize(size)}
+                    // Vous pouvez désactiver les boutons pour les combinaisons en rupture de stock ici si nécessaire
                   >
                     {size}
                   </button>
@@ -654,8 +827,48 @@ function ProductDetail() {
               </div>
             </div>
           )}
-          {/* 🚨 NOUVEAU : Champ de sélection de quantité 🚨 */}
-          {!product.isOutOfStock && (
+          {/* -------------------------------------------------
+            ⭐️ LOGIQUE D'AFFICHAGE DU STOCK PAR VARIATION ⭐️
+            -------------------------------------------------
+          */}
+          {productVariations.length === 0 ? (
+            // CAS 1: Produit Simple (utilise le stock du parent)
+            displayStock && (
+              <p className="stock-info">
+                {product.isOutOfStock
+                  ? "Rupture de stock (0 disponible)"
+                  : `${product.stockQuantity} articles en stock`}
+              </p>
+            )
+          ) : (
+            // CAS 2: Produit Variable (utilise le stock de la variation)
+            <>
+              {selectedVariation && displayStock && !isVariationOutOfStock && (
+                <p className="stock-info">
+                  {currentStockQuantity === 0
+                    ? "Rupture de stock (0 disponible)"
+                    : `${currentStockQuantity} articles en stock`}
+                </p>
+              )}
+
+              {/* Message pour la variation épuisée */}
+              {selectedVariation && isVariationOutOfStock && (
+                <p className="stock-info out-of-stock-message">
+                  Rupture de stock pour cette option.
+                </p>
+              )}
+
+              {/* Message si les options sont sélectionnées mais aucune variation correspondante n'est trouvée (combo invalide) */}
+              {!selectedVariation && (selectedColor || selectedSize) && (
+                <p className="stock-info out-of-stock-message">
+                  Cette combinaison (Couleur/Pointure) n'est pas disponible.
+                </p>
+              )}
+            </>
+          )}
+
+          {/* 🚨 Champ de sélection de quantité 🚨 */}
+          {!isVariationOutOfStock && !product.isOutOfStock && (
             <div className="quantity-selector-group">
               <label htmlFor="product-quantity">Quantité :</label>{" "}
               <input
@@ -664,14 +877,13 @@ function ProductDetail() {
                 min="1"
                 value={quantity}
                 onChange={(e) => {
-                  let val = parseInt(e.target.value, 10); // Déterminer le max pour la validation côté client
+                  let val = parseInt(e.target.value, 10);
                   const maxStock =
-                    product.manageStock && product.stockQuantity !== null
-                      ? product.stockQuantity
-                      : Infinity; // S'assurer que la valeur est au moins 1
+                    stockSource.manage_stock && currentStockQuantity !== null
+                      ? currentStockQuantity
+                      : Infinity;
 
-                  val = Math.max(1, val); // S'assurer que la valeur ne dépasse pas le stock maximal
-
+                  val = Math.max(1, val);
                   val = Math.min(val, maxStock);
 
                   setQuantity(val);
@@ -680,22 +892,23 @@ function ProductDetail() {
               />
             </div>
           )}
-          {product.manageStock &&
-            !product.isOutOfStock &&
-            product.stockQuantity !== null && (
-              <p className="stock-info">
-                {product.stockQuantity === 0
-                  ? "Rupture de stock (0 disponible)"
-                  : `${product.stockQuantity} articles en stock`}
-              </p>
-            )}
+
           <button
             className="btn-add-to-cart"
             type="button"
-            disabled={product.isOutOfStock || quantity < 1}
+            disabled={
+              product.isOutOfStock ||
+              isVariationOutOfStock ||
+              quantity < 1 ||
+              (availableColors.length > 0 && !selectedColor) ||
+              (availableSizes.length > 0 && !selectedSize) ||
+              (productVariations.length > 0 && !selectedVariation) // Désactiver si variable et qu'aucune variation valide n'est trouvée
+            }
             onClick={handleAddToCart}
           >
-            {product.isOutOfStock ? "Indisponible" : `Ajouter au panier`}
+            {product.isOutOfStock || isVariationOutOfStock
+              ? "Indisponible"
+              : `Ajouter au panier`}
           </button>
         </div>
       </div>

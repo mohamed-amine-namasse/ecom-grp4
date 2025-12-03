@@ -15,7 +15,7 @@ const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 // Construction de l'URL API
 const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}&per_page=100`;
 
-// Définition des filtres initiaux (avec un prix max par défaut de 500)
+// Définition des filtres initiaux
 const initialFilters = {
   size: [],
   color: [],
@@ -33,9 +33,8 @@ const getAttributeValue = (attributes, name) => {
   );
 
   if (attr && attr.options) {
-    // Pour les attributs multiples (comme Taille), retourne un tableau de chaînes
     return attr.options.map((option) => String(option).trim());
-  } // Pour une valeur simple
+  }
   if (attr && attr.option) {
     return String(attr.option).trim();
   }
@@ -44,15 +43,14 @@ const getAttributeValue = (attributes, name) => {
 
 // Fonction utilitaire pour calculer le prix maximum
 const getMaxPrice = (products) => {
-  if (!products || products.length === 0) return 300; // Trouver le prix maximum
+  if (!products || products.length === 0) return 300;
 
-  const max = Math.max(...products.map((p) => p.price)); // Arrondir au multiple de 10 supérieur (ou 250 minimum)
+  const max = Math.max(...products.map((p) => p.maxPrice || p.price));
 
   return Math.max(250, Math.ceil(max / 10) * 10);
 };
 
 function Shop() {
-  // Ligne supprimée: const { addToCart, cartItems } = useCart();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,23 +59,24 @@ function Shop() {
     marques: [],
     sizes: [],
     materials: [],
-  }); //   TOTAL
+  });
+  const [totalProducts, setTotalProducts] = useState(0);
 
-  const [totalProducts, setTotalProducts] = useState(0); // Lignes supprimées (message flash): // const [showStockFlash, setShowStockFlash] = useState(false); // const [stockFlashMessage, setStockFlashMessage] = useState(""); // Ligne supprimée (gestion message flash): // const handleCloseStockFlash = () => { //   setShowStockFlash(false); //   setStockFlashMessage(""); // };
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
     }));
-  }; // Réinitialisation des filtres
+  };
 
   const handleResetFilters = () => {
     setFilters(initialFilters);
   };
 
   const formatPrice = (p) =>
-    p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }); // --- APPEL API REALISTE ---
+    p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
+  // --- APPEL API ET MAPPING CORRIGÉ AVEC RÉCUPÉRATION DES VARIATIONS ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -87,19 +86,69 @@ function Shop() {
           throw new Error(
             `Erreur HTTP: ${response.status} - Vérifiez les clés API.`
           );
-        } //  Récupérer le total à partir des en-têtes
+        }
 
         const totalCount =
           parseInt(response.headers.get("X-WP-Total"), 10) || 0;
 
-        const data = await response.json(); // --- MAPPAGE DES DONNÉES WOOCOMMERCE ---
+        const data = await response.json();
 
-        const formattedProducts = data.map((product) => {
-          const price = product.sale_price
-            ? parseFloat(product.sale_price)
-            : parseFloat(product.regular_price); // Le prix régulier (pour l'affichage barré si en promo)
+        // 🚨 NOUVEAU: Traitement asynchrone pour récupérer les variations si min_price est 0
+        const productsPromises = data.map(async (product) => {
+          let price = 0;
+          let regularPrice = 0;
+          let maxPrice = 0;
+          const productType = product.type;
 
-          const regularPrice = parseFloat(product.regular_price);
+          if (productType === "variable") {
+            // 1. Tenter d'abord la récupération du prix via min_price (méthode rapide)
+            const minPriceAPI = parseFloat(product.min_price) || 0;
+            const maxPriceAPI = parseFloat(product.max_price) || 0;
+
+            if (minPriceAPI > 0) {
+              // Si le prix est valide, on utilise la méthode rapide (préférable)
+              price = minPriceAPI;
+              maxPrice = maxPriceAPI;
+            } else {
+              // 2. Si min_price est 0, faire un appel aux variations (méthode lente mais fiable)
+              const variationsUrl = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${product.id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+
+              if (product.variations && product.variations.length > 0) {
+                const variationsResponse = await fetch(variationsUrl);
+                if (variationsResponse.ok) {
+                  const variations = await variationsResponse.json();
+
+                  // Extraction des prix de toutes les variations valides
+                  const validPrices = variations
+                    .map((v) => parseFloat(v.price))
+                    .filter((p) => p > 0);
+
+                  if (validPrices.length > 0) {
+                    // On prend le min/max des variations réelles pour le prix
+                    price = Math.min(...validPrices);
+                    maxPrice = Math.max(...validPrices);
+                  }
+                }
+              }
+
+              // 3. Dernier recours : utiliser regular_price du parent
+              if (price === 0) {
+                price = parseFloat(product.regular_price) || 0;
+              }
+            }
+            regularPrice = parseFloat(product.regular_price) || 0;
+          } else {
+            // Pour les produits simples (Logique inchangée)
+            price = product.sale_price
+              ? parseFloat(product.sale_price)
+              : parseFloat(product.regular_price);
+            regularPrice = parseFloat(product.regular_price);
+            maxPrice = regularPrice;
+          }
+
+          price = isNaN(price) ? 0 : price;
+          regularPrice = isNaN(regularPrice) ? 0 : regularPrice;
+          maxPrice = isNaN(maxPrice) ? 0 : maxPrice;
 
           const desc = product.short_description
             ? product.short_description.replace(/<\/?[^>]+(>|$)/g, "")
@@ -109,7 +158,8 @@ function Shop() {
             product.images.length > 0
               ? product.images[0].src
               : "https://via.placeholder.com/400x300?text=Image+Manquante";
-          const brandKeyName = "brands"; // Cherche la première marque associée au produit dans le tableau de la clé trouvée
+
+          const brandKeyName = "brands";
 
           const firstBrand =
             product[brandKeyName] && product[brandKeyName].length > 0
@@ -125,17 +175,21 @@ function Shop() {
             material: getAttributeValue(product.attributes, "matière") || "",
             surface: getAttributeValue(product.attributes, "surface") || "",
             marque: marqueName,
-          }; // 🚨 AJOUT DES DONNÉES DE STOCK WOOCOMMERCE
+          };
+
           const manageStock = product.manage_stock;
           const stockQuantity =
             product.stock_quantity !== null
               ? parseInt(product.stock_quantity, 10)
               : null;
+
           return {
             id: product.id,
             name: product.name,
+            type: productType,
             price: price || 0,
             regularPrice: regularPrice || 0,
+            maxPrice: maxPrice || price || 0,
             desc: desc,
             image: imageUrl,
             stock_status: product.stock_status,
@@ -143,36 +197,41 @@ function Shop() {
             manageStock: manageStock,
             stockQuantity: stockQuantity,
           };
-        }); // Calcul des Matières uniques
+        });
+
+        // Attendre que tous les appels API (variations) soient terminés
+        const formattedProducts = await Promise.all(productsPromises);
+
+        // Calcul des options uniques (inchangé)
         const allMaterials = formattedProducts
           .map((p) => p.attributes.material)
           .filter((m) => m && String(m).trim() !== "");
-        console.log("Matériaux bruts collectés :", allMaterials); // Calcul des marques uniques ⭐️
+
         const allMarques = formattedProducts
           .map((p) => p.attributes.marque)
-          .filter((m) => m && m.trim() !== ""); // Élimine les vides/nulls // Crée un ensemble (Set) pour avoir des valeurs uniques, puis le reconvertit en tableau
+          .filter((m) => m && m.trim() !== "");
 
-        const uniqueMarques = Array.from(new Set(allMarques)).sort(); // Calcul des tailles uniques 🚀
+        const uniqueMarques = Array.from(new Set(allMarques)).sort();
+
         const allSizes = formattedProducts
           .map((p) => p.attributes.size)
-          .flat() // Important : aplatir le tableau de tableaux de tailles
+          .flat()
           .filter((s) => s && String(s).trim() !== "");
 
         const uniqueSizes = Array.from(new Set(allSizes))
           .map(String)
           .sort((a, b) => {
-            // Tente de trier numériquement pour 39, 40, 41...
             const numA = Number(a);
             const numB = Number(b);
             if (!isNaN(numA) && !isNaN(numB)) {
               return numA - numB;
-            } // Tri alphabétique par défaut (S, M, L)
+            }
             return a.localeCompare(b);
           });
         const uniqueMaterials = Array.from(new Set(allMaterials)).sort();
 
-        setProducts(formattedProducts); //  Mettre à jour le nombre total
-        setTotalProducts(totalCount); // Mise à jour de l'état des options dynamiques
+        setProducts(formattedProducts);
+        setTotalProducts(totalCount);
         setShopOptions((prev) => ({
           ...prev,
           marques: uniqueMarques,
@@ -191,17 +250,19 @@ function Shop() {
     };
 
     fetchProducts();
-  }, []); // --- FIN APPEL API REALISTE --- // 2. Fonction de filtrage principale (Utilisation de useMemo pour l'optimisation)
+  }, []);
+
+  // 2. Fonction de filtrage principale (inchangé)
   const filteredProducts = useMemo(() => {
     if (products.length === 0) return [];
 
-    let workingProducts = products; // FILTRE PRIX
+    let workingProducts = products;
 
     workingProducts = workingProducts.filter(
       (prod) =>
         prod.price >= filters.priceRange[0] &&
         prod.price <= filters.priceRange[1]
-    ); // FILTRE DISPONIBILITÉ
+    );
 
     if (filters.disponibility !== "all") {
       const status =
@@ -213,17 +274,15 @@ function Shop() {
 
     const filterByAttribute = (attributeName, attributeValue) => {
       if (filters[attributeName].length > 0) {
-        // Si l'attribut est un tableau (Tailles)
         if (Array.isArray(attributeValue)) {
-          return filters[attributeName].some(
-            (filterVal) => attributeValue.includes(String(filterVal)) // Conversion en chaîne pour la sécurité
+          return filters[attributeName].some((filterVal) =>
+            attributeValue.includes(String(filterVal))
           );
-        } // Si l'attribut est une chaîne simple (Couleur, Gamme, etc.)
-
+        }
         return filters[attributeName].includes(attributeValue);
       }
       return true;
-    }; // Appliquer les filtres spécifiques
+    };
 
     workingProducts = workingProducts.filter(
       (prod) =>
@@ -236,6 +295,7 @@ function Shop() {
 
     return workingProducts;
   }, [products, filters]);
+
   if (isLoading) {
     return (
       <main className="shop-container loading-state">
@@ -257,23 +317,22 @@ function Shop() {
         </div>
       </main>
     );
-  } // Calcul du prix maximum dynamique pour FilterControls
+  }
 
-  const maxShopPrice = getMaxPrice(products); // 5. Rendu du contenu
+  const maxShopPrice = getMaxPrice(products);
 
+  // 5. Rendu du contenu (inchangé, car le prix est maintenant correct dans prod.price)
   return (
     <main className="shop-container">
       <header className="shop-header">
         <h1>Boutique</h1>
-        {/* Affichage du nombre total de produits  */}
         <p className="total-products-count">
           {totalProducts > 0
             ? `Total des produits: ${totalProducts} `
             : "Aucun produit trouvé sur WooCommerce."}
         </p>
       </header>
-      {/* Lignes supprimées (Rendu du message flash d'erreur de stock) */}
-      {/* {showStockFlash && ( ... )} */}
+
       <div className="shop-layout">
         <aside className="shop-sidebar">
           <FilterControls
@@ -283,11 +342,10 @@ function Shop() {
             maxShopPrice={maxShopPrice}
             dynamicMarques={shopOptions.marques}
             dynamicSizes={shopOptions.sizes}
+            dynamicMaterials={shopOptions.materials}
           />
         </aside>
         <section className="products-grid" aria-live="polite">
-          {/* Ligne d'info sur les produits filtrés (optionnel) */}
-
           <p className="filtered-count-info">
             {filteredProducts.length} produit
             {filteredProducts.length > 1 ? "s" : ""} correspondent à vos
@@ -300,14 +358,18 @@ function Shop() {
           )}
           {filteredProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
-            const productLink = `/product/${prod.id}`; // Définir le lien une seule fois // Ligne supprimée: const quantityInCart = getProductQuantityInCart(prod.id);
+            const productLink = `/product/${prod.id}`;
+            const isVariable = prod.type === "variable";
+
+            // Promo seulement pour produits simples
+            const hasSalePrice = prod.price < prod.regularPrice && !isVariable;
+
             return (
-              <article className="product-card">
-                <div className="product-media" key={prod.id}>
+              <article className="product-card" key={prod.id}>
+                <div className="product-media">
                   <Link to={productLink} className="product-image-link">
                     <img src={prod.image} alt={prod.name} />
                   </Link>
-                  {/* Affichage du badge si rupture de stock */}
                   {isOutOfStock && (
                     <div className="product-badge out-of-stock">
                       Rupture de Stock
@@ -324,16 +386,15 @@ function Shop() {
                     <p className="product-desc">{prod.desc}</p>
                   )}
                   <div className="product-footer">
-                    {/* Affichage du prix régulier barré si une promotion est active */}
-
                     <div className="flex">
-                      {prod.price < prod.regularPrice && (
+                      {/* Affichage du prix régulier barré si promotion sur produit simple */}
+                      {hasSalePrice && (
                         <span className="product-price old-price">
-                          {formatPrice(prod.regularPrice)} {" "}
+                          {formatPrice(prod.regularPrice)}{" "}
                         </span>
                       )}
-                      {/* Prix actuel (prix de vente ou prix régulier) */}
 
+                      {/* Prix actuel : Affiche simplement prod.price */}
                       <span className="product-price current-price">
                         {formatPrice(prod.price)}
                       </span>

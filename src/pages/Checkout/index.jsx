@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "../../components/CartContext";
 import { Link } from "react-router";
+import { loadStripe } from "@stripe/stripe-js";
 import "./style.css";
 
 // Fonction utilitaire pour le formatage du prix
@@ -8,8 +9,10 @@ const formatPrice = (p) => {
   return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 };
 
+const stripePromise = loadStripe("pk_live_...REMPLACEZ_PAR_VOTRE_PUBLISHABLE_KEY"); // ou mettre dans .env
+
 function Checkout() {
-  const { cartItems, cartTotal } = useCart(); // Calcul du sous-total (peut-être déjà fait dans cartTotal, mais on s'assure d'avoir la donnée)
+  const { cartItems, cartTotal } = useCart(); // Calcul du sous-total (peut-être déjà fait dans cartTotal, mais on s'assure d'avoir la donnée
 
   const subtotal = formatPrice(cartTotal); // Pour l'affichage Total, qui sera le même au début sans frais de port
   const totalDisplay = formatPrice(cartTotal); // 1. STATE : Pour stocker les données du formulaire d'adresse
@@ -39,6 +42,41 @@ function Checkout() {
   const isAllShippingFieldsFilled = Object.values(shippingAddress).every(
     (val) => val.trim() !== ""
   );
+
+  const handlePayWithStripe = async () => {
+    // Construire payload minimal (adapter selon ce que vous voulez envoyer)
+    const payload = {
+      items: cartItems.map((it) => ({
+        id: it.id,
+        name: it.name,
+        unit_amount: Math.round((it.price || 0) * 100), // en cents
+        quantity: it.quantity || 1,
+        // ajouter options si nécessaire
+      })),
+      shipping: shippingAddress,
+      success_url: window.location.origin + "/checkout/success",
+      cancel_url: window.location.origin + "/cart",
+    };
+
+    // Appeler votre endpoint WP REST qui crée la Checkout Session
+    const res = await fetch("https://votre-site-wp.com/wp-json/stripe/v1/create-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      console.error("Erreur création session Stripe", await res.text());
+      return;
+    }
+
+    const { sessionId } = await res.json();
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({ sessionId });
+    if (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="checkout-container ">
@@ -125,8 +163,12 @@ function Checkout() {
               onChange={handleShippingChange}
             />
           </div>
-          <button className="next-btn" disabled={!isAllShippingFieldsFilled}>
-            Shipping →
+          <button
+            className="next-btn"
+            disabled={!isAllShippingFieldsFilled}
+            onClick={handlePayWithStripe}
+          >
+            Proceed to Stripe Payment →
           </button>
         </div>
       </div>

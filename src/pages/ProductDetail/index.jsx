@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router";
 import { useCart } from "../../components/CartContext";
 import "./style.css";
 
@@ -51,7 +51,7 @@ function ProductDetail() {
   const [showStockFlash, setShowStockFlash] = useState(false);
   const [stockFlashMessage, setStockFlashMessage] = useState("");
 
-  // ⭐️ ÉTATS POUR LE PRIX D'AFFICHAGE (MAINTENANT FIXE) ⭐️
+  // ⭐️ ÉTATS POUR LE PRIX D'AFFICHAGE (DYNAMIQUE) ⭐️
   const [displayPrice, setDisplayPrice] = useState(null);
   const [displayRegularPrice, setDisplayRegularPrice] = useState(null);
 
@@ -184,7 +184,7 @@ function ProductDetail() {
           product.name +
           (selectedColor ? ` - ${selectedColor}` : "") +
           (selectedSize ? ` / ${selectedSize}` : ""),
-        // ⭐️ UTILISER LE PRIX D'AFFICHAGE ACTUEL (qui est fixe) ⭐️
+        // ⭐️ UTILISER LE PRIX D'AFFICHAGE ACTUEL ⭐️
         price: displayPrice || product.price,
         // Utiliser l'image de la variation si elle existe
         image:
@@ -285,9 +285,12 @@ function ProductDetail() {
         if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
         const data = await response.json();
 
-        // 1. Récupération des Variations (Nécessaire pour la sélection de stock)
+        // 1. Récupération des Variations
         let variationsData = [];
-        if (data.variations && data.variations.length > 0) {
+        let defaultVariation = null;
+        const isVariable = data.type === "variable";
+
+        if (isVariable) {
           const variationsResponse = await fetch(API_VARIATIONS_URL);
           if (variationsResponse.ok) {
             variationsData = await variationsResponse.json();
@@ -295,22 +298,7 @@ function ProductDetail() {
           }
         }
 
-        // 2. Détermination du prix FIXE (utilise toujours le prix du produit parent)
-        const fixedSalePrice = data.sale_price
-          ? parseFloat(data.sale_price)
-          : null;
-        const fixedRegularPrice = parseFloat(data.regular_price) || 0;
-
-        // Le prix affiché sera le prix de solde s'il existe, sinon le prix normal
-        const fixedDisplayPrice =
-          fixedSalePrice !== null ? fixedSalePrice : fixedRegularPrice;
-
-        // ⭐️ DÉFINIR LE PRIX INITIAL FIXE ⭐️
-        setDisplayPrice(fixedDisplayPrice);
-        setDisplayRegularPrice(fixedRegularPrice);
-
-        // --- DÉTERMINATION DE LA VARIATION PAR DÉFAUT (Pour stock/image initial) ---
-        let defaultVariation = null;
+        // 2. Détermination de la variation par défaut (Pour stock/image/PRIX initial)
         if (variationsData.length > 0) {
           // Trouver la première variation qui n'est pas en rupture de stock
           defaultVariation =
@@ -320,6 +308,29 @@ function ProductDetail() {
           // Mise à jour immédiate du selectedVariation pour le stock/l'image au premier rendu
           setSelectedVariation(defaultVariation);
         }
+
+        // ⭐️ DÉTERMINATION DES PRIX INITIAUX ⭐️
+        let initialPrice = 0;
+        let initialRegularPrice = 0;
+
+        if (defaultVariation) {
+          // CAS VARIABLE: Utiliser les prix de la variation par défaut
+          initialPrice =
+            parseFloat(defaultVariation.price) ||
+            parseFloat(defaultVariation.regular_price) ||
+            0;
+          initialRegularPrice = parseFloat(defaultVariation.regular_price) || 0;
+        } else {
+          // CAS SIMPLE: Utiliser les prix du produit parent
+          initialPrice = data.sale_price
+            ? parseFloat(data.sale_price)
+            : parseFloat(data.regular_price) || 0;
+          initialRegularPrice = parseFloat(data.regular_price) || 0;
+        }
+
+        // ⭐️ DÉFINIR LE PRIX INITIAL DYNAMIQUE ⭐️
+        setDisplayPrice(initialPrice);
+        setDisplayRegularPrice(initialRegularPrice);
 
         // --- LOGIQUE DE DESCRIPTION/ATTRIBUTS/TAILLES (inchangée) ---
         const fullDescription = data.description
@@ -417,9 +428,9 @@ function ProductDetail() {
         setProduct({
           id: data.id,
           name: data.name,
-          // ⭐️ Utiliser les prix fixes pour l'objet product ⭐️
-          price: fixedDisplayPrice,
-          regularPrice: fixedRegularPrice,
+          // ⭐️ Utiliser les prix initialisés ci-dessus
+          price: initialPrice,
+          regularPrice: initialRegularPrice,
           description: fullDescription,
           shortDescription: shortDescription,
           displayDescription: displayDescription,
@@ -430,6 +441,7 @@ function ProductDetail() {
           stockQuantity: stockQuantity,
           manageStock: manageStock,
           availableSizes: sizes,
+          isVariable: isVariable, // Ajout du type de produit
         });
 
         await fetchReviews();
@@ -448,14 +460,15 @@ function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  // ⭐️ EFFECT CONSERVÉ : Recherche de variation, mise à jour du STOCK et de l'IMAGE (mais pas du prix) ⭐️
+  // ⭐️ EFFECT CRITIQUE : Recherche de variation, mise à jour du STOCK et du PRIX ⭐️
   useEffect(() => {
     // Ne s'exécute que si le produit est chargé et qu'il y a des variations à chercher
-    if (!product || productVariations.length === 0) {
+    if (!product || !product.isVariable || productVariations.length === 0) {
+      // Si ce n'est pas un produit variable, on ne fait rien
       return;
     }
 
-    // Fonction pour trouver une variation spécifique
+    // Fonction pour trouver une variation spécifique (inchangée)
     const findVariation = (color, size) => {
       // Si toutes les options ne sont pas sélectionnées, on ne cherche pas encore de variation spécifique
       if (availableColors.length > 0 && !color) return null;
@@ -474,12 +487,12 @@ function ProductDetail() {
           const name = attr.name.toLowerCase();
           const option = attr.option;
 
-          // 1. VÉRIFICATION DE LA COULEUR (NORMALISATION EN MINUSCULE)
+          // 1. VÉRIFICATION DE LA COULEUR
           if (
             (name.includes("couleur") || name.includes("color")) &&
             availableColors.length > 0
           ) {
-            colorMatch = option.toLowerCase() === color.toLowerCase(); // Correction: comparaison normalisée
+            colorMatch = option.toLowerCase() === color.toLowerCase();
           }
 
           // 2. VÉRIFICATION DE LA POINTURE/TAILLE (NORMALISATION EN MINUSCULE)

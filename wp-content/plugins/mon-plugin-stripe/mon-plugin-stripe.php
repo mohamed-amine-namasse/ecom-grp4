@@ -22,9 +22,9 @@ if (file_exists(__DIR__ . '/stripe-php/vendor/autoload.php')) {
     return;
 }
 
-/* Définit votre clé secrète — remplacez avant mise en production */
+
 if (!defined('MON_PLUGIN_STRIPE_SECRET')) {
-    define('MON_PLUGIN_STRIPE_SECRET', 'sk_test_');
+    define('MON_PLUGIN_STRIPE_SECRET', 'sk_test_51SaCaURpucHWGHGFS6rSrWSgKM632Q0c7f6PAZn4rxCJ9eozNOyTvwEeH9MXioW1OLE2sDrGAfXyVb71pfwQcRxD00Y4B9Z2X7');
 }
 
 add_action('rest_api_init', function () {

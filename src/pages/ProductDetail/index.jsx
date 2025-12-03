@@ -295,6 +295,15 @@ function ProductDetail() {
           if (variationsResponse.ok) {
             variationsData = await variationsResponse.json();
             setProductVariations(variationsData);
+            // 🚨 VÉRIFICATION DE LA LISTE COMPLÈTE 🚨
+            console.log(
+              "Variations complètes chargées:",
+              variationsData.map((v) => ({
+                id: v.id,
+                attributes: v.attributes,
+                stock_status: v.stock_status,
+              }))
+            );
           }
         }
 
@@ -474,38 +483,65 @@ function ProductDetail() {
       if (availableColors.length > 0 && !color) return null;
       if (availableSizes.length > 0 && !size) return null;
 
+      // Normalisation des sélections pour la comparaison
+      const selectedColorTrimmed = color ? color.toLowerCase().trim() : "";
+      const selectedSizeTrimmed = size ? size.toLowerCase().trim() : "";
+      // DANS LA FONCTION findVariation
+      console.log("--- Recherche de variation ---");
+      console.log("Sélection Couleur (norm.) :", selectedColorTrimmed);
+      console.log("Sélection Pointure (norm.) :", selectedSizeTrimmed);
       return productVariations.find((variation) => {
-        let colorMatch = false;
-        let sizeMatch = false;
+        // Initialiser les correspondances pour CHAQUE variation
+        let colorMatch = availableColors.length === 0; // Vrai par défaut si pas de couleur
+        let sizeMatch = availableSizes.length === 0; // Vrai par défaut si pas de taille
 
-        // Si le produit n'utilise pas de couleur/taille, les considérer comme "matchés" par défaut
-        if (availableColors.length === 0) colorMatch = true;
-        if (availableSizes.length === 0) sizeMatch = true;
-
-        // ⭐️ PARCOURIR TOUS LES ATTRIBUTS DE CETTE VARIATION ⭐️
+        // ⭐️ BOUCLE D'ANALYSE DES ATTRIBUTS DE LA VARIATION ⭐️
         variation.attributes.forEach((attr) => {
           const name = attr.name.toLowerCase();
-          const option = attr.option;
-
+          const option = attr.option.toLowerCase().trim();
+          if (name.includes("couleur") || name.includes("color")) {
+            console.log(
+              `[Variation ID: ${
+                variation.id
+              }] Couleur API (norm.): ${option}, Match: ${
+                option === selectedColorTrimmed
+              }`
+            );
+          }
+          if (name.includes("pointure") || name.includes("taille")) {
+            console.log(
+              `[Variation ID: ${
+                variation.id
+              }] Pointure API (norm.): ${option}, Match: ${
+                option === selectedSizeTrimmed
+              }`
+            );
+          }
           // 1. VÉRIFICATION DE LA COULEUR
           if (
             (name.includes("couleur") || name.includes("color")) &&
             availableColors.length > 0
           ) {
-            colorMatch = option.toLowerCase() === color.toLowerCase();
+            // On met à jour le match de couleur
+            colorMatch = option === selectedColorTrimmed;
           }
 
-          // 2. VÉRIFICATION DE LA POINTURE/TAILLE (NORMALISATION EN MINUSCULE)
-          else if (
+          // 2. VÉRIFICATION DE LA POINTURE/TAILLE
+          // 🚨 CORRECTION CRITIQUE : C'est un IF séparé, PAS un ELSE IF.
+          // Cela permet de vérifier la couleur ET la taille, quel que soit l'ordre
+          // des attributs dans le tableau de l'API.
+          if (
+            // Ancien code : else if (
             (name.includes("pointure") || name.includes("taille")) &&
             availableSizes.length > 0
           ) {
-            sizeMatch = option.toLowerCase() === size.toLowerCase(); // Correction: comparaison normalisée
+            // On met à jour le match de taille
+            sizeMatch = option === selectedSizeTrimmed;
           }
           // Les autres attributs (surface, matière, etc.) sont ignorés
         });
 
-        // La condition est vraie si TOUS les critères nécessaires (couleur ET taille) sont remplis
+        // La variation est valide si TOUS les critères nécessaires (couleur ET taille) sont remplis
         return colorMatch && sizeMatch;
       });
     };

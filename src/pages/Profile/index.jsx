@@ -1,85 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { updateUserPublic, getUser } from "../../components/Api";
+import { updateUserPublic, validateStoredToken } from "../../components/Api";
 import "./style.css";
 
 function Profile() {
   const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirm_password: ""
+    user_display_name: "",
+    user_email: "",
   });
 
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // 🔥 Charger les données utilisateur dès l’arrivée sur la page
   useEffect(() => {
-    (async () => {
-      const user = await getUser();
+    // Récupérer les données stockées
+    const storedData = localStorage.getItem("JWT Token:");
 
-      if (!user) {
-        setMessage({ type: "error", text: "Vous devez être connecté." });
-        return;
-      }
-
-      setForm((prev) => ({
-        ...prev,
-        username: user.username || "",
-        email: user.email || ""
-      }));
-
-    })();
-  }, []);
-
-  const onChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const validate = () => {
-    if (!form.username || !form.email)
-      return "Tous les champs sont requis.";
-
-    if (form.password && form.password !== form.confirm_password)
-      return "Les mots de passe ne correspondent pas.";
-
-    return null;
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    const v = validate();
-    if (v) {
-      setMessage({ type: "error", text: v });
+    if (!storedData) {
+      setMessage({ type: "error", text: "Vous devez être connecté." });
       return;
     }
-
-    setLoading(true);
-    setMessage(null);
+    if (storedData) {
+      validateStoredToken()
+        .then(() => {
+          console.log("Token valide");
+        })
+        .catch((err) => {
+          console.error("Token invalide:", err);
+          setMessage({ type: "error", text: "Token invalide. Veuillez vous reconnecter." });
+        });
+    }
 
     try {
-      const res = await ({
-        username: form.username,
-        email: form.email,
-        password: form.password || null
+      const user = JSON.parse(storedData); // Contient tout ton data
+
+      setForm({
+        user_display_name: user.user_display_name || "",
+        user_email: user.user_email || "",
       });
-
-      setMessage({ type: "success", text: "Profil mis à jour avec succès." });
-
-
-      localStorage.setItem("username", form.username);
-      localStorage.setItem("email", form.email);
-
     } catch (err) {
-      console.error(err);
-      setMessage({
-        type: "error",
-        text: "Erreur de mise à jour du profil."
-      });
-    } finally {
-      setLoading(false);
+      console.error("Erreur parsing JSON:", err);
+      setMessage({ type: "error", text: "Erreur lors du chargement du profil." });
     }
-  };
+  }, []);
 
   return (
     <div className="form">
@@ -89,55 +50,28 @@ function Profile() {
         <div className={`alert alert-${message.type}`}>{message.text}</div>
       )}
 
-      <form onSubmit={onSubmit}>
+      <form>
         <div className="form-group">
           <input
-            name="username"
+            name="user_display_name"
             placeholder="Nom d'utilisateur"
-            value={form.username}
-            onChange={onChange}
-            required
+            value={form.user_display_name}
+            readOnly
           />
         </div>
 
         <div className="form-group">
           <input
-            name="email"
+            name="user_email"
             type="email"
             placeholder="Email"
-            value={form.email}
-            onChange={onChange}
-            required
+            value={form.user_email}
+            readOnly
           />
         </div>
-
-        <div className="form-group">
-          <input
-            name="password"
-            type="password"
-            placeholder="Nouveau mot de passe (optionnel)"
-            value={form.password}
-            onChange={onChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <input
-            name="confirm_password"
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={form.confirm_password}
-            onChange={onChange}
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Envoi..." : "Mettre à jour le profil"}
-        </button>
       </form>
     </div>
   );
 }
 
 export default Profile;
-

@@ -55,7 +55,7 @@ export async function validateToken(token) {
     },
   });
 
-  return res.json(); 
+  return res.json(); // {code: "jwt_auth_valid_token", data: ...}
 }
 
 export async function registerUserPublic(userData) {
@@ -89,68 +89,50 @@ export async function loginUser(username, password) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({username, password}),
     });
-
     const data = await res.json();
 
     if (!res.ok) {
       throw new Error(data.message || "Erreur connexion JWT");
     }
 
-    localStorage.setItem("🔑 JWT Token:", data.token);
-    localStorage.setItem("username", data.username);
-    localStorage.setItem("email", data.email);
+    localStorage.setItem("JWT Token:", JSON.stringify (data));
 
-
-    return data;
   } catch (err) {
     console.error("Erreur login JWT:", err.message);
     throw err;
   }
-
 }
-
-export async function getUser() {
-  const token = localStorage.getItem("token");
-
-  if (!token) return null;
+export async function validateStoredToken() {
+  const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token/validate`;
+  const storedData = localStorage.getItem("JWT Token:");
+  if (!storedData) {
+    throw new Error("No token found in localStorage");
+  }
+  const { token } = JSON.parse(storedData);
 
   try {
-    // 1. Vérification du token
-    const check = await fetch(`${WP_BASE}/jwt-auth/v1/token/validate`, {
+    const res = await fetch(ENDPOINT, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
+      },
     });
+    const data = await res.json();
 
-    const checkData = await check.json();
-
-    if (!check.ok || !checkData?.data?.user_id) {
-      return null;
+    if (!res.ok) {
+      throw new Error(data.message || "Erreur validation JWT");
     }
-
-    const userId = checkData.data.user_id;
-
-    // 2. Récupération des données utilisateur
-    const userRes = await fetch(`${WP_BASE}/wp/v2/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if (!userRes.ok) return null;
-
-    const user = await userRes.json();
-    return user;
-
+    return data;
   } catch (err) {
-    console.error("Erreur getUser()", err);
-    return null;
+    console.error("Erreur validation JWT:", err.message);
+    throw err;
   }
 }
+
+
+
 
 
 

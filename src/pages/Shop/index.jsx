@@ -74,9 +74,8 @@ function Shop() {
   };
 
   const formatPrice = (p) =>
-    p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+    p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" }); // --- APPEL API ET MAPPING CORRIGÉ AVEC RÉCUPÉRATION DES VARIATIONS ---
 
-  // --- APPEL API ET MAPPING CORRIGÉ AVEC RÉCUPÉRATION DES VARIATIONS ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -91,54 +90,60 @@ function Shop() {
         const totalCount =
           parseInt(response.headers.get("X-WP-Total"), 10) || 0;
 
-        const data = await response.json();
+        const data = await response.json(); // Traitement asynchrone pour récupérer les variations si nécessaire
 
-        // 🚨 NOUVEAU: Traitement asynchrone pour récupérer les variations si min_price est 0
         const productsPromises = data.map(async (product) => {
-          let price = 0;
-          let regularPrice = 0;
+          let price = 0; // Prix de vente (min pour variable)
+          let regularPrice = 0; // Prix régulier (prix barré potentiel)
           let maxPrice = 0;
           const productType = product.type;
 
           if (productType === "variable") {
             // 1. Tenter d'abord la récupération du prix via min_price (méthode rapide)
             const minPriceAPI = parseFloat(product.min_price) || 0;
-            const maxPriceAPI = parseFloat(product.max_price) || 0;
+            const maxPriceAPI = parseFloat(product.max_price) || 0; // Utiliser min_regular_price de l'API comme prix de base
+
+            regularPrice = parseFloat(product.min_regular_price) || 0;
 
             if (minPriceAPI > 0) {
-              // Si le prix est valide, on utilise la méthode rapide (préférable)
+              // Utilisation des prix de vente rapides
               price = minPriceAPI;
               maxPrice = maxPriceAPI;
-            } else {
-              // 2. Si min_price est 0, faire un appel aux variations (méthode lente mais fiable)
+            } // Si la méthode rapide n'a pas donné de prix, on passe à la vérification des variations
+
+            if (price === 0) {
               const variationsUrl = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${product.id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
 
               if (product.variations && product.variations.length > 0) {
                 const variationsResponse = await fetch(variationsUrl);
                 if (variationsResponse.ok) {
-                  const variations = await variationsResponse.json();
+                  const variations = await variationsResponse.json(); // Extraction des prix de vente effectifs
 
-                  // Extraction des prix de toutes les variations valides
                   const validPrices = variations
                     .map((v) => parseFloat(v.price))
+                    .filter((p) => p > 0); // Extraction des prix réguliers (pour le barré)
+
+                  const validRegularPrices = variations
+                    .map((v) => parseFloat(v.regular_price))
                     .filter((p) => p > 0);
 
                   if (validPrices.length > 0) {
-                    // On prend le min/max des variations réelles pour le prix
                     price = Math.min(...validPrices);
-                    maxPrice = Math.max(...validPrices);
+                    maxPrice = Math.max(...validPrices); // Mettre le prix régulier minimum trouvé comme prix barré
+
+                    if (validRegularPrices.length > 0) {
+                      regularPrice = Math.min(...validRegularPrices);
+                    }
                   }
                 }
-              }
+              } // Dernier recours si aucun prix trouvé
 
-              // 3. Dernier recours : utiliser regular_price du parent
               if (price === 0) {
                 price = parseFloat(product.regular_price) || 0;
               }
             }
-            regularPrice = parseFloat(product.regular_price) || 0;
           } else {
-            // Pour les produits simples (Logique inchangée)
+            // Pour les produits simples
             price = product.sale_price
               ? parseFloat(product.sale_price)
               : parseFloat(product.regular_price);
@@ -148,7 +153,14 @@ function Shop() {
 
           price = isNaN(price) ? 0 : price;
           regularPrice = isNaN(regularPrice) ? 0 : regularPrice;
-          maxPrice = isNaN(maxPrice) ? 0 : maxPrice;
+          maxPrice = isNaN(maxPrice) ? 0 : maxPrice; // Correction de cohérence finale : S'assurer que regularPrice n'est jamais 0 // quand un prix est trouvé, ou qu'il n'est pas inférieur au prix de vente.
+
+          if (regularPrice === 0 && price > 0) {
+            regularPrice = price;
+          }
+          if (regularPrice < price) {
+            regularPrice = price;
+          }
 
           const desc = product.short_description
             ? product.short_description.replace(/<\/?[^>]+(>|$)/g, "")
@@ -197,12 +209,10 @@ function Shop() {
             manageStock: manageStock,
             stockQuantity: stockQuantity,
           };
-        });
+        }); // Attendre que tous les appels API (variations) soient terminés
 
-        // Attendre que tous les appels API (variations) soient terminés
-        const formattedProducts = await Promise.all(productsPromises);
+        const formattedProducts = await Promise.all(productsPromises); // Calcul des options uniques (inchangé)
 
-        // Calcul des options uniques (inchangé)
         const allMaterials = formattedProducts
           .map((p) => p.attributes.material)
           .filter((m) => m && String(m).trim() !== "");
@@ -250,9 +260,8 @@ function Shop() {
     };
 
     fetchProducts();
-  }, []);
+  }, []); // 2. Fonction de filtrage principale (inchangé)
 
-  // 2. Fonction de filtrage principale (inchangé)
   const filteredProducts = useMemo(() => {
     if (products.length === 0) return [];
 
@@ -319,9 +328,8 @@ function Shop() {
     );
   }
 
-  const maxShopPrice = getMaxPrice(products);
+  const maxShopPrice = getMaxPrice(products); // 5. Rendu du contenu
 
-  // 5. Rendu du contenu (inchangé, car le prix est maintenant correct dans prod.price)
   return (
     <main className="shop-container">
       <header className="shop-header">
@@ -345,6 +353,7 @@ function Shop() {
             dynamicMaterials={shopOptions.materials}
           />
         </aside>
+
         <section className="products-grid" aria-live="polite">
           <p className="filtered-count-info">
             {filteredProducts.length} produit
@@ -360,9 +369,12 @@ function Shop() {
             const isOutOfStock = prod.stock_status === "outofstock";
             const productLink = `/product/${prod.id}`;
             const isVariable = prod.type === "variable";
+            const hasPriceRange =
+              isVariable &&
+              prod.price !== prod.maxPrice &&
+              prod.maxPrice > prod.price; // VRAIE condition de promotion: Le prix de vente est strictement inférieur au prix régulier
 
-            // Promo seulement pour produits simples
-            const hasSalePrice = prod.price < prod.regularPrice && !isVariable;
+            const isOnSale = prod.price < prod.regularPrice;
 
             return (
               <article className="product-card" key={prod.id}>
@@ -370,12 +382,14 @@ function Shop() {
                   <Link to={productLink} className="product-image-link">
                     <img src={prod.image} alt={prod.name} />
                   </Link>
+
                   {isOutOfStock && (
                     <div className="product-badge out-of-stock">
                       Rupture de Stock
                     </div>
                   )}
                 </div>
+
                 <div className="product-body">
                   <h3 className="product-title">
                     <Link className="text-dark " to={productLink}>
@@ -387,16 +401,20 @@ function Shop() {
                   )}
                   <div className="product-footer">
                     <div className="flex">
-                      {/* Affichage du prix régulier barré si promotion sur produit simple */}
-                      {hasSalePrice && (
+                      {/* Affichage du prix régulier barré SI le produit est en promotion */}
+                      {isOnSale && (
                         <span className="product-price old-price">
-                          {formatPrice(prod.regularPrice)}{" "}
+                          {formatPrice(prod.regularPrice)}
                         </span>
                       )}
-
-                      {/* Prix actuel : Affiche simplement prod.price */}
+                      {/* Prix actuel (prix de vente ou prix régulier) */}
                       <span className="product-price current-price">
-                        {formatPrice(prod.price)}
+                        {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
+                        {hasPriceRange && !isOnSale
+                          ? `${formatPrice(prod.price)} - ${formatPrice(
+                              prod.maxPrice
+                            )}`
+                          : formatPrice(prod.price)}
                       </span>
                     </div>
                   </div>

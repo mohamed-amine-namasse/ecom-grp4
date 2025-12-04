@@ -20,35 +20,38 @@ import Shipping from "./pages/Shipping";
 import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./components/CartContext";
 import ScrollToTop from "./components/ScrollToTop";
+import { AuthProvider } from "./components/AuthContext";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <CartProvider>
-        <NavScrollExample />
+    <AuthProvider>
+      <Router>
+        <ScrollToTop />
+        <CartProvider>
+          <NavScrollExample />
 
-        <Routes>
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/profile/update" element={<Update />} />
-          <Route path="/profile/orders/:customerId" element={<Orders />} />
-          <Route path="/shipping" element={<Shipping />} />
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<Error />} />
-        </Routes>
-      </CartProvider>
-      <Footer />
-    </Router>
+          <Routes>
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/update" element={<Update />} />
+            <Route path="/profile/orders/:customerId" element={<Orders />} />
+            <Route path="/shipping" element={<Shipping />} />
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<Error />} />
+          </Routes>
+        </CartProvider>
+        <Footer />
+      </Router>
+    </AuthProvider>
   );
 }
 

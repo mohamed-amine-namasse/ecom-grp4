@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import logo from "./logo.png";
 import { useCart } from "../CartContext"; // Assurez-vous que le chemin est correct
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
@@ -297,7 +298,7 @@ function NavScrollExample() {
             {/* L'image de votre logo est ajoutée ici */}
             {/* ---------------------------------------------------- */}
             <img
-              src="../images/LOGO.jpg" // REMPLACEZ CETTE URL PAR L'URL DE VOTRE LOGO HEBERGÉ
+              src={logo} // REMPLACEZ CETTE URL PAR L'URL DE VOTRE LOGO HEBERGÉ
               alt="Foot Market Logo"
               className="navbar-logo" // Classe pour le style
             />

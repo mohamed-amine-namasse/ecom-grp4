@@ -34,7 +34,7 @@ function Login() {
       });
 
       setTimeout(() => {
-        navigate("/profile");
+        navigate("/");
       }, 1000);
 
       setForm({ username: "", password: "" });

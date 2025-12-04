@@ -31,7 +31,7 @@ function Cart() {
         <div className="cart-empty-state">
           <p>
             Votre panier est vide. Commencez vos achats dans la
-            <a href="/shop">Boutique</a> !
+            <a href="/shop"> Boutique</a> !
           </p>
         </div>
       ) : (

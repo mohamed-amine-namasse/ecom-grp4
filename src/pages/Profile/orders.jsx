@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import "./style.css";
+import "./orders.css";
 
 const WOOCOMMERCE_FULL_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";

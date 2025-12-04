@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { updateUserPublic, validateStoredToken } from "../../components/Api";
-import "./style.css";
+import "./orders.css";
 
 function Profile() {
   const [form, setForm] = useState({
@@ -57,7 +57,7 @@ function Profile() {
             <a href="/profile/update">Modification du profil</a>
           </li>
           <li>
-            <a href="/orders">Commandes</a>
+            <a href="/profile/orders/1">Commandes</a>
           </li>
           <li>
             <a href="/support">Support</a>

@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
 import Shipping from "./pages/Shipping";
 import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./components/CartContext";
@@ -37,6 +38,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/orders/:customerId" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/" element={<Home />} />

@@ -478,74 +478,91 @@ function ProductDetail() {
     }
 
     // Fonction pour trouver une variation spécifique (inchangée)
+    // VERS LA LIGNE 366 (Remplacez l'intégralité de la fonction)
     const findVariation = (color, size) => {
-      // Si toutes les options ne sont pas sélectionnées, on ne cherche pas encore de variation spécifique
       if (availableColors.length > 0 && !color) return null;
       if (availableSizes.length > 0 && !size) return null;
 
-      // Normalisation des sélections pour la comparaison
-      const selectedColorTrimmed = color ? color.toLowerCase().trim() : "";
-      const selectedSizeTrimmed = size ? size.toLowerCase().trim() : "";
-      // DANS LA FONCTION findVariation
+      // FONCTION DE NORMALISATION FORTE
+      // Supprime les accents et les caractères spéciaux non essentiels
+      const normalizeString = (str) => {
+        if (!str) return "";
+        return (
+          str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Enlève les accents
+            .replace(/[\/\\]/g, "") // Enlève les barres obliques/antislash
+            // ⭐️ CORRECTION 1 : Accepte les majuscules A-Z.
+            // ⭐️ CORRECTION 2 : Accepte les lettres minuscules a-z.
+            // ⭐️ CORRECTION 3 : Accepte les chiffres 0-9.
+            // Nous allons conserver le remplacement initial par sécurité, mais en incluant A-Z.
+            .replace(/[^A-Za-z0-9]/g, "") // ENLÈVE TOUT CE QUI N'EST PAS UNE LETTRE OU UN CHIFFRE
+            .toLowerCase() // Tout en minuscules
+            .trim()
+        ); // Enlève les espaces résiduels (maintenant vides)
+      };
+
+      // Normalisation des sélections
+      const selectedColorTrimmed = normalizeString(color);
+      const selectedSizeTrimmed = normalizeString(size);
+
       console.log("--- Recherche de variation ---");
       console.log("Sélection Couleur (norm.) :", selectedColorTrimmed);
       console.log("Sélection Pointure (norm.) :", selectedSizeTrimmed);
+
       return productVariations.find((variation) => {
-        // Initialiser les correspondances pour CHAQUE variation
-        let colorMatch = availableColors.length === 0; // Vrai par défaut si pas de couleur
-        let sizeMatch = availableSizes.length === 0; // Vrai par défaut si pas de taille
+        let variationColor = null;
+        let variationSize = null;
 
-        // ⭐️ BOUCLE D'ANALYSE DES ATTRIBUTS DE LA VARIATION ⭐️
+        // 1. PARCOURIR LES ATTRIBUTS ET RÉCUPÉRER LES VALEURS
         variation.attributes.forEach((attr) => {
-          const name = attr.name.toLowerCase();
-          const option = attr.option.toLowerCase().trim();
-          if (name.includes("couleur") || name.includes("color")) {
-            console.log(
-              `[Variation ID: ${
-                variation.id
-              }] Couleur API (norm.): ${option}, Match: ${
-                option === selectedColorTrimmed
-              }`
-            );
-          }
-          if (name.includes("pointure") || name.includes("taille")) {
-            console.log(
-              `[Variation ID: ${
-                variation.id
-              }] Pointure API (norm.): ${option}, Match: ${
-                option === selectedSizeTrimmed
-              }`
-            );
-          }
-          // 1. VÉRIFICATION DE LA COULEUR
+          // Utiliser la normalisation sur le nom de l'attribut (pour 'Taille/Pointure')
+          const normalizedName = normalizeString(attr.name);
+          // Utiliser la normalisation sur l'option (pour '35' ou 'Blanc')
+          const normalizedOption = normalizeString(attr.option);
+          const normalizedSlug = normalizeString(attr.slug);
+
+          // Récupère la COULEUR de cette variation
           if (
-            (name.includes("couleur") || name.includes("color")) &&
-            availableColors.length > 0
+            normalizedName.includes("couleur") ||
+            normalizedName.includes("color") ||
+            normalizedSlug.includes("couleur") ||
+            normalizedSlug.includes("color")
           ) {
-            // On met à jour le match de couleur
-            colorMatch = option === selectedColorTrimmed;
+            variationColor = normalizedOption;
           }
 
-          // 2. VÉRIFICATION DE LA POINTURE/TAILLE
-          // 🚨 CORRECTION CRITIQUE : C'est un IF séparé, PAS un ELSE IF.
-          // Cela permet de vérifier la couleur ET la taille, quel que soit l'ordre
-          // des attributs dans le tableau de l'API.
+          // Récupère la TAILLE/POINTURE de cette variation
           if (
-            // Ancien code : else if (
-            (name.includes("pointure") || name.includes("taille")) &&
-            availableSizes.length > 0
+            normalizedName.includes("pointure") ||
+            normalizedName.includes("taille") ||
+            normalizedSlug.includes("taille") ||
+            normalizedSlug.includes("pointure")
           ) {
-            // On met à jour le match de taille
-            sizeMatch = option === selectedSizeTrimmed;
+            variationSize = normalizedOption;
           }
-          // Les autres attributs (surface, matière, etc.) sont ignorés
         });
 
-        // La variation est valide si TOUS les critères nécessaires (couleur ET taille) sont remplis
-        return colorMatch && sizeMatch;
+        // 2. COMPARAISON FINALE
+
+        // La couleur doit correspondre, SAUF si le produit n'a pas d'attribut couleur
+        const colorMatch =
+          availableColors.length === 0 ||
+          variationColor === selectedColorTrimmed;
+
+        // La taille doit correspondre, SAUF si le produit n'a pas d'attribut taille
+        const sizeMatch =
+          availableSizes.length === 0 || variationSize === selectedSizeTrimmed;
+
+        if (colorMatch && sizeMatch) {
+          console.log(
+            `✅ MATCH TROUVÉ : ID ${variation.id} (Couleur: ${variationColor}, Taille: ${variationSize})`
+          );
+          return true;
+        }
+        return false;
       });
     };
-
     // Cherche une variation basée sur les sélections actuelles
     const foundVariation = findVariation(selectedColor, selectedSize);
 

@@ -9,7 +9,7 @@ function ProductCards() {
     {
       title: "Nike Mercurial",
       description: "Crampons légers et rapides pour dominer le terrain.",
-      image: "images/images.jpg",
+      image: "images/unnamed (2).jpg",
     },
     {
       title: "Adidas Predator",
@@ -38,6 +38,7 @@ function ProductCards() {
               src={product.image}
               style={{ height: "200px", objectFit: "cover" }}
             />
+            
           </Card>
         </Col>
       ))}

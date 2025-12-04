@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { updateUserPublic, validateStoredToken } from "../../components/Api";
 import "./style.css";
 
-function Profile() {
+function Update() {
   const [form, setForm] = useState({
     user_display_name: "",
     user_email: "",
@@ -62,7 +62,7 @@ function Profile() {
       </div>
       
       <div className="form">
-        <h1>Page de Profil</h1>
+        <h1>Modification du Profile</h1>
 
         {message && (
           <div className={`alert alert-${message.type}`}>{message.text}</div>
@@ -93,5 +93,4 @@ function Profile() {
   );
 }
 
-export default Profile;
-
+export default Update;

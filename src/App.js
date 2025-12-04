@@ -8,6 +8,7 @@ import Shop from "./pages/Shop";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
+import Update from "./pages/Profile/update";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/Profile/update" element={<Update />} />
         <Route path="/" element={<Home />} />
         <Route path="*" element={<Error />} />
       </Routes>

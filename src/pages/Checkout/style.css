@@ -251,6 +251,24 @@ body {
   background-color: green; /* Ou laissez #007bff si vous voulez juste le trait rempli */
 }
 
+/* Style du bouton Payer à la Livraison */
+.checkout-container .checkout-left .section .cod-btn {
+  background-color: #28a745; /* Vert pour Cash on Delivery */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-container .checkout-left .section .cod-btn:hover:not(:disabled) {
+  background-color: #1e7e34;
+}
+
 /* Media Query pour la réactivité */
 @media (max-width: 900px) {
   .checkout-container {

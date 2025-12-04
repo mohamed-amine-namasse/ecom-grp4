@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { useCart } from "../../components/CartContext";
 import { Link } from "react-router";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import "./style.css";
 
 // Fonction utilitaire pour le formatage du prix
@@ -10,16 +15,19 @@ const formatPrice = (p) => {
   return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 };
 
-// Utiliser variable d'environnement, fallback optionnel 
+// Utiliser variable d'environnement, fallback optionnel
 const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || "pk_test_51SaCaURpucHWGHGFLujFQb5NuwDLONlNeyaLq6Gj74vHNxJJhom8NbTZdEE6yZIrxCR3heI92DnJDphekVTJjxTz00pYKhG5M2"
+  process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY ||
+    "pk_test_51SaCaURpucHWGHGFLujFQb5NuwDLONlNeyaLq6Gj74vHNxJJhom8NbTZdEE6yZIrxCR3heI92DnJDphekVTJjxTz00pYKhG5M2"
 );
 
 // Base URL WordPress (mettre dans .env.local REACT_APP_WP_API_BASE)
-const WP_API_BASE = process.env.REACT_APP_WP_API_BASE || "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
+const WP_API_BASE =
+  process.env.REACT_APP_WP_API_BASE ||
+  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 
 function Checkout() {
-  const { cartItems, cartTotal } = useCart();
+  const { cartItems, cartTotal, clearCart } = useCart(); // MODIFICATION: Assurez-vous d'avoir clearCart si vous voulez vider le panier après commande.
 
   const subtotal = formatPrice(cartTotal || 0);
   const totalDisplay = formatPrice(cartTotal || 0);
@@ -32,6 +40,8 @@ function Checkout() {
     address: "",
     city: "",
     postalCode: "",
+    email: "", // MODIFICATION: Ajoutez l'email ici (ou récupérez-le des inputs CONTACT INFO)
+    phone: "", // MODIFICATION: Ajoutez le téléphone ici
   });
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
@@ -43,16 +53,102 @@ function Checkout() {
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
 
-  const isShippingCompleted = Object.values(shippingAddress).some((val) => val.trim() !== "");
-  const isAllShippingFieldsFilled = Object.values(shippingAddress).every((val) => val.trim() !== "");
+  const isShippingCompleted = Object.values(shippingAddress).some(
+    (val) => val.trim() !== ""
+  );
+  // MODIFICATION: Exclure explicitement email/phone du contrôle isAllShippingFieldsFilled si les champs de Contact sont gérés séparément
+  const isAllShippingFieldsFilled = Object.entries(shippingAddress).every(
+    ([key, val]) =>
+      key !== "email" && key !== "phone" ? val.trim() !== "" : true
+  );
+
+  // MODIFICATION: Nouvelle fonction pour gérer la soumission de la commande sans paiement (PAL)
+  const handlePlaceOrderWithCOD = async () => {
+    // MODIFICATION: Inclure email/phone dans la vérification si les inputs CONTACT INFO sont liés à `shippingAddress`
+    const isContactFilled =
+      shippingAddress.email.trim() !== "" &&
+      shippingAddress.phone.trim() !== "";
+
+    if (
+      !isAllShippingFieldsFilled ||
+      !isContactFilled ||
+      cartItems.length === 0
+    ) {
+      setPaymentMessage(
+        "Veuillez remplir toutes les informations de contact et de livraison, et avoir des articles dans le panier."
+      );
+      return;
+    }
+
+    setPaymentMessage("Passage de la commande...");
+    setShowPaymentForm(false);
+    setPaymentSuccess(false);
+
+    // Préparation des données de commande pour le backend
+    const orderData = {
+      shipping: shippingAddress,
+      items: cartItems.map((item) => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        meta: {
+          color: item.selectedColor,
+          size: item.selectedSize,
+        },
+      })),
+      total: cartTotal,
+      customer_email: shippingAddress.email, // Ajout de l'email
+      customer_phone: shippingAddress.phone, // Ajout du téléphone
+      payment_method: "cash_on_delivery", // Utiliser un slug de méthode de paiement à la livraison
+      status: "processing", // Statut initial pour une commande en attente de paiement à la livraison
+    };
+
+    // MODIFICATION: Vous devrez implémenter ce endpoint dans votre backend (API WordPress)
+    // Ce endpoint doit créer une commande WooCommerce (ou autre) avec la méthode de paiement "cash_on_delivery"
+    const endpoint = `${WP_API_BASE}/wp-json/your-custom/v1/create-cod-order`;
+
+    try {
+      const resp = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      const data = await resp.json();
+
+      if (resp.ok && data.order_id) {
+        setPaymentSuccess(true);
+        setPaymentMessage(
+          `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`
+        );
+        // OPTIONNEL : Vider le panier après commande réussie
+        // clearCart();
+      } else {
+        const errorMsg =
+          data.message || "Erreur lors de la création de la commande.";
+        setPaymentSuccess(false);
+        setPaymentMessage(`❌ Échec de la commande : ${errorMsg}`);
+      }
+    } catch (err) {
+      setPaymentSuccess(false);
+      setPaymentMessage(`Erreur réseau : ${err.message}`);
+    }
+  };
+  // FIN MODIFICATION: Nouvelle fonction pour gérer la soumission de la commande sans paiement (PAL)
 
   const handleProceedToPayment = () => {
-    if (!isAllShippingFieldsFilled) return;
+    if (
+      !isAllShippingFieldsFilled ||
+      shippingAddress.email.trim() === "" ||
+      shippingAddress.phone.trim() === ""
+    )
+      return; // MODIFICATION: Vérification des champs de contact
     setShowPaymentForm(true);
   };
 
   // PaymentForm (fusion du PaymentPage.jsx)
   function PaymentForm({ amountCents, defaultBilling, onSuccess, onError }) {
+    // ... code PaymentForm existant (inchangé ou utilisez la version fournie par l'utilisateur) ...
+
     const stripe = useStripe();
     const elements = useElements();
     const [processing, setProcessing] = useState(false);
@@ -75,6 +171,7 @@ function Checkout() {
 
     async function handleSubmit(e) {
       e.preventDefault();
+      // ... logique Stripe existante ...
       if (!stripe || !elements) {
         setStatus("Stripe non initialisé");
         return;
@@ -139,7 +236,10 @@ function Checkout() {
         if (result.error) {
           setStatus(result.error.message || "Erreur paiement");
           onError && onError(result.error.message);
-        } else if (result.paymentIntent && result.paymentIntent.status === "succeeded") {
+        } else if (
+          result.paymentIntent &&
+          result.paymentIntent.status === "succeeded"
+        ) {
           setStatus("Paiement réussi — merci !");
           onSuccess && onSuccess(result.paymentIntent);
         } else {
@@ -154,27 +254,65 @@ function Checkout() {
       }
     }
 
+    // MODIFICATION: Suppression de l'ancienne fonction handlePlaceOrderWithoutPayment pour la centraliser dans Checkout
+
     return (
       <form className="payment-form" onSubmit={handleSubmit}>
-        <h3>Informations de facturation & paiement</h3>
+        <h3>Informations de facturation & paiement (Carte Bancaire)</h3>
 
         <div className="row">
-          <input name="firstName" value={billing.firstName} onChange={handleChange} placeholder="Prénom" />
-          <input name="lastName" value={billing.lastName} onChange={handleChange} placeholder="Nom" />
+          <input
+            name="firstName"
+            value={billing.firstName}
+            onChange={handleChange}
+            placeholder="Prénom"
+          />
+          <input
+            name="lastName"
+            value={billing.lastName}
+            onChange={handleChange}
+            placeholder="Nom"
+          />
         </div>
 
         <div className="row">
-          <input name="email" value={billing.email} onChange={handleChange} placeholder="Email" type="email" />
+          <input
+            name="email"
+            value={billing.email}
+            onChange={handleChange}
+            placeholder="Email"
+            type="email"
+          />
         </div>
 
         <div className="row">
-          <input name="address" value={billing.address} onChange={handleChange} placeholder="Adresse" />
+          <input
+            name="address"
+            value={billing.address}
+            onChange={handleChange}
+            placeholder="Adresse"
+          />
         </div>
 
         <div className="row">
-          <input name="city" value={billing.city} onChange={handleChange} placeholder="Ville" />
-          <input name="postalCode" value={billing.postalCode} onChange={handleChange} placeholder="Code postal" />
-          <input name="country" value={billing.country} onChange={handleChange} placeholder="Pays (ISO)" />
+          <input
+            name="city"
+            value={billing.city}
+            onChange={handleChange}
+            placeholder="Ville"
+          />
+          <input
+            name="postalCode"
+            value={billing.postalCode}
+            onChange={handleChange}
+            placeholder="Code postal"
+          />
+          <input
+            name="country"
+            value={billing.country}
+            onChange={handleChange}
+            placeholder="Pays (ISO)"
+          />
         </div>
 
         <div className="row card-row">
@@ -186,9 +324,16 @@ function Checkout() {
 
         <div className="actions">
           <button type="submit" disabled={!stripe || processing}>
-            {processing ? "Paiement…" : `Payer (${(amountCents / 100).toFixed(2)} €)`}
+            {processing
+              ? "Paiement…"
+              : `Payer (${(amountCents / 100).toFixed(2)} €)`}
           </button>
-          <button type="button" className="cancel" onClick={() => setShowPaymentForm(false)} disabled={processing}>
+          <button
+            type="button"
+            className="cancel"
+            onClick={() => setShowPaymentForm(false)}
+            disabled={processing}
+          >
             Annuler
           </button>
         </div>
@@ -204,15 +349,34 @@ function Checkout() {
         <h1>CHECKOUT</h1>
         <div className="steps">
           <span className="active">INFORMATION</span>
-          <span className={isShippingCompleted ? "completed" : ""}>SHIPPING</span>
-          <span className={isAllShippingFieldsFilled ? "completed" : ""}>PAYMENT</span>
+          <span className={isShippingCompleted ? "completed" : ""}>
+            SHIPPING
+          </span>
+          <span className={isAllShippingFieldsFilled ? "completed" : ""}>
+            PAYMENT
+          </span>
         </div>
 
         <div className="section">
           <h3>CONTACT INFO</h3>
           <div className="row">
-            <input type="email" placeholder="Email" />
-            <input type="text" placeholder="Phone" />
+            {/* MODIFICATION: Lier les inputs Email et Phone au state shippingAddress */}
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={shippingAddress.email}
+              onChange={handleShippingChange}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Phone"
+              name="phone"
+              value={shippingAddress.phone}
+              onChange={handleShippingChange}
+              required
+            />
           </div>
         </div>
 
@@ -279,24 +443,49 @@ function Checkout() {
               onChange={handleShippingChange}
             />
           </div>
-          <button className="next-btn" disabled={!isAllShippingFieldsFilled} onClick={handleProceedToPayment}>
-            Proceed to Stripe Payment →
-          </button>
+
+          <div className="payment-options">
+            {/* MODIFICATION: Bouton pour le paiement à la livraison (PAL) */}
+            <button
+              className="cod-btn"
+              disabled={
+                !isAllShippingFieldsFilled ||
+                shippingAddress.email.trim() === "" ||
+                shippingAddress.phone.trim() === ""
+              }
+              onClick={handlePlaceOrderWithCOD}
+            >
+              Payer à la Livraison
+            </button>
+
+            {/* MODIFICATION: Bouton pour passer à Stripe (s'affiche si les champs sont remplis) */}
+            <button
+              className="next-btn"
+              disabled={
+                !isAllShippingFieldsFilled ||
+                shippingAddress.email.trim() === "" ||
+                shippingAddress.phone.trim() === ""
+              }
+              onClick={handleProceedToPayment}
+            >
+              Procéder au Paiement par Carte (Stripe) →
+            </button>
+          </div>
 
           {showPaymentForm && (
             <div className="payment-section">
               <Elements stripe={stripePromise}>
                 <PaymentForm
                   amountCents={Math.round((cartTotal || 0) * 100)}
-                  defaultBilling={{ ...shippingAddress, email: "" }}
+                  defaultBilling={{ ...shippingAddress }} // MODIFICATION: Passer toutes les infos, y compris email/phone
                   onSuccess={(intent) => {
                     setPaymentSuccess(true);
-                    setPaymentMessage("Paiement réussi — merci !");
+                    setPaymentMessage("Paiement Stripe réussi — merci !");
                     // TODO: appeler backend pour marquer commande payée, sauvegarder order id, etc.
                   }}
                   onError={(err) => {
                     setPaymentSuccess(false);
-                    setPaymentMessage(err || "Erreur paiement");
+                    setPaymentMessage(err || "Erreur paiement Stripe");
                   }}
                 />
               </Elements>
@@ -307,24 +496,33 @@ function Checkout() {
 
       <div className="checkout-right">
         <h3>YOUR ORDER</h3>
+        {/* ... Reste de la section Order (inchangée) ... */}
         {cartItems.length === 0 ? (
           <p>Votre panier est vide.</p>
         ) : (
           cartItems.map((item) => {
             const optionsArray = [];
-            if (item.selectedColor) optionsArray.push(`Couleur: ${item.selectedColor}`);
-            if (item.selectedSize) optionsArray.push(`Pointure: ${item.selectedSize}`);
+            if (item.selectedColor)
+              optionsArray.push(`Couleur: ${item.selectedColor}`);
+            if (item.selectedSize)
+              optionsArray.push(`Pointure: ${item.selectedSize}`);
             const optionsDisplay = optionsArray.join(" | ");
             return (
               <div key={item.id} className="product">
                 <img src={item.image || "/img/default.jpg"} alt={item.name} />
                 <div>
                   <p className="title">{item.name}</p>
-                  {optionsDisplay && <p className="product-options">{optionsDisplay}</p>}
-                  <Link to="/cart" className="change-link">Change</Link>
+                  {optionsDisplay && (
+                    <p className="product-options">{optionsDisplay}</p>
+                  )}
+                  <Link to="/cart" className="change-link">
+                    Change
+                  </Link>
                   <p>({item.quantity})</p>
                 </div>
-                <p className="price">{formatPrice(item.price * item.quantity)}</p>
+                <p className="price">
+                  {formatPrice(item.price * item.quantity)}
+                </p>
               </div>
             );
           })
@@ -343,7 +541,16 @@ function Checkout() {
             <span>{totalDisplay}</span>
           </div>
         </div>
-        {paymentMessage && <p className="payment-message">{paymentMessage}</p>}
+        {paymentMessage && (
+          <p
+            className={`payment-message ${
+              paymentSuccess ? "success" : "error"
+            }`}
+          >
+            {paymentMessage}
+          </p>
+        )}{" "}
+        {/* MODIFICATION: Ajout de classes pour le style */}
       </div>
     </div>
   );

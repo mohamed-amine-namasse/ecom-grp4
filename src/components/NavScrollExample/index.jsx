@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import logo from "./logo.png";
+import logo from "./LOGO.jpg";
 import { useCart } from "../CartContext"; // Assurez-vous que le chemin est correct
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";

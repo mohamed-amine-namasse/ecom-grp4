@@ -59,9 +59,6 @@ function Profile() {
           <li>
             <a href="/profile/orders/1">Commandes</a>
           </li>
-          <li>
-            <a href="/support">Support</a>
-          </li>
         </ul>
       </div>
 

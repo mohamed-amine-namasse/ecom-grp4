@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../components/Api";
 import "./style.css";
 
@@ -33,14 +33,8 @@ function Login() {
         text: data?.message || "Connexion réussie.",
       });
 
-      // Stocker les données utilisateur
-      localStorage.setItem("user_id", data.user_id);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("email", data.email);
-
-      // Redirection vers Shop après 1 seconde
       setTimeout(() => {
-        navigate("/shop");
+        navigate("/profile");
       }, 1000);
 
       setForm({ username: "", password: "" });

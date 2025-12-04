@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { registerUserPublic } from "../../components/Api";
+import { registerUserPublic } from "../../components/Api/";
 import "./style.css";
 
 function Register() {

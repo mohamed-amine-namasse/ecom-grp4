@@ -1,137 +1,99 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { updateUserPublic, validateStoredToken } from "../../components/Api";
 import "./style.css";
 
 function Profile() {
-  const [form, setForm] = useState({ nom: "", prenom: "", email: "" });
-  const [status, setStatus] = useState("");
-  const [editingPassword, setEditingPassword] = useState(false);
-  const [pw, setPw] = useState({ newPassword: "", confirmPassword: "" });
+  const [form, setForm] = useState({
+    user_display_name: "",
+    user_email: "",
+  });
 
-  function handleChange(e) {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-  }
+  const [message, setMessage] = useState(null);
 
-  function handlePwChange(e) {
-    setPw((p) => ({ ...p, [e.target.name]: e.target.value }));
-  }
+  useEffect(() => {
+    const storedData = localStorage.getItem("JWT Token:");
 
-  function validEmail(email) {
-    return /\S+@\S+\.\S+/.test(email);
-  }
+    if (!storedData) {
+      setMessage({ type: "error", text: "Vous devez être connecté." });
+      return;
+    }
+    if (storedData) {
+      validateStoredToken()
+        .then(() => {
+          console.log("Token valide");
+        })
+        .catch((err) => {
+          console.error("Token invalide:", err);
+          setMessage({
+            type: "error",
+            text: "Token invalide. Veuillez vous reconnecter.",
+          });
+        });
+    }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!form.nom.trim()) return setStatus("Veuillez indiquer votre nom.");
-    if (!form.prenom.trim())
-      return setStatus("Veuillez indiquer votre prénom.");
-    if (!validEmail(form.email)) return setStatus("Email invalide.");
-    setStatus("Enregistrement…");
-    setTimeout(() => {
-      setStatus("Profil enregistré.");
-      setTimeout(() => setStatus(""), 2000);
-    }, 700);
-  }
+    try {
+      const user = JSON.parse(storedData);
 
-  function handlePasswordSave(e) {
-    e.preventDefault();
-    if (pw.newPassword.length < 6)
-      return setStatus("Le mot de passe doit contenir au moins 6 caractères.");
-    if (pw.newPassword !== pw.confirmPassword)
-      return setStatus("Les mots de passe ne correspondent pas.");
-    setStatus("Mise à jour du mot de passe…");
-    setTimeout(() => {
-      setStatus("Mot de passe mis à jour.");
-      setPw({ newPassword: "", confirmPassword: "" });
-      setEditingPassword(false);
-      setTimeout(() => setStatus(""), 2000);
-    }, 700);
-  }
+      setForm({
+        user_display_name: user.user_display_name || "",
+        user_email: user.user_email || "",
+      });
+    } catch (err) {
+      console.error("Erreur parsing JSON:", err);
+      setMessage({
+        type: "error",
+        text: "Erreur lors du chargement du profil.",
+      });
+    }
+  }, []);
 
   return (
-    <main className="contact-page">
-      <form className="contact-card" onSubmit={handleSubmit} noValidate>
-        <h1>Mon profil</h1>
+    <div className="page-wrapper">
+      {/* MENU LATÉRAL */}
+      <div className="side-menu">
+        <h2>Menu</h2>
+        <ul>
+          <li>
+            <a href="/profile/update">Modification du profil</a>
+          </li>
+          <li>
+            <a href="/orders">Commandes</a>
+          </li>
+          <li>
+            <a href="/support">Support</a>
+          </li>
+        </ul>
+      </div>
 
-        <label>
-          Nom
-          <input name="nom" value={form.nom} onChange={handleChange} />
-        </label>
+      <div className="form">
+        <h1>Page de Profil</h1>
 
-        <label>
-          Prénom
-          <input name="prenom" value={form.prenom} onChange={handleChange} />
-        </label>
-
-        <label>
-          Email
-          <input name="email" value={form.email} onChange={handleChange} />
-        </label>
-
-        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          Mot de passe
-          <input
-            type="password"
-            name="password"
-            value=""
-            placeholder="••••••••"
-            disabled
-            style={{ flex: 1 }}
-          />
-          <button
-            type="button"
-            className="btn"
-            onClick={() => {
-              setEditingPassword((s) => !s);
-              setStatus("");
-            }}
-          >
-            {editingPassword ? "Annuler" : "Modifier le mot de passe"}
-          </button>
-        </label>
-
-        {editingPassword && (
-          <div style={{ marginTop: 8 }}>
-            <label>
-              Nouveau mot de passe
-              <input
-                type="password"
-                name="newPassword"
-                value={pw.newPassword}
-                onChange={handlePwChange}
-              />
-            </label>
-
-            <label>
-              Confirmer le mot de passe
-              <input
-                type="password"
-                name="confirmPassword"
-                value={pw.confirmPassword}
-                onChange={handlePwChange}
-              />
-            </label>
-
-            <div className="actions" style={{ marginTop: 8 }}>
-              <button
-                type="button"
-                className="btn"
-                onClick={handlePasswordSave}
-              >
-                Sauvegarder le mot de passe
-              </button>
-            </div>
-          </div>
+        {message && (
+          <div className={`alert alert-${message.type}`}>{message.text}</div>
         )}
 
-        <div className="actions" style={{ marginTop: 12 }}>
-          <button type="submit" className="btn">
-            Enregistrer
-          </button>
-        </div>
+        <form>
+          <div className="form-group">
+            <input
+              name="user_display_name"
+              placeholder="Nom d'utilisateur"
+              value={form.user_display_name}
+              readOnly
+            />
+          </div>
 
-        {status && <p className="status">{status}</p>}
-      </form>
-    </main>
+          <div className="form-group">
+            <input
+              name="user_email"
+              type="email"
+              placeholder="Email"
+              value={form.user_email}
+              readOnly
+            />
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 

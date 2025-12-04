@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
+import Update from "./pages/Profile/update";
 import Orders from "./pages/Orders";
 import Shipping from "./pages/Shipping";
 import ProductDetail from "./pages/ProductDetail";
@@ -40,6 +41,7 @@ function App() {
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/orders/:customerId" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/update" element={<Update />} />
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/" element={<Home />} />
           <Route path="*" element={<Error />} />

@@ -1,105 +1,127 @@
-:root {
-  --pink-bg: #ffc1cc;
-  --card: #ffffff;
-  --accent: #ff5c9e;
-  --text: #222;
-  --muted: #6b6b6b;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* fond site rose uni et centrage vertical/horizontal */
-.contact-page {
-  min-height: 100vh;
+.page-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--pink-bg);
-  padding: 24px;
-  box-sizing: border-box;
+  min-height: calc(100vh - 70px); /* Laisse la place au header */
+  margin-top: 70px;
 }
 
-/* carte centrée, contenu aligné à gauche pour les labels */
-.contact-card {
-  width: 100%;
-  max-width: 520px;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
-  box-sizing: border-box;
+/* ===========================
+   MENU LATÉRAL GAUCHE
+=========================== */
 
+.side-menu {
+  width: 260px;
+  background: white;
+  border-right: 3px solid #667eea;
+  padding: 40px 25px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  text-align: left;
+  gap: 15px;
 }
 
-.contact-card h1 {
-  margin: 0 0 12px 0;
-  color: var(--text);
-  font-size: 1.4rem;
-  text-align: center;
+.side-menu h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: bold;
 }
 
-/* labels et champs pleine largeur */
-.contact-card label {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--muted);
-  margin-bottom: 10px;
-  width: 100%;
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.contact-card input,
-.contact-card textarea {
-  width: 100%;
-  margin-top: 6px;
-  padding: 10px 12px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  color: var(--text);
+.side-menu li {
+  margin: 12px 0;
 }
 
-/* actions et boutons centrés */
-.actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
-  width: 100%;
-  gap: 8px;
-}
-
-.actions button,
-.btn {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  cursor: pointer;
+.side-menu a {
+  text-decoration: none;
+  font-size: 1.1rem;
+  color: #764ba2;
   font-weight: 600;
+  transition: 0.2s ease;
 }
 
-/* status centré */
-.status {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 0.95rem;
+.side-menu a:hover {
+  color: #667eea;
+  padding-left: 6px;
+}
+
+/* ===========================
+   ZONE VIOLETTE + CONTENU
+=========================== */
+
+.form {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centre horizontal */
+  justify-content: center; /* centre vertical */
+  padding: 40px 20px;
+  color: white;
+}
+
+/* Titre */
+.form h1 {
+  font-size: 2.8rem;
+  margin-bottom: 30px;
+  font-weight: 700;
   text-align: center;
 }
 
-/* responsive */
-@media (max-width: 520px) {
-  .contact-card {
-    padding: 16px;
+/* ===========================
+   FORMULAIRE BLANC CENTRÉ
+=========================== */
+
+.form form {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Inputs */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  background: #f9f9f9;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #764ba2;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(118, 75, 162, 0.3);
+}
+
+/* ===========================
+   RESPONSIVE MOBILE
+=========================== */
+
+@media (max-width: 900px) {
+  .page-wrapper {
+    flex-direction: column;
+  }
+
+  .side-menu {
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #667eea;
+  }
+
+  .form {
+    padding: 50px 20px;
   }
 }

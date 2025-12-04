@@ -1,7 +1,6 @@
 const WP_BASE =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json";
 
-// Génère les options fetch par défaut
 function defaultOptions() {
   return {
     headers: { "Content-Type": "application/json" },
@@ -9,9 +8,6 @@ function defaultOptions() {
   };
 }
 
-// -------------------------------
-// GET POSTS
-// -------------------------------
 export async function getPosts(params = {}) {
   const queryString = new URLSearchParams(params).toString();
   const url = `${WP_BASE}/posts${queryString ? "?" + queryString : ""}`;
@@ -25,17 +21,11 @@ export async function getPosts(params = {}) {
   return res.json();
 }
 
-// -------------------------------
-// BASIC AUTH HEADER
-// -------------------------------
 export function authHeader(username, appPassword) {
   const token = btoa(`${username}:${appPassword}`);
   return { Authorization: `Basic ${token}` };
 }
 
-// -------------------------------
-// CREATE POST (avec auth)
-// -------------------------------
 export async function createPost(postData, auth) {
   const res = await fetch(`${WP_BASE}/posts`, {
     ...defaultOptions(),
@@ -55,9 +45,19 @@ export async function createPost(postData, auth) {
   return res.json();
 }
 
-// -------------------------------
-// REGISTER USER (public API)
-// -------------------------------
+export async function validateToken(token) {
+  const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token/validate`;
+
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.json(); // {code: "jwt_auth_valid_token", data: ...}
+}
+
 export async function registerUserPublic(userData) {
   const ENDPOINT = `${WP_BASE}/custom/v1/register`;
 
@@ -80,23 +80,52 @@ export async function registerUserPublic(userData) {
   }
 }
 
-// -------------------------------
-// LOGIN USER
-// -------------------------------
 export async function loginUser(username, password) {
-  const ENDPOINT = `${WP_BASE}/custom/v1/login`;
+  const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token`;
 
   try {
     const res = await fetch(ENDPOINT, {
-      ...defaultOptions(),
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ username, password }),
     });
+    const data = await res.json();
 
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Erreur connexion JWT");
+    }
+
+    localStorage.setItem("JWT Token:", JSON.stringify(data));
   } catch (err) {
-    console.error("Erreur login:", err.message);
+    console.error("Erreur login JWT:", err.message);
+    throw err;
+  }
+}
+export async function validateStoredToken() {
+  const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token/validate`;
+  const storedData = localStorage.getItem("JWT Token:");
+  if (!storedData) {
+    throw new Error("No token found in localStorage");
+  }
+  const { token } = JSON.parse(storedData);
+
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Erreur validation JWT");
+    }
+    return data;
+  } catch (err) {
+    console.error("Erreur validation JWT:", err.message);
     throw err;
   }
 }

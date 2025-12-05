@@ -200,7 +200,7 @@ function ProductDetail() {
       };
 
       addToCart(itemToAdd, quantityToAdd);
-
+      setAddedQuantity(quantityToAdd);
       setShowFlash(true);
     }
   };
@@ -793,14 +793,14 @@ function ProductDetail() {
       {showFlash && (
         <div className="flash-message-cart flash-success">
           {/* ⭐️ Le conteneur "flash-message-content" sera ciblé par Flexbox ⭐️ */}
+
           <div className="flash-message-content">
             <p>
               {/* ... (Logique IIFE pour construire le message du produit) ... */}
+
               {(() => {
                 let name = product.name;
-                const variations = [];
-                // ... (logique de construction de 'name' et 'variations') ...
-
+                const variations = []; // ... (logique de construction de 'name' et 'variations') ...
                 if (selectedSize) {
                   variations.push(selectedSize);
                 }
@@ -814,14 +814,14 @@ function ProductDetail() {
 
                 const articleName = `"${name}"`;
 
-                if (quantity > 1) {
-                  return `${quantity} x ${articleName} ont été ajoutés à votre panier.`;
+                // 👇 MODIFIEZ `quantity` par `addedQuantity`
+                if (addedQuantity > 1) {
+                  return `${addedQuantity} x ${articleName} ont été ajoutés à votre panier.`;
                 } else {
                   return `${articleName} a été ajouté à votre panier.`;
                 }
               })()}
             </p>
-
             {/* Le lien sera aligné à droite de la phrase */}
             <Link
               to="/cart"
@@ -831,7 +831,6 @@ function ProductDetail() {
               Voir le panier
             </Link>
           </div>
-
           {/* Bouton de Fermeture */}
           <button
             className="btn-close-flash"

@@ -32,10 +32,12 @@ function Profile() {
         setForm({
           user_display_name: user.username || "",
           user_email: user.email || "",
-        }); // Validation du token (Optionnel)
-
+        });
+        // Validation du token (Optionnel)
         validateStoredToken()
-          // ... (reste du useEffect inchangé)
+          .then(() => {
+            setMessage(null);
+          })
           .catch((err) => {
             console.error("Token invalide:", err);
             setMessage({
@@ -49,16 +51,17 @@ function Profile() {
           type: "error",
           text: "Vous devez être connecté pour accéder à cette page.",
         });
-      } // Mettre fin au chargement local une fois que le contexte est stable
-
+      }
+      // Mettre fin au chargement local une fois que le contexte est stable
       setLocalLoading(false);
     }
-  }, [authLoading, isAuthenticated, user]); // Afficher un message de chargement tant que le contexte ou le chargement local est actif
+  }, [authLoading, isAuthenticated, user]);
 
+  // Afficher un message de chargement tant que le contexte ou le chargement local est actif
   if (authLoading || localLoading) {
     return <div className="page-wrapper">Chargement du profil...</div>;
-  } // Afficher un message d'erreur si non connecté
-
+  }
+  // Afficher un message d'erreur si non connecté
   if (message && message.type === "error" && !isAuthenticated) {
     return (
       <div className="page-wrapper">
@@ -91,6 +94,7 @@ function Profile() {
 
   return (
     <div className="page-wrapper">
+      {/* MENU LATÉRAL */}
       <div className="side-menu">
         <h2>Menu</h2>
         <ul>
@@ -98,6 +102,7 @@ function Profile() {
             <a href="/profile/update">Modification du profil</a>
           </li>
           <li>
+            {/* Le lien reste /profile/orders/0 comme demandé */}
             {user && user.id ? (
               <a href={`/profile/orders/0`}>Commandes (ID Client: {user.id})</a>
             ) : (
@@ -109,7 +114,40 @@ function Profile() {
         </ul>
       </div>
 
-      <h1>Page de Profil</h1>
+      {/* 📝 FORMULAIRE DE PROFIL AJOUTÉ ICI */}
+      <div className="form">
+        <h1>Page de Profil</h1>
+
+        {/* Affichage des messages (sauf l'erreur de non-connexion, gérée plus haut) */}
+        {message && message.type !== "error" && (
+          <div className={`alert alert-${message.type}`}>{message.text}</div>
+        )}
+
+        {/* Afficher le formulaire uniquement si l'utilisateur est chargé */}
+        {user && (
+          <form>
+            <div className="form-group">
+              <input
+                name="user_display_name"
+                placeholder="Nom d'utilisateur"
+                value={form.user_display_name}
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <input
+                name="user_email"
+                type="email"
+                placeholder="Email"
+                value={form.user_email}
+                readOnly
+              />
+            </div>
+          </form>
+        )}
+      </div>
+      {/* FIN DU FORMULAIRE */}
     </div>
   );
 }

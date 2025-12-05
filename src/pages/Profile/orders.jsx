@@ -114,7 +114,7 @@ const Orders = ({ userEmail }) => {
     );
   }
 
-  const pageTitle = `Vos commandes (E-mail: ${userEmail})`;
+  const pageTitle = `Vos commandes `;
 
   return (
     <div className="orders-page">

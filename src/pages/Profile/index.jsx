@@ -62,7 +62,7 @@ function Profile() {
   if (message && message.type === "error" && !isAuthenticated) {
     return (
       <div className="page-wrapper">
-                <div className={`alert alert-error`}>{message.text}</div>     {" "}
+        <div className={`alert alert-error`}>{message.text}</div>
       </div>
     );
   }
@@ -91,38 +91,25 @@ function Profile() {
 
   return (
     <div className="page-wrapper">
-            {/* MENU LATÉRAL */}     {" "}
       <div className="side-menu">
-                <h2>Menu</h2>       {" "}
+        <h2>Menu</h2>
         <ul>
-                   {" "}
           <li>
-                        <a href="/profile/update">Modification du profil</a>   
-                 {" "}
+            <a href="/profile/update">Modification du profil</a>
           </li>
-                   {" "}
           <li>
-                        {/* Le lien reste /profile/orders/0 comme demandé */}   
-                   {" "}
             {user && user.id ? (
               <a href={`/profile/orders/0`}>Commandes (ID Client: {user.id})</a>
             ) : (
               <span className="disabled-link" title="ID client non disponible">
-                                Commandes              {" "}
+                Commandes
               </span>
             )}
-                     {" "}
           </li>
-                 {" "}
         </ul>
-             {" "}
       </div>
-      {/* Reste du formulaire de profil (inchangé) */}     {" "}
-      <div className="form">
-                <h1>Page de Profil</h1>
-        {/* ... (Affichage du formulaire et des messages) ... */}     {" "}
-      </div>
-         {" "}
+
+      <h1>Page de Profil</h1>
     </div>
   );
 }

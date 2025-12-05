@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../../components/CartContext";
 import { Link } from "react-router";
 import { loadStripe } from "@stripe/stripe-js";
+import { useAuth } from "../../components/AuthContext";
 import {
   Elements,
   CardElement,
@@ -28,7 +29,7 @@ const WP_API_BASE =
 
 function Checkout() {
   const { cartItems, cartTotal, clearCart } = useCart(); // MODIFICATION: Assurez-vous d'avoir clearCart si vous voulez vider le panier après commande.
-
+  const { user } = useAuth();
   const subtotal = formatPrice(cartTotal || 0);
   const totalDisplay = formatPrice(cartTotal || 0);
 
@@ -43,7 +44,18 @@ function Checkout() {
     email: "", // MODIFICATION: Ajoutez l'email ici (ou récupérez-le des inputs CONTACT INFO)
     phone: "", // MODIFICATION: Ajoutez le téléphone ici
   });
-
+  // ⭐️ NOUVEAU useEffect pour pré-remplir l'email ⭐️
+  useEffect(() => {
+    // Si l'utilisateur est connecté ET son email est disponible,
+    // ET si le champ email n'est pas déjà rempli par l'utilisateur,
+    // on met à jour l'état.
+    if (user && user.email && !shippingAddress.email) {
+      setShippingAddress((prev) => ({
+        ...prev,
+        email: user.email,
+      }));
+    }
+  }, [user, shippingAddress.email]); // Dépend de l'objet user et de l'état actuel de l'email
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");

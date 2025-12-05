@@ -793,25 +793,46 @@ function ProductDetail() {
       {showFlash && (
         <div className="flash-message-cart flash-success">
           <p>
-            {quantity > 1
-              ? `${quantity} x "${product.name}" ont été ajoutés `
-              : ` "${product.name}" a été ajouté `}
-            à votre panier.
+            {/* Construction du nom de produit complet avec variations (Logique IIFE) */}
+            {(() => {
+              let name = product.name;
+              const variations = [];
+
+              // 1. Utilisation de l'état local 'selectedSize' pour la pointure
+              if (selectedSize) {
+                variations.push(selectedSize);
+              }
+
+              // 2. Utilisation de l'état local 'selectedColor' pour la couleur
+              if (selectedColor) {
+                variations.push(selectedColor);
+              }
+
+              // 3. Ajout des variations au nom si le tableau n'est pas vide
+              if (variations.length > 0) {
+                // Joindre les variations avec un espace
+                name += ` ,${variations.join(" ")}`;
+              }
+
+              // 4. Affichage du message avec gestion du pluriel
+              const articleName = `"${name}"`;
+
+              if (quantity > 1) {
+                return `${quantity} x ${articleName} ont été ajoutés à votre panier.`;
+              } else {
+                return `${articleName} a été ajouté à votre panier.`;
+              }
+            })()}
           </p>
 
-          <div className="flash-actions">
-            <Link to="/cart" className="btn-view-cart">
-              Voir le panier
-            </Link>
-
-            <button
-              className="btn-close-flash"
-              onClick={handleCloseFlash}
-              aria-label="Fermer la notification d'ajout au panier"
-            >
-              &times;
-            </button>
-          </div>
+          {/* ❌ Bouton de Fermeture ❌ */}
+          <button
+            className="btn-close-flash"
+            onClick={handleCloseFlash} // ⬅️ Appel de la fonction pour masquer le message
+            aria-label="Fermer la notification"
+          >
+            &times; {/* Entité HTML pour la croix (X) */}
+          </button>
         </div>
       )}
       {showStockFlash && (

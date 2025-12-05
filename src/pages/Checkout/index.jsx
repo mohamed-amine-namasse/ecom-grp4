@@ -116,6 +116,7 @@ function Checkout() {
       const data = await resp.json();
 
       if (resp.ok && data.order_id) {
+        clearCart();
         setPaymentSuccess(true);
         setPaymentMessage(
           `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`

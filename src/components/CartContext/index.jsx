@@ -17,11 +17,13 @@ export const useCart = () => {
 // ------------------------------------------------------------------
 // --- LOGIQUE DE PERSISTANCE ET D'INITIALISATION
 // ------------------------------------------------------------------
+// Clé utilisée pour le Local Storage (doit être définie une seule fois)
+const CART_STORAGE_KEY = "cartItems";
 
 // Fonction pour récupérer le panier du localStorage lors de l'initialisation
 const getInitialCart = () => {
   try {
-    const savedCart = localStorage.getItem("cartItems"); // Si des données existent, parsez-les. Sinon, retournez un tableau vide.
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
     return savedCart ? JSON.parse(savedCart) : [];
   } catch (e) {
     console.error("Erreur de lecture de localStorage:", e);
@@ -32,30 +34,21 @@ const getInitialCart = () => {
 // Fournisseur de Contexte (Wrapper pour l'application)
 export const CartProvider = ({ children }) => {
   // L'état du panier est initialisé à partir du localStorage
-  const [cartItems, setCartItems] = useState(getInitialCart); // Effet pour synchroniser cartItems avec localStorage à chaque changement
+  const [cartItems, setCartItems] = useState(getInitialCart);
 
   useEffect(() => {
     try {
       // Sauvegarder les données dans localStorage
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
     } catch (e) {
       console.error("Erreur d'écriture dans localStorage:", e);
     }
-  }, [cartItems]);
-  /**
-   * Ajoute un produit au panier ou augmente sa quantité s'il existe déjà.
-   * Cette fonction inclut désormais la vérification du stock maximal.
-   * @param {object} product - L'objet produit (doit inclure manageStock et stockQuantity).
-   */
-
-  // ------------------------------------------------------------------
-  // --- FONCTIONS DE LOGIQUE DU PANIER
-  // ------------------------------------------------------------------
-
+  }, [cartItems]); // ------------------------------------------------------------------ // --- FONCTIONS DE LOGIQUE DU PANIER // ------------------------------------------------------------------
   const addToCart = (product, quantityToAdd = 1) => {
+    // ... (Logique addToCart inchangée)
     const price = parseFloat(product.price) || 0;
     const maxStock = product.stockQuantity;
-    const manageStock = product.manageStock; // S'assurer que la quantité est au moins 1
+    const manageStock = product.manageStock;
 
     const initialQuantity = Math.max(1, quantityToAdd);
 
@@ -70,11 +63,11 @@ export const CartProvider = ({ children }) => {
         // Cas où l'article existe déjà
         newCart = [...prevItems];
         const existingItem = newCart[existingItemIndex];
-        let newQuantity = existingItem.quantity + initialQuantity; // 🚨 PLAFONNEMENT À L'AJOUT
+        let newQuantity = existingItem.quantity + initialQuantity;
 
         if (manageStock && maxStock !== null && newQuantity > maxStock) {
           newQuantity = maxStock;
-        } // Si la quantité n'a pas changé à cause du plafonnement, ne pas mettre à jour
+        }
 
         if (existingItem.quantity === newQuantity) {
           return prevItems;
@@ -88,7 +81,7 @@ export const CartProvider = ({ children }) => {
         };
       } else {
         // Cas où l'article est NOUVEAU
-        let finalQuantity = initialQuantity; // 🚨 PLAFONNEMENT À LA CRÉATION
+        let finalQuantity = initialQuantity;
 
         if (manageStock && maxStock !== null && finalQuantity > maxStock) {
           finalQuantity = maxStock;
@@ -112,35 +105,25 @@ export const CartProvider = ({ children }) => {
       return newCart;
     });
   };
-  /**
-   * Met à jour la quantité d'un produit spécifique, en plafonnant au stock max.
-   * @param {number} id - L'ID du produit.
-   * @param {number} newQuantity - La nouvelle quantité souhaitée.
-   */
-
   const updateQuantity = (id, newQuantity) => {
+    // ... (Logique updateQuantity inchangée)
     setCartItems((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
           const maxStock = item.stockQuantity;
           const manageStock = item.manageStock;
-          let finalQuantity = newQuantity; // 🚨 VÉRIFICATION ET PLAFONNEMENT DU STOCK (C'EST LE FIX)
+          let finalQuantity = newQuantity;
 
           if (manageStock && maxStock !== null) {
-            // Plafonner si la nouvelle quantité dépasse le stock
             if (newQuantity > maxStock) {
               finalQuantity = maxStock;
             }
-          } // S'assurer que la quantité est au moins 1
+          }
 
           if (finalQuantity < 1) {
-            // Si c'est l'intention (gérée dans Cart.js), on peut appeler removeFromCart
-            // Mais ici, on se contente de la mettre à 1 si on veut la garder dans le panier.
-            // Cependant, votre Cart.js gère le retrait si < 1, donc on laisse 1 ici pour la sécurité.
             finalQuantity = 1;
           }
 
-          // Si la quantité n'a pas changé après vérification/plafonnement, on retourne l'item inchangé
           if (item.quantity === finalQuantity) {
             return item;
           }
@@ -151,26 +134,17 @@ export const CartProvider = ({ children }) => {
       });
     });
   };
-  /**
-   * Retire complètement un produit du panier.
-   */
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
-  /**
-   * Retourne le nombre total d'articles (somme des quantités) dans le panier (pour le badge).
-   */
-
-  // ------------------------------------------------------------------
-  // --- CALCULS OPTIMISÉS (useMemo)
-  // ------------------------------------------------------------------
+  }; // ⭐️ NOUVELLE FONCTION : Vide complètement le panier et le localStorage ⭐️
+  const clearCart = () => {
+    setCartItems([]); // Vider l'état React
+    localStorage.removeItem(CART_STORAGE_KEY); // Vider le Local Storage
+    console.log("Panier vidé et localStorage nettoyé.");
+  }; // ------------------------------------------------------------------ // --- CALCULS OPTIMISÉS (useMemo) // ------------------------------------------------------------------
   const getCartCount = useMemo(() => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   }, [cartItems]);
-  /**
-   * Calcule le montant total du panier.
-   */
-
   const cartTotal = useMemo(() => {
     return cartItems.reduce((total, item) => {
       const price =
@@ -185,6 +159,7 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     updateQuantity,
     removeFromCart,
+    clearCart, // ⬅️ EXPOSER LA NOUVELLE FONCTION
     cartTotal,
   };
 

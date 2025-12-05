@@ -536,14 +536,6 @@ function Checkout() {
           })
         )}
         <div className="summary">
-          <div className="line">
-            <span>Subtotal</span>
-            <span>{subtotal}</span>
-          </div>
-          <div className="line">
-            <span>Shipping</span>
-            <span>Calculated at next step</span>
-          </div>
           <div className="total">
             <span>Total</span>
             <span>{totalDisplay}</span>

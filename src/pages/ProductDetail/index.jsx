@@ -37,7 +37,7 @@ function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [addedQuantity, setAddedQuantity] = useState(0);
   // --- ÉTAT POUR LE MESSAGE FLASH ---
   const [showFlash, setShowFlash] = useState(false);
   const [quantity, setQuantity] = useState(1);

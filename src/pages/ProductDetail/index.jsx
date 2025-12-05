@@ -43,10 +43,10 @@ function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [productVariations, setProductVariations] = useState([]);
   const [selectedVariation, setSelectedVariation] = useState(null); // Variation complète sélectionnée
-
+  const [flashSize, setFlashSize] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [availableSizes, setAvailableSizes] = useState([]);
-
+  const [flashColor, setFlashColor] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [availableColors, setAvailableColors] = useState([]);
 
@@ -201,6 +201,8 @@ function ProductDetail() {
 
       addToCart(itemToAdd, quantityToAdd);
       setAddedQuantity(quantityToAdd);
+      setFlashSize(selectedSize);
+      setFlashColor(selectedColor);
       setShowFlash(true);
     }
   };
@@ -801,11 +803,11 @@ function ProductDetail() {
               {(() => {
                 let name = product.name;
                 const variations = []; // ... (logique de construction de 'name' et 'variations') ...
-                if (selectedSize) {
-                  variations.push(selectedSize);
+                if (flashSize) {
+                  variations.push(flashSize);
                 }
-                if (selectedColor) {
-                  variations.push(selectedColor);
+                if (flashColor) {
+                  variations.push(flashColor);
                 }
 
                 if (variations.length > 0) {

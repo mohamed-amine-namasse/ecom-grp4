@@ -1,143 +1,104 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../../components/AuthContext";
-import "./orders.css"; // L'import est déjà présent, assurez-vous du nom du fichier !
+import { useParams } from "react-router";
+import "./orders.css";
 
 const WOOCOMMERCE_FULL_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
+const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
+const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 
-// Helper pour déterminer la classe de statut
-const getStatusClass = (status) => {
-  switch (status) {
-    case "completed":
-      return "status-completed";
-    case "processing":
-      return "status-processing";
-    case "pending":
-    case "on-hold":
-      return "status-pending";
-    default:
-      return "";
-  }
-};
+const Orders = () => {
+  const { customerId } = useParams();
 
-function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { customerId } = useParams();
-  const { token, user } = useAuth();
 
   useEffect(() => {
-    // ... (Logique de fetch inchangée, elle est correcte)
-    if (!token || !user || !user.email) {
-      setError("Token ou email manquant pour charger les commandes.");
-      setLoading(false);
-      return;
-    }
-
     const fetchOrders = async () => {
       setLoading(true);
       setError(null);
 
-      const customerFilter = customerId || 0;
-      const userEmail = user.email;
+      if (!customerId) {
+        setLoading(false); // Utilisez un message plus clair pour l'absence d'ID au montage
+        setError(
+          "L'ID du client est manquant dans l'URL. Veuillez vous connecter."
+        );
+        return;
+      }
 
-      const ENDPOINT = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/orders?customer=${customerFilter}&billing_email=${userEmail}`;
+      const ordersApiUrl = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/orders?customer=${customerId}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
 
       try {
-        const res = await fetch(ENDPOINT, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(ordersApiUrl);
 
-        const data = await res.json();
-
-        if (!res.ok) {
+        if (!response.ok) {
+          // Tentative de lire le corps de la réponse pour plus de détails en cas d'erreur
+          const errorBody = await response.json();
           throw new Error(
-            data.message ||
-              "Erreur lors de la récupération des commandes. Vérifiez les permissions de l'API."
+            `Erreur HTTP! Statut: ${response.status}. Message: ${
+              errorBody.message || "Non spécifié"
+            }`
           );
         }
 
-        // Triez par ID décroissant pour voir les commandes les plus récentes en premier
-        const sortedOrders = data.sort((a, b) => b.id - a.id);
-        setOrders(sortedOrders);
-        setError(null);
-      } catch (err) {
-        console.error("Erreur de récupération des commandes:", err.message);
+        const data = await response.json();
+        setOrders(data);
+      } catch (e) {
+        console.error("Erreur lors de la récupération des commandes:", e);
         setError(
-          `Impossible de charger les commandes: ${err.message}. L'ID utilisé est ${customerFilter}`
+          `Échec du chargement des commandes : ${e.message}. Veuillez vérifier les clés API ou l'ID du client.`
         );
       } finally {
         setLoading(false);
       }
-    };
+    }; // 🔑 C'est le changement crucial : inclure 'customerId' dans le tableau de dépendances
 
     fetchOrders();
-  }, [customerId, token, user]);
+  }, [customerId]); // 👈 Le useEffect se réexécutera si 'customerId' change. // --- Rendu du composant (inchangé) ---
 
-  // --- RENDU AVEC LES CLASSES CSS ---
+  if (loading) {
+    return <div>Chargement des commandes...</div>;
+  }
+
+  if (error) {
+    return <div> Erreur: {error}</div>;
+  }
+
+  if (orders.length === 0) {
+    return <div>Aucune commande trouvée pour le client ID: {customerId}.</div>;
+  }
 
   return (
     <div className="orders-page">
-      {" "}
-      {/* Conteneur principal */}
-      <h1>Historique des Commandes</h1>
-      {loading && <p>Chargement des commandes...</p>}
-      {error && <div style={{ color: "red" }}>Erreur: {error}</div>}
-      {!loading && !error && orders.length === 0 && (
-        <div>
+      <h1>Vos commandes (Client ID: {customerId})</h1>
+      {orders.map((order) => (
+        <div className="border border-dark mb-4" key={order.id}>
+          <h2>
+            Commande #{order.id} - Statut:
+            <span> {order.status}</span>
+          </h2>
+
+          <p>Date: {new Date(order.date_created).toLocaleDateString()}</p>
           <p>
-            Aucune commande trouvée pour le client ID: {customerId || "N/A"}
+            Total:
+            <strong>
+              {order.total} {order.currency}
+            </strong>
           </p>
+          <h3>Articles:</h3>
+          <ul>
+            {order.line_items.map((item) => (
+              <li key={item.id}>
+                &bull; {item.name} &mdash; Quantité: {item.quantity} &mdash;
+                Prix unitaire: {item.subtotal}
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
-      {/* Affichage de la liste des commandes */}
-      {!loading && !error && orders.length > 0 && (
-        <div>
-          {orders.map((order) => (
-            <div key={order.id} className="order-box">
-              <h2>
-                <span>Commande #{order.number || order.id}</span>
-                <span className={`status-tag ${getStatusClass(order.status)}`}>
-                  {order.status.replace("-", " ")}
-                </span>
-              </h2>
-
-              <div className="order-details">
-                <p>
-                  <strong>Date:</strong>
-                  <span>
-                    {new Date(order.date_created).toLocaleDateString()}
-                  </span>
-                </p>
-                <p>
-                  <strong>Total:</strong>
-                  <strong>
-                    {order.total} {order.currency_symbol}
-                  </strong>
-                </p>
-              </div>
-
-              <h3>Articles Commandés ({order.line_items.length})</h3>
-              <ul className="item-list">
-                {order.line_items.map((item) => (
-                  <li key={item.id}>
-                    {item.quantity} x {item.name}
-                    (Prix: {item.total} {order.currency_symbol})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
+      ))}
     </div>
   );
-}
+};
 
 export default Orders;

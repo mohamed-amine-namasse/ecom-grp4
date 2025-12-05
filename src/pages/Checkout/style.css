@@ -291,3 +291,23 @@ body {
     gap: 0;
   }
 }
+
+/* Style du bouton "Finaliser l'achat" */
+.finalize-btn {
+  display: block; /* Prend toute la largeur si besoin */
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  background-color: #007bff; /* Bleu principal */
+  color: white;
+  font-size: 1.1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.finalize-btn:hover {
+  background-color: #0056b3; /* Bleu foncé au survol */
+}

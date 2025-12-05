@@ -60,7 +60,7 @@ function Checkout() {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
-
+  const [orderId, setOrderId] = useState(null); // Pour stocker le numéro de commande
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
@@ -129,15 +129,13 @@ function Checkout() {
       if (resp.ok && data.order_id) {
         // 1. Commande générée avec succès
         setPaymentSuccess(true);
+        setOrderId(data.order_id);
         setPaymentMessage(
           `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`
         );
 
         // 2. Vidage du panier (côté serveur et client)
         await clearCart();
-
-        // 3. Redirection vers la page d'accueil
-        navigate("/");
       } else {
         const errorMsg =
           data.message || "Erreur lors de la création de la commande.";
@@ -150,6 +148,9 @@ function Checkout() {
     }
   };
   // FIN LOGIQUE DE COMMANDE (COD)
+  const handleFinalizeOrder = () => {
+    navigate("/"); // Redirection vers la page d'accueil
+  };
 
   const handleProceedToPayment = () => {
     if (
@@ -258,7 +259,6 @@ function Checkout() {
 
           // ⚠️ Logique pour Stripe: Vider le panier et rediriger APRES succès Stripe
           await clearCart();
-          navigate("/");
         } else {
           setStatus("Échec du paiement");
           onError && onError("payment_failed");
@@ -488,7 +488,10 @@ function Checkout() {
                   amountCents={Math.round((cartTotal || 0) * 100)}
                   defaultBilling={{ ...shippingAddress }}
                   onSuccess={(intent) => {
-                    // La logique clearCart et navigate a été déplacée dans PaymentForm
+                    // La logique clearCart et navigate a été
+                    // déplacée dans PaymentForm
+                    setPaymentSuccess(true); // ⭐️ AJOUTER
+                    setOrderId(intent.id);
                     setPaymentMessage("Paiement Stripe réussi — merci !");
                   }}
                   onError={(err) => {
@@ -501,46 +504,63 @@ function Checkout() {
           )}
         </div>
       </div>
-
       <div className="checkout-right">
         <h3>YOUR ORDER</h3>
-        {/* Affichage des articles du panier */}
-        {cartItems.length === 0 ? (
-          <p>Votre panier est vide.</p>
-        ) : (
-          cartItems.map((item) => {
-            const optionsArray = [];
-            if (item.selectedColor)
-              optionsArray.push(`Couleur: ${item.selectedColor}`);
-            if (item.selectedSize)
-              optionsArray.push(`Pointure: ${item.selectedSize}`);
-            const optionsDisplay = optionsArray.join(" | ");
-            return (
-              <div key={item.id} className="product">
-                <img src={item.image || "/img/default.jpg"} alt={item.name} />
-                <div>
-                  <p className="title">{item.name}</p>
-                  {optionsDisplay && (
-                    <p className="product-options">{optionsDisplay}</p>
-                  )}
-                  <Link to="/cart" className="change-link">
-                    Change
-                  </Link>
-                  <p>({item.quantity})</p>
-                </div>
-                <p className="price">
-                  {formatPrice(item.price * item.quantity)}
-                </p>
+        {/* ⭐️ CONDITION D'AFFICHAGE : Afficher le panier SEULEMENT si orderId n'est PAS encore défini ⭐️ */}
+
+        {!orderId ? (
+          <>
+            {/* Affichage des articles du panier */}
+
+            {cartItems.length === 0 ? (
+              <p>Votre panier est vide.</p>
+            ) : (
+              cartItems.map((item) => {
+                const optionsArray = [];
+                if (item.selectedColor)
+                  optionsArray.push(`Couleur: ${item.selectedColor}`);
+                if (item.selectedSize)
+                  optionsArray.push(`Pointure: ${item.selectedSize}`);
+                const optionsDisplay = optionsArray.join(" | ");
+                return (
+                  <div key={item.id} className="product">
+                    <img
+                      src={item.image || "/img/default.jpg"}
+                      alt={item.name}
+                    />
+                    <div>
+                      <p className="title">{item.name}</p>
+
+                      {optionsDisplay && (
+                        <p className="product-options">{optionsDisplay}</p>
+                      )}
+                      <Link to="/cart" className="change-link">
+                        Change
+                      </Link>
+                      <p>({item.quantity})</p>
+                    </div>
+                    <p className="price">
+                      {formatPrice(item.price * item.quantity)}
+                    </p>
+                  </div>
+                );
+              })
+            )}
+            {/* Résumé des totaux : Doit être DANS la condition !orderId */}
+            <div className="summary">
+              <div className="total">
+                <span>Total</span>
+                <span>{totalDisplay}</span>
               </div>
-            );
-          })
-        )}
-        <div className="summary">
-          <div className="total">
-            <span>Total</span>
-            <span>{totalDisplay}</span>
+            </div>
+          </>
+        ) : (
+          // ⭐️ Affichage si orderId EST défini ⭐️
+          <div className="order-submitted-message">
+            <p>Merci ! Votre commande a bien été enregistrée.</p>
           </div>
-        </div>
+        )}
+        {/* Le message de paiement/succès et le bouton Finaliser l'achat restent visibles ici, en dehors du bloc conditionnel précédent */}
         {paymentMessage && (
           <p
             className={`payment-message ${
@@ -549,7 +569,12 @@ function Checkout() {
           >
             {paymentMessage}
           </p>
-        )}{" "}
+        )}
+        {paymentSuccess && orderId && (
+          <button className="finalize-btn" onClick={handleFinalizeOrder}>
+            Finaliser l'achat
+          </button>
+        )}
       </div>
     </div>
   );

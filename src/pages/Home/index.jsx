@@ -11,7 +11,6 @@ const API_URL =
 
 function Home() {
   const { clearCart } = useCart();
-  const location = useLocation(); // ⬅️ Récupère l'objet location
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

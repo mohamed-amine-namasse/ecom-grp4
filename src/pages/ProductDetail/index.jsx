@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router";
 import { useCart } from "../../components/CartContext";
+import { useAuth } from "../../components/AuthContext";
 import "./style.css";
 
 // --- CONFIGURATION WOOCOMMERCE ---
@@ -31,6 +32,7 @@ const RatingStars = ({ rating }) => {
 function ProductDetail() {
   const { id } = useParams();
   const { addToCart, cartItems } = useCart();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -221,10 +223,23 @@ function ProductDetail() {
       return;
     }
 
-    // Générer un nom d'utilisateur anonyme unique si le champ est vide
-    const reviewerNameToSend = reviewForm.reviewer
-      ? reviewForm.reviewer
-      : `Anonyme #${Math.floor(Math.random() * 10000)}`;
+    // 🔑 LOGIQUE CRUCIALE : DÉTERMINATION DU NOM ET DE L'EMAIL À ENVOYER 🔑
+
+    // 1. Détermination du Nom (Reviewer)
+    const reviewerNameToSend =
+      isAuthenticated && user?.username
+        ? user.username // Utilisateur connecté : utiliser le nom d'utilisateur
+        : `Anonyme #${Math.floor(Math.random() * 10000)}`; // Déconnecté : générer un nom
+
+    // 2. Détermination de l'Email (Reviewer Email)
+    const reviewerEmailToSend =
+      isAuthenticated && user?.email
+        ? user.email // Utilisateur connecté : utiliser l'email
+        : "guest@example.com"; // Déconnecté : utiliser un email par défaut (souvent requis par l'API)
+
+    // Si l'utilisateur est déconnecté et n'a pas de champ email, il pourrait y avoir une erreur
+    // si l'API n'accepte pas "guest@example.com". C'est la meilleure approximation sans champ d'entrée.
+
     const API_POST_REVIEW_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews`;
 
     try {
@@ -238,25 +253,29 @@ function ProductDetail() {
           body: JSON.stringify({
             product_id: id,
             review: reviewForm.review,
+            // ⭐️ UTILISER LES VALEURS DÉTERMINÉES CI-DESSUS ⭐️
             reviewer: reviewerNameToSend,
-            reviewer_email: reviewForm.reviewer_email,
+            reviewer_email: reviewerEmailToSend,
             rating: reviewForm.rating,
-            status: "approved",
+            status: "approved", // Ou 'hold' si vous voulez modérer
           }),
         }
       );
 
       if (!response.ok) {
+        const errorData = await response.json();
         throw new Error(
-          `Erreur lors de l'envoi de l'avis: ${response.statusText}`
+          `Erreur lors de l'envoi de l'avis: ${
+            errorData.message || response.statusText
+          }`
         );
       }
 
       setReviewSubmitStatus("success");
-      await fetchReviews();
+      await fetchReviews(); // Recharger les avis
+
+      // Réinitialiser uniquement l'avis (garder la note par défaut)
       setReviewForm({
-        reviewer: "",
-        reviewer_email: "",
         review: "",
         rating: 5,
       });

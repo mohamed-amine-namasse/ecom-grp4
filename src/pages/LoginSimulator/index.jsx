@@ -1,31 +1,34 @@
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import { useNavigate } from "react-router-dom"; // Correction : Utiliser 'react-router-dom' pour useNavigate
-// import { loginUser } from "../../components/Api"; // Décommenter si vous utilisez une API
-// import { useAuth } from "../../components/AuthContext"; // Décommenter si vous utilisez un AuthContext
+import Form from "react-bootstrap/Form";
+import { useNavigate } from "react-router";
+
+// ⚠️ ASSUREZ-VOUS QUE LES CHEMINS CI-DESSOUS SONT CORRECTS
+import { loginUser } from "../../components/Api";
+import { useAuth } from "../../components/AuthContext";
 import { setAuthDataState } from "../../components/NavScrollExample";
+
 import "./style.css";
 
 // ----------------------------------------------------------------------
-// --- DONNÉES DE SIMULATION ---
+// --- DONNÉES DE SIMULATION (GARDER POUR DEBUG SEULEMENT) ---
 // ----------------------------------------------------------------------
 const mockLoginData = {
   token:
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21vaGFtZWQtYW1pbmUtbmFtYXNzZS5zdHVkZW50cy1sYXBsYXRlZm9ybWUuaW8vd29yZHByZXNzLWVjby93b3JkcHJlc3MiLCJpYXQiOjE3NjQ5MjQ0MTQsIm5iZiI6MTc2NDkyNDQxNCwiZXhwIjoxNzY1NTI5MjE0LCJkYXRhIjp7InVzZXIiOnsiaWQiOiIzMyJ9fX0.yEVa9owL6rvC7brNqv7guENi0YZAIgdIpvlk6mgygYc",
-  user_email: "compte1@yahoo.com",
-  user_nicename: "compte1",
-  user_display_name: "compte1",
+  user_email: "mock.user@yahoo.com",
+  user_nicename: "mockuser",
+  user_display_name: "Mock User",
   customerId: 33,
 };
 
 /**
- * Composant de la page de connexion, gérant un formulaire de connexion réel.
+ * Composant de la page de connexion, gérant la soumission du formulaire et la mise à jour de l'état.
  */
 const LoginSimulator = () => {
-  // Déclarations de Hooks au niveau supérieur du composant (CORRIGÉ)
+  // Hooks React
   const navigate = useNavigate();
-  // const { login } = useAuth(); // Décommenter si vous utilisez un AuthContext
+  const { login } = useAuth();
 
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -46,7 +49,7 @@ const LoginSimulator = () => {
     e.preventDefault();
     const validationError = validate();
     if (validationError) {
-      setMessage({ type: "danger", text: validationError }); // Utiliser 'danger' pour Bootstrap
+      setMessage({ type: "danger", text: validationError });
       return;
     }
 
@@ -54,35 +57,41 @@ const LoginSimulator = () => {
     setMessage(null);
 
     try {
-      // 1. Appel API réel (Décommenter et configurer si nécessaire)
-      // const data = await loginUser(form.username, form.password);
+      // 1. Appel de l'API avec les données du formulaire
+      const apiData = await loginUser(form.username, form.password);
 
-      // *** ⚠️ SIMULATION API SANS VÉRITABLE APPEL ***
-      // Utilisez mockLoginData pour simuler le succès
-      const data = mockLoginData;
-      // ---------------------------------------------
+      // ⚠️ Pour utiliser l'API réelle, la ligne ci-dessous DOIT ÊTRE COMMENTÉE OU SUPPRIMÉE.
+      // const apiData = mockLoginData;
 
-      // 2. Mise à jour du Local Storage pour la NavBar (intégration de notre logique)
-      setAuthDataState(data);
+      // 2. Normalisation des données pour le Contexte
+      // Cette étape adapte la structure de l'objet API aux besoins de votre application (Profile.jsx).
+      const normalizedUser = {
+        token: apiData.token,
+        // Ces clés doivent être celles que Profile.jsx attend (username, email, id)
+        username: apiData.user_display_name || apiData.user_nicename,
+        email: apiData.user_email,
+        id: apiData.customerId,
+      };
+
+      // 3. Mise à jour du Contexte Global
+      login(normalizedUser);
+
+      // 4. Mise à jour de la Navbar (mécanisme custom)
+      setAuthDataState(normalizedUser); // Mise à jour explicite du Local Storage pour la navbar
       window.dispatchEvent(new Event("storageUpdate"));
 
       setMessage({
         type: "success",
-        text: data?.message || "Connexion réussie.",
+        text: "Connexion réussie. Redirection en cours...",
       });
 
-      console.log("Connexion réussie. Redirection imminente.");
-
-      // 3. Redirection après un court délai
+      // 5. Redirection
       setTimeout(() => {
         navigate("/");
       }, 1000);
-
-      setForm({ username: "", password: "" });
     } catch (err) {
       console.error("Erreur de connexion:", err);
       let text = "Erreur de connexion inconnue.";
-      // Logique de gestion des erreurs (adaptée pour l'affichage)
       if (err.response) {
         text = err.response.data?.message || JSON.stringify(err.response.data);
       } else if (err.request) {
@@ -90,7 +99,7 @@ const LoginSimulator = () => {
       } else if (err.message) {
         text = err.message;
       }
-      setMessage({ type: "danger", text }); // Utiliser 'danger' pour Bootstrap
+      setMessage({ type: "danger", text });
     } finally {
       setLoading(false);
     }
@@ -102,25 +111,24 @@ const LoginSimulator = () => {
 
   return (
     <div className="form">
-      {" "}
-      {/* Utiliser la classe container pour le style */}
       <h1>Connexion</h1>
       {/* Affichage des messages d'erreur ou de succès */}
       {message && (
         <div className={`alert alert-${message.type}`}>{message.text}</div>
       )}
-      <form onSubmit={onSubmit}>
-        <div className="form-group">
-          <input
+
+      <Form onSubmit={onSubmit}>
+        <Form.Group className="form-group">
+          <Form.Control
             name="username"
             placeholder="Nom d'utilisateur ou email"
             value={form.username}
             onChange={onChange}
             required
           />
-        </div>
-        <div className="form-group">
-          <input
+        </Form.Group>
+        <Form.Group className="form-group">
+          <Form.Control
             name="password"
             type="password"
             placeholder="Mot de passe"
@@ -128,11 +136,16 @@ const LoginSimulator = () => {
             onChange={onChange}
             required
           />
-        </div>
-        <Button type="submit" disabled={loading}>
+        </Form.Group>
+        <Button
+          type="submit"
+          disabled={loading}
+          variant="primary"
+          className="w-100 mt-3"
+        >
           {loading ? "Connexion..." : "Se connecter"}
         </Button>
-      </form>
+      </Form>
     </div>
   );
 };

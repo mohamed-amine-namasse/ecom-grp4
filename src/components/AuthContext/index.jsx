@@ -1,109 +1,103 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { loginUser, validateStoredToken } from "../Api"; // Assurez-vous que le chemin est correct
+import React, { createContext, useState, useEffect, useContext } from "react";
+// ⚠️ Assurez-vous que le chemin vers votre API est correct
+import { validateStoredToken } from "../Api";
 
-// État initial de l'utilisateur (non connecté)
-const initialAuthState = {
+// Clé utilisée pour le Local Storage (doit correspondre à celle de NavScrollExample.js)
+const AUTH_STORAGE_KEY = "userAuth";
+
+// 1. Création du Contexte
+const AuthContext = createContext({
+  user: null,
   isAuthenticated: false,
-  user: null, // Contient { id, username, email }
-  token: null,
-};
+  loading: true, // Doit commencer à true pour vérifier le LS
+  login: () => {}, // Fonction pour la connexion
+  logout: () => {}, // Fonction pour la déconnexion
+});
 
-const AuthContext = createContext(initialAuthState);
-
-export const useAuth = () => useContext(AuthContext);
-
+// 2. Le Fournisseur de Contexte
 export const AuthProvider = ({ children }) => {
-  const [authState, setAuthState] = useState(initialAuthState);
-  const [loading, setLoading] = useState(true);
+  // État principal
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // Initialisation à true pour la vérification
 
-  // Fonction utilitaire pour lire l'état complet du localStorage
-  const getAuthStateFromStorage = () => {
-    try {
-      const storedData = localStorage.getItem("JWT Token:");
-      if (storedData) {
-        const data = JSON.parse(storedData);
+  // Fonction pour la connexion (utilisée par LoginSimulator.js)
+  const login = (userData) => {
+    // 1. Mise à jour de l'état du Contexte (déclenche le re-rendu de Profile.jsx)
+    setUser(userData);
+    setIsAuthenticated(true);
 
-        if (data.token && data.customerId) {
-          return {
-            isAuthenticated: true,
-            user: {
-              id: data.customerId, // 👈 Lecture de l'ID Client stocké
-              username: data.user_display_name,
-              email: data.user_email,
-            },
-            token: data.token,
-          };
-        }
-      }
-    } catch (e) {
-      console.error("Erreur de parsing du localStorage", e);
-    }
-    return initialAuthState;
+    // 2. Mise à jour du Local Storage pour la persistance
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
+
+    // 3. Informer la Navbar (mécanisme custom)
+    window.dispatchEvent(new Event("storageUpdate"));
   };
 
-  // 1. Charger et valider le token au montage
-  useEffect(() => {
-    const checkToken = async () => {
-      setLoading(true);
-      try {
-        const validationResponse = await validateStoredToken();
-        const storedState = getAuthStateFromStorage();
-
-        if (
-          validationResponse.code === "jwt_auth_valid_token" &&
-          storedState.isAuthenticated
-        ) {
-          setAuthState(storedState);
-        } else {
-          localStorage.removeItem("JWT Token:");
-          setAuthState(initialAuthState);
-        }
-      } catch (error) {
-        localStorage.removeItem("JWT Token:");
-        setAuthState(initialAuthState);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkToken();
-  }, []);
-
-  // --- FONCTIONS D'AUTHENTIFICATION ---
-
-  const login = async (username, password) => {
-    try {
-      const data = await loginUser(username, password); // data contient customerId
-
-      setAuthState({
-        isAuthenticated: true,
-        user: {
-          id: data.customerId, // 👈 Utilisation de l'ID Client
-          username: data.user_display_name,
-          email: data.user_email,
-        },
-        token: data.token,
-      });
-      return true;
-    } catch (error) {
-      console.error("Erreur de connexion dans AuthContext:", error.message);
-      throw error;
-    }
-  };
-
+  // Fonction pour la déconnexion (utilisée par NavScrollExample.js)
   const logout = () => {
-    localStorage.removeItem("JWT Token:");
-    setAuthState(initialAuthState);
+    // 1. 🛑 Vider l'état global du contexte 🛑
+    setUser(null);
+    setIsAuthenticated(false);
+
+    // 2. 🛑 Supprimer les données du Local Storage 🛑
+    // 🔑 CORRECTION : Utilisation de la clé AUTH_STORAGE_KEY pour la suppression.
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+
+    // 3. (Crucial pour la Navbar) Déclencher l'événement de mise à jour du stockage
+    window.dispatchEvent(new Event("storageUpdate"));
+
+    console.log("Déconnexion réussie: token retiré et état vidé.");
   };
 
-  // --- RENDU DU CONTEXTE ---
+  // 3. Effet de vérification initiale (Gestion du chargement infini)
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
 
-  if (loading) {
-    return <div>Vérification de la session...</div>;
-  }
+      if (storedAuth) {
+        try {
+          const data = JSON.parse(storedAuth);
+
+          // 🛑 VÉRIFICATION API : S'assurer que le token est valide
+          // Utilise la fonction importée.
+          // Note: Assurez-vous que validateStoredToken dans ../Api.js utilise le token
+          // de l'objet 'data' ou est adaptée pour valider le token de 'data'.
+          await validateStoredToken(data.token);
+
+          // Si le token est valide:
+          setUser(data);
+          setIsAuthenticated(true);
+        } catch (error) {
+          // Si le token est expiré ou invalide: Nettoyer la session
+          console.warn(
+            "Token expiré ou invalide. Déconnexion automatique.",
+            error
+          );
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
+
+      // 🛑 CECI EST LA LIGNE CRUCIALE : Assurer l'arrêt du chargement
+      setLoading(false);
+    };
+
+    checkAuthStatus();
+  }, []); // Le tableau vide s'exécute uniquement au montage
 
   return (
-    <AuthContext.Provider value={{ ...authState, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, loading, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
+
+// 4. Hook personnalisé pour utiliser le contexte
+export const useAuth = () => useContext(AuthContext);
+
+// Export par défaut (si vous utilisez le fournisseur directement)
+export default AuthProvider;

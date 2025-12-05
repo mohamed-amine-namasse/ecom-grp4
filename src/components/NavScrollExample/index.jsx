@@ -17,6 +17,8 @@ import Modal from "react-bootstrap/Modal";
 import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
+import { useAuth } from "../AuthContext";
+import { useNavigate } from "react-router-dom"; // Pour la redirection
 import "./style.css";
 
 // ----------------------------------------------------------------------
@@ -133,14 +135,12 @@ function NavScrollExample() {
       window.removeEventListener("storageUpdate", updateAuthFromStorage);
     };
   }, [updateAuthFromStorage]);
-
+  const { isAuthenticated, logout } = useAuth(); // ⬅️ Récupérer la fonction logout
+  const navigate = useNavigate();
   // Fonction de déconnexion
   const handleLogout = () => {
-    setAuthDataState(null); // Supprime du Local Storage
-    window.dispatchEvent(new Event("storageUpdate")); // Déclenche la mise à jour immédiate de la Navbar
-    console.log(
-      "Déconnexion. Données utilisateur supprimées du Local Storage."
-    );
+    logout(); // ⬅️ Appel de la fonction de déconnexion
+    navigate("/login"); // ⬅️ Rediriger l'utilisateur
   };
 
   // ----------------------------------------------------------------------

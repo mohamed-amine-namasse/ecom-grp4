@@ -437,7 +437,20 @@ select {
   align-items: center;
   gap: 10px; /* Espace entre le bouton 'Voir le panier' et le bouton de fermeture */
 }
+/* ⭐️ CIBLE PRINCIPALE : Conteneur du message et du bouton Voir panier ⭐️ */
+.flash-message-content {
+  /* Rend ce conteneur flexible */
+  display: flex;
 
+  /* 1. Aligner horizontalement le <p> et le <Link> */
+  align-items: center;
+
+  /* 2. Ajouter un petit espace entre la phrase et le bouton */
+  gap: 15px; /* Ajustez la valeur selon vos préférences */
+
+  /* Permet à ce bloc de prendre l'espace nécessaire */
+  flex-grow: 1;
+}
 /* Style du lien "Voir le panier" */
 .btn-view-cart {
   background-color: #28a745;

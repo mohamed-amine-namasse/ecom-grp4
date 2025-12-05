@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../../components/CartContext";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router-dom"; // ⬅️ AJOUT/VÉRIFICATION : Import de useNavigate
 import { loadStripe } from "@stripe/stripe-js";
 import { useAuth } from "../../components/AuthContext";
 import {
@@ -28,8 +28,10 @@ const WP_API_BASE =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 
 function Checkout() {
-  const { cartItems, cartTotal, clearCart } = useCart(); // MODIFICATION: Assurez-vous d'avoir clearCart si vous voulez vider le panier après commande.
+  const { cartItems, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
+  const navigate = useNavigate(); // ⬅️ Utilisation pour la redirection
+
   const subtotal = formatPrice(cartTotal || 0);
   const totalDisplay = formatPrice(cartTotal || 0);
 
@@ -41,21 +43,20 @@ function Checkout() {
     address: "",
     city: "",
     postalCode: "",
-    email: "", // MODIFICATION: Ajoutez l'email ici (ou récupérez-le des inputs CONTACT INFO)
-    phone: "", // MODIFICATION: Ajoutez le téléphone ici
+    email: "",
+    phone: "",
   });
-  // ⭐️ NOUVEAU useEffect pour pré-remplir l'email ⭐️
+
+  // ⭐️ useEffect pour pré-remplir l'email de l'utilisateur connecté ⭐️
   useEffect(() => {
-    // Si l'utilisateur est connecté ET son email est disponible,
-    // ET si le champ email n'est pas déjà rempli par l'utilisateur,
-    // on met à jour l'état.
     if (user && user.email && !shippingAddress.email) {
       setShippingAddress((prev) => ({
         ...prev,
         email: user.email,
       }));
     }
-  }, [user, shippingAddress.email]); // Dépend de l'objet user et de l'état actuel de l'email
+  }, [user, shippingAddress.email]);
+
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
@@ -68,19 +69,19 @@ function Checkout() {
   const isShippingCompleted = Object.values(shippingAddress).some(
     (val) => val.trim() !== ""
   );
-  // MODIFICATION: Exclure explicitement email/phone du contrôle isAllShippingFieldsFilled si les champs de Contact sont gérés séparément
+
+  // Vérifie si tous les champs de shipping (sauf email/phone) sont remplis
   const isAllShippingFieldsFilled = Object.entries(shippingAddress).every(
     ([key, val]) =>
       key !== "email" && key !== "phone" ? val.trim() !== "" : true
   );
 
-  // MODIFICATION: Nouvelle fonction pour gérer la soumission de la commande sans paiement (PAL)
-  const handlePlaceOrderWithCOD = async () => {
-    // MODIFICATION: Inclure email/phone dans la vérification si les inputs CONTACT INFO sont liés à `shippingAddress`
-    const isContactFilled =
-      shippingAddress.email.trim() !== "" &&
-      shippingAddress.phone.trim() !== "";
+  // Vérifie si les champs de Contact sont remplis
+  const isContactFilled =
+    shippingAddress.email.trim() !== "" && shippingAddress.phone.trim() !== "";
 
+  // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
+  const handlePlaceOrderWithCOD = async () => {
     if (
       !isAllShippingFieldsFilled ||
       !isContactFilled ||
@@ -96,7 +97,7 @@ function Checkout() {
     setShowPaymentForm(false);
     setPaymentSuccess(false);
 
-    // Préparation des données de commande pour le backend
+    // Préparation des données de commande
     const orderData = {
       shipping: shippingAddress,
       items: cartItems.map((item) => ({
@@ -108,14 +109,12 @@ function Checkout() {
         },
       })),
       total: cartTotal,
-      customer_email: shippingAddress.email, // Ajout de l'email
-      customer_phone: shippingAddress.phone, // Ajout du téléphone
-      payment_method: "cash_on_delivery", // Utiliser un slug de méthode de paiement à la livraison
-      status: "processing", // Statut initial pour une commande en attente de paiement à la livraison
+      customer_email: shippingAddress.email,
+      customer_phone: shippingAddress.phone,
+      payment_method: "cash_on_delivery",
+      status: "processing",
     };
 
-    // MODIFICATION: Vous devrez implémenter ce endpoint dans votre backend (API WordPress)
-    // Ce endpoint doit créer une commande WooCommerce (ou autre) avec la méthode de paiement "cash_on_delivery"
     const endpoint = `${WP_API_BASE}/wp-json/your-custom/v1/create-cod-order`;
 
     try {
@@ -128,13 +127,17 @@ function Checkout() {
       const data = await resp.json();
 
       if (resp.ok && data.order_id) {
-        clearCart();
+        // 1. Commande générée avec succès
         setPaymentSuccess(true);
         setPaymentMessage(
           `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`
         );
-        // OPTIONNEL : Vider le panier après commande réussie
-        // clearCart();
+
+        // 2. Vidage du panier (côté serveur et client)
+        await clearCart();
+
+        // 3. Redirection vers la page d'accueil
+        navigate("/");
       } else {
         const errorMsg =
           data.message || "Erreur lors de la création de la commande.";
@@ -146,7 +149,7 @@ function Checkout() {
       setPaymentMessage(`Erreur réseau : ${err.message}`);
     }
   };
-  // FIN MODIFICATION: Nouvelle fonction pour gérer la soumission de la commande sans paiement (PAL)
+  // FIN LOGIQUE DE COMMANDE (COD)
 
   const handleProceedToPayment = () => {
     if (
@@ -154,14 +157,12 @@ function Checkout() {
       shippingAddress.email.trim() === "" ||
       shippingAddress.phone.trim() === ""
     )
-      return; // MODIFICATION: Vérification des champs de contact
+      return;
     setShowPaymentForm(true);
   };
 
-  // PaymentForm (fusion du PaymentPage.jsx)
+  // PaymentForm (Composant de Paiement Stripe)
   function PaymentForm({ amountCents, defaultBilling, onSuccess, onError }) {
-    // ... code PaymentForm existant (inchangé ou utilisez la version fournie par l'utilisateur) ...
-
     const stripe = useStripe();
     const elements = useElements();
     const [processing, setProcessing] = useState(false);
@@ -184,7 +185,7 @@ function Checkout() {
 
     async function handleSubmit(e) {
       e.preventDefault();
-      // ... logique Stripe existante ...
+
       if (!stripe || !elements) {
         setStatus("Stripe non initialisé");
         return;
@@ -208,7 +209,6 @@ function Checkout() {
             amount: amountCents,
             currency: "eur",
             billing: billing,
-            // vous pouvez ajouter cart/items si besoin
           }),
         });
 
@@ -255,6 +255,10 @@ function Checkout() {
         ) {
           setStatus("Paiement réussi — merci !");
           onSuccess && onSuccess(result.paymentIntent);
+
+          // ⚠️ Logique pour Stripe: Vider le panier et rediriger APRES succès Stripe
+          await clearCart();
+          navigate("/");
         } else {
           setStatus("Échec du paiement");
           onError && onError("payment_failed");
@@ -267,12 +271,11 @@ function Checkout() {
       }
     }
 
-    // MODIFICATION: Suppression de l'ancienne fonction handlePlaceOrderWithoutPayment pour la centraliser dans Checkout
-
     return (
       <form className="payment-form" onSubmit={handleSubmit}>
         <h3>Informations de facturation & paiement (Carte Bancaire)</h3>
 
+        {/* Champs de facturation pré-remplis par shippingAddress */}
         <div className="row">
           <input
             name="firstName"
@@ -356,6 +359,7 @@ function Checkout() {
     );
   }
 
+  // RENDU PRINCIPAL DU CHECKOUT
   return (
     <div className="checkout-container ">
       <div className="checkout-left ">
@@ -373,7 +377,7 @@ function Checkout() {
         <div className="section">
           <h3>CONTACT INFO</h3>
           <div className="row">
-            {/* MODIFICATION: Lier les inputs Email et Phone au state shippingAddress */}
+            {/* L'input email est pré-rempli via le useEffect */}
             <input
               type="email"
               placeholder="Email"
@@ -458,27 +462,19 @@ function Checkout() {
           </div>
 
           <div className="payment-options">
-            {/* MODIFICATION: Bouton pour le paiement à la livraison (PAL) */}
+            {/* Bouton Paiement à la Livraison (COD) */}
             <button
               className="cod-btn"
-              disabled={
-                !isAllShippingFieldsFilled ||
-                shippingAddress.email.trim() === "" ||
-                shippingAddress.phone.trim() === ""
-              }
+              disabled={!isAllShippingFieldsFilled || !isContactFilled}
               onClick={handlePlaceOrderWithCOD}
             >
               Payer à la Livraison
             </button>
 
-            {/* MODIFICATION: Bouton pour passer à Stripe (s'affiche si les champs sont remplis) */}
+            {/* Bouton Procéder au Paiement (Stripe) */}
             <button
               className="next-btn"
-              disabled={
-                !isAllShippingFieldsFilled ||
-                shippingAddress.email.trim() === "" ||
-                shippingAddress.phone.trim() === ""
-              }
+              disabled={!isAllShippingFieldsFilled || !isContactFilled}
               onClick={handleProceedToPayment}
             >
               Procéder au Paiement par Carte (Stripe) →
@@ -490,11 +486,10 @@ function Checkout() {
               <Elements stripe={stripePromise}>
                 <PaymentForm
                   amountCents={Math.round((cartTotal || 0) * 100)}
-                  defaultBilling={{ ...shippingAddress }} // MODIFICATION: Passer toutes les infos, y compris email/phone
+                  defaultBilling={{ ...shippingAddress }}
                   onSuccess={(intent) => {
-                    setPaymentSuccess(true);
+                    // La logique clearCart et navigate a été déplacée dans PaymentForm
                     setPaymentMessage("Paiement Stripe réussi — merci !");
-                    // TODO: appeler backend pour marquer commande payée, sauvegarder order id, etc.
                   }}
                   onError={(err) => {
                     setPaymentSuccess(false);
@@ -509,7 +504,7 @@ function Checkout() {
 
       <div className="checkout-right">
         <h3>YOUR ORDER</h3>
-        {/* ... Reste de la section Order (inchangée) ... */}
+        {/* Affichage des articles du panier */}
         {cartItems.length === 0 ? (
           <p>Votre panier est vide.</p>
         ) : (
@@ -563,7 +558,6 @@ function Checkout() {
             {paymentMessage}
           </p>
         )}{" "}
-        {/* MODIFICATION: Ajout de classes pour le style */}
       </div>
     </div>
   );

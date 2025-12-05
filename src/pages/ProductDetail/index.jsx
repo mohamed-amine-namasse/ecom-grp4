@@ -792,46 +792,53 @@ function ProductDetail() {
       {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */}
       {showFlash && (
         <div className="flash-message-cart flash-success">
-          <p>
-            {/* Construction du nom de produit complet avec variations (Logique IIFE) */}
-            {(() => {
-              let name = product.name;
-              const variations = [];
+          {/* ⭐️ Le conteneur "flash-message-content" sera ciblé par Flexbox ⭐️ */}
+          <div className="flash-message-content">
+            <p>
+              {/* ... (Logique IIFE pour construire le message du produit) ... */}
+              {(() => {
+                let name = product.name;
+                const variations = [];
+                // ... (logique de construction de 'name' et 'variations') ...
 
-              // 1. Utilisation de l'état local 'selectedSize' pour la pointure
-              if (selectedSize) {
-                variations.push(selectedSize);
-              }
+                if (selectedSize) {
+                  variations.push(selectedSize);
+                }
+                if (selectedColor) {
+                  variations.push(selectedColor);
+                }
 
-              // 2. Utilisation de l'état local 'selectedColor' pour la couleur
-              if (selectedColor) {
-                variations.push(selectedColor);
-              }
+                if (variations.length > 0) {
+                  name += ` ,${variations.join(" ")}`;
+                }
 
-              // 3. Ajout des variations au nom si le tableau n'est pas vide
-              if (variations.length > 0) {
-                // Joindre les variations avec un espace
-                name += ` ,${variations.join(" ")}`;
-              }
+                const articleName = `"${name}"`;
 
-              // 4. Affichage du message avec gestion du pluriel
-              const articleName = `"${name}"`;
+                if (quantity > 1) {
+                  return `${quantity} x ${articleName} ont été ajoutés à votre panier.`;
+                } else {
+                  return `${articleName} a été ajouté à votre panier.`;
+                }
+              })()}
+            </p>
 
-              if (quantity > 1) {
-                return `${quantity} x ${articleName} ont été ajoutés à votre panier.`;
-              } else {
-                return `${articleName} a été ajouté à votre panier.`;
-              }
-            })()}
-          </p>
+            {/* Le lien sera aligné à droite de la phrase */}
+            <Link
+              to="/cart"
+              className="btn-view-cart"
+              onClick={handleCloseFlash}
+            >
+              Voir le panier
+            </Link>
+          </div>
 
-          {/* ❌ Bouton de Fermeture ❌ */}
+          {/* Bouton de Fermeture */}
           <button
             className="btn-close-flash"
-            onClick={handleCloseFlash} // ⬅️ Appel de la fonction pour masquer le message
+            onClick={handleCloseFlash}
             aria-label="Fermer la notification"
           >
-            &times; {/* Entité HTML pour la croix (X) */}
+            &times;
           </button>
         </div>
       )}

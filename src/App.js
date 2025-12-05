@@ -15,7 +15,6 @@ import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Update from "./pages/Profile/update";
-import Orders from "./pages/Profile/orders";
 import Shipping from "./pages/Shipping";
 import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./components/CartContext";
@@ -43,7 +42,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/update" element={<Update />} />
-            <Route path="/profile/orders/:customerId" element={<Orders />} />
+            <Route path="/profile/orders/:customerId" element={<Profile />} />
             <Route path="/shipping" element={<Shipping />} />
             <Route path="/" element={<Home />} />
             <Route path="*" element={<Error />} />

@@ -16,22 +16,6 @@ function Terms() {
         détection des commentaires indésirables.
       </p>
 
-      <p>
-        Une chaîne anonymisée créée à partir de votre adresse e-mail (également
-        appelée hash) peut être envoyée au service Gravatar pour vérifier si
-        vous utilisez ce dernier. Les clauses de confidentialité du service
-        Gravatar sont disponibles ici :
-        <a
-          href="https://automattic.com/privacy/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          https://automattic.com/privacy/
-        </a>
-        . Après validation de votre commentaire, votre photo de profil sera
-        visible publiquement à côté de votre commentaire.
-      </p>
-
       <h2>Cookies</h2>
       <p>
         Si vous déposez un commentaire sur notre site, il vous sera proposé

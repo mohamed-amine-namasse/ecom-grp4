@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import "./style.css";
 
 function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  // 1. Mise à jour de l'état pour inclure 'subject'
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   // ⚠️ TRÈS IMPORTANT : Configurez ces variables
   const WORDPRESS_URL =
-    "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/";
+    "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
   const FORM_ID = 371;
 
   // Endpoint de l'API REST de Contact Form 7
@@ -19,60 +25,54 @@ function Contact() {
   }
 
   function validEmail(email) {
-    // Regex simple pour la validation d'email
     return /\S+@\S+\.\S+/.test(email);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // 1. Validation de base côté client
+    // 1. Validation de base côté client (Ajout de la validation 'subject')
     if (isLoading) return;
     if (!form.name.trim()) return setStatus("Veuillez indiquer votre nom.");
     if (!validEmail(form.email)) return setStatus("Email invalide.");
+    if (!form.subject.trim()) return setStatus("Veuillez indiquer l'objet."); // <-- NOUVEAU
     if (!form.message.trim()) return setStatus("Veuillez écrire un message.");
 
     // 2. Préparation et envoi
     setIsLoading(true);
     setStatus("Envoi en cours…");
 
-    // CF7 attend une soumission de formulaire classique, pas du JSON, donc on utilise FormData
     const formData = new FormData();
 
-    // Les clés doivent correspondre aux noms des champs de votre formulaire CF7 (par défaut)
+    // 3. Ajout du champ 'subject' à l'objet FormData
+    // La clé CF7 par défaut pour l'objet est 'your-subject'
     formData.append("your-name", form.name);
     formData.append("your-email", form.email);
+    formData.append("your-subject", form.subject); // <-- NOUVEAU
     formData.append("your-message", form.message);
 
-    // 🚨 AJOUT DE LA BALISE D'UNITÉ : Nécessaire pour éviter l'erreur "aucune balise d’unité valide"
-    // Le format est généralement 'wpcf7-f[ID_du_form]-p0-o1'
+    // Champs de sécurité CF7 (inchangés)
     formData.append("_wpcf7_unit_tag", `wpcf7-f${FORM_ID}-p0-o1`);
-
-    // Ajout des autres champs de sécurité requis par CF7
     formData.append("_wpcf7_form_scan_tests", "");
     formData.append("_wpcf7_submit", "1");
 
     try {
       const response = await fetch(CF7_ENDPOINT, {
         method: "POST",
-        // Important: Ne pas définir Content-Type. 'fetch' le gère automatiquement avec FormData.
         body: formData,
       });
 
-      const result = await response.json(); // Réponse de CF7
+      const result = await response.json();
 
       if (result.status === "mail_sent") {
-        // Succès
         setStatus("✅ Merci, votre message a bien été envoyé !");
-        setForm({ name: "", email: "", message: "" }); // Réinitialisation
+        setForm({ name: "", email: "", subject: "", message: "" }); // Réinitialisation de 'subject'
       } else if (result.status === "validation_failed") {
-        // Erreur de validation du serveur CF7
         const errorMessages = result.invalid_fields
           .map((field) => field.message)
           .join(" ; ");
         setStatus(`❌ Erreur de validation du serveur : ${errorMessages}`);
       } else {
-        // Échec général (mail_failed, spam, etc.)
         setStatus(
           `❌ Échec de l'envoi : ${
             result.message || "Vérifiez les logs de votre serveur/CF7."
@@ -112,6 +112,17 @@ function Contact() {
           />
         </label>
 
+        {/* NOUVEAU CHAMP OBJET */}
+        <label>
+          Objet
+          <input
+            name="subject" // <-- IMPORTANT : name="subject" pour correspondre à l'état
+            value={form.subject}
+            onChange={handleChange}
+            disabled={isLoading}
+          />
+        </label>
+
         <label>
           Message
           <textarea
@@ -129,7 +140,6 @@ function Contact() {
           </button>
         </div>
 
-        {/* Affichage du statut avec classes CSS pour stylisation */}
         {status && (
           <p
             className={`status ${

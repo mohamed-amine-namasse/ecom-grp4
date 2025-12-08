@@ -104,8 +104,8 @@ function Update() {
   async function handlePasswordSave(e) {
     e.preventDefault();
 
-    if (pw.newPassword.length < 6)
-      return setStatus("Le mot de passe doit contenir au moins 6 caractères.");
+    if (pw.newPassword.length < 8)
+      return setStatus("Le mot de passe doit contenir au moins 8 caractères.");
     if (pw.newPassword !== pw.confirmPassword)
       return setStatus("Les mots de passe ne correspondent pas.");
 

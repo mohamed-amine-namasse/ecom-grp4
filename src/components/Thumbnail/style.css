@@ -1,0 +1,39 @@
+/* Styles du conteneur de la vignette (in changés ou ajustés si besoin) */
+.thumbnail-card {
+  width: 150px; /* Taille fixe */
+  height: 100px;
+  padding: 5px; /* Réduire le padding pour donner plus d'espace à l'image */
+
+  background-color: #f0f0f0; /* Gardez le fond pour la carte elle-même */
+  border-radius: 8px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  display: flex; /* Utilisé pour centrer l'image */
+  justify-content: center;
+  align-items: center;
+}
+
+/* ⭐️ NOUVEAU STYLE POUR L'IMAGE ⭐️ */
+.thumbnail-image {
+  width: 100%; /* L'image prend toute la largeur du conteneur */
+  height: 100%; /* L'image prend toute la hauteur du conteneur */
+  display: block;
+
+  /* CLÉ : Comment l'image remplit l'espace */
+  /* 1. cover: L'image remplit tout l'espace, mais peut être coupée (souvent le meilleur choix ici).
+     2. fill: L'image remplit tout l'espace, mais peut être déformée.
+  */
+  object-fit: fill;
+
+  /* Supprimez les transformations ou ombres indésirables */
+  transform: none;
+  filter: none;
+}
+
+.thumbnail-card.selected {
+  border-color: #e3002b; /* Bordure rouge pour la sélection */
+  box-shadow: 0 0 10px rgba(227, 0, 43, 0.5);
+}

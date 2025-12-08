@@ -4,7 +4,7 @@ import Cards from "../../components/Cards";
 import Figures from "../../components/Figures";
 import Momo from "../../components/Momo";
 import ShoppingLoader from "../../components/ShoppingLoader";
-import { useLocation } from "react-router-dom"; // ⬅️ Hook pour récupérer l'état
+
 import { useCart } from "../../components/CartContext"; // ⬅️ Hook pour vider le panier
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wp/v2/posts";

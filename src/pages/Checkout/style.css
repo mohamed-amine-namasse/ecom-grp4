@@ -24,10 +24,11 @@ body {
 
 .checkout-left h1 {
   font-size: 2em;
-  color: #333;
   margin-bottom: 30px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid black;
   padding-bottom: 10px;
+
+  font-size: 2rem;
 }
 
 /* Indicateur d'étapes */
@@ -46,7 +47,7 @@ body {
 
 .steps .active {
   font-weight: bold;
-  color: #007bff;
+  color: #fff;
   border-bottom: 007bff;
 }
 
@@ -221,7 +222,7 @@ body {
   left: 0;
   width: 0; /* Commence à 0 de largeur */
   height: 3px;
-  background-color: #007bff; /* Couleur de votre trait actif (ajustez si nécessaire) */
+  background-color: #fff; /* Couleur de votre trait actif (ajustez si nécessaire) */
   transition: width 0.3s ease; /* Animation pour l'apparition du trait */
 }
 
@@ -236,13 +237,13 @@ body {
 
 /* 🚨 NOUVEL ÉTAT COMPLÉTÉ (SHIPPING, PAYMENT) 🚨 */
 .checkout-left .steps span.completed {
-  color: #007bff; /* Change la couleur du texte pour indiquer la complétion */
+  color: #fff; /* Change la couleur du texte pour indiquer la complétion */
 }
 
 .checkout-left .steps span.completed::after {
   /* Le trait est complet pour l'étape terminée, peut être vert ou la couleur active */
   width: 100%;
-  background-color: #007bff; /* Ou laissez #007bff si vous voulez juste le trait rempli */
+  background-color: #fff; /* Ou laissez #007bff si vous voulez juste le trait rempli */
 }
 
 /* Style du bouton Payer à la Livraison */

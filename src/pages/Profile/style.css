@@ -111,15 +111,18 @@
 
 @media (max-width: 900px) {
   .page-wrapper {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .side-menu {
-    width: 100%;
+    width: 40%;
     border-right: none;
   }
 
   .form {
     padding: 50px 20px;
+  }
+  h1 {
+    font-size: 6vw !important;
   }
 }

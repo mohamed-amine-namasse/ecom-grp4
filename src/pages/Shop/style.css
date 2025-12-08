@@ -8,7 +8,7 @@
 /* --- 2. Styles du Conteneur Global (Shop) --- */
 .shop-container {
   height: fit-content;
-  background-color: #ffc1cc;
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
   padding: 24px;
   color: #222;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
@@ -211,7 +211,7 @@
   justify-content: end;
   width: 100%;
   font-size: 0.9em;
-  color: #666;
+  font-weight: bold;
 }
 
 /* Style pour l'information de comptage des produits filtrés.

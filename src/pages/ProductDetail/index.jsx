@@ -620,7 +620,9 @@ function ProductDetail() {
         <div className="alert alert-danger">
           <h2>Erreur</h2>
           <p>{error || "Détails du produit introuvables."}</p>
-          <Link to="/shop">Retour à la boutique</Link>
+          <button className="btn-add-to-cart">
+            <Link to="/shop">Retour à la boutique</Link>
+          </button>
         </div>
       </main>
     );
@@ -788,9 +790,11 @@ function ProductDetail() {
 
   return (
     <main className="product-detail-container">
-      <Link to="/shop" className="back-link">
-        &larr; Retour à la boutique
-      </Link>
+      <button className="btn bg-dark my-2">
+        <Link className="link-light text-decoration-none" to="/shop">
+          Retour à la boutique
+        </Link>
+      </button>
       {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */}
       {showFlash && (
         <div className="flash-message-cart flash-success">

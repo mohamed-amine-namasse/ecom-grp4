@@ -103,7 +103,7 @@ function FilterControls({
       {/* --- BOUTON DE RÉINITIALISATION (Haut) --- */}
       <div className="d-grid mb-3">
         <button
-          className="btn btn-sm btn-outline-dark"
+          className="btn btn-sm btn-dark"
           onClick={handleFullReset}
           type="button"
         >

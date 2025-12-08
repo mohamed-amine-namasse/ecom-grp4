@@ -9,7 +9,7 @@
 }
 
 .background {
-  background-color: var(--pink-bg);
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
   padding: 25px;
 }
 

@@ -9,7 +9,7 @@ body {
 .checkout-container {
   display: flex;
 
-  background-color: #ffc1cc;
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
@@ -236,13 +236,13 @@ body {
 
 /* 🚨 NOUVEL ÉTAT COMPLÉTÉ (SHIPPING, PAYMENT) 🚨 */
 .checkout-left .steps span.completed {
-  color: green; /* Change la couleur du texte pour indiquer la complétion */
+  color: #007bff; /* Change la couleur du texte pour indiquer la complétion */
 }
 
 .checkout-left .steps span.completed::after {
   /* Le trait est complet pour l'étape terminée, peut être vert ou la couleur active */
   width: 100%;
-  background-color: green; /* Ou laissez #007bff si vous voulez juste le trait rempli */
+  background-color: #007bff; /* Ou laissez #007bff si vous voulez juste le trait rempli */
 }
 
 /* Style du bouton Payer à la Livraison */

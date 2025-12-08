@@ -333,7 +333,7 @@ function Shop() {
   return (
     <main className="shop-container">
       <header className="shop-header">
-        <h1>Boutique</h1>
+        <h1 className="px-3">Boutique</h1>
         <p className="total-products-count">
           {totalProducts > 0
             ? `Total des produits: ${totalProducts} `

@@ -1,5 +1,3 @@
-import { NavLink } from "react-router";
-import Nav from "react-bootstrap/Nav";
 import "./style.css";
 function Terms() {
   return (
@@ -8,9 +6,7 @@ function Terms() {
 
       <h2>Qui sommes-nous ?</h2>
 
-      <Nav.Link as={NavLink} to="/about">
-        A propos
-      </Nav.Link>
+      <a href={`./About`}>A propos</a>
 
       <h2>Commentaires</h2>
       <p>
@@ -34,14 +30,6 @@ function Terms() {
         </a>
         . Après validation de votre commentaire, votre photo de profil sera
         visible publiquement à côté de votre commentaire.
-      </p>
-
-      <h2>Médias</h2>
-      <p>
-        Si vous téléversez des images sur le site, nous vous conseillons
-        d’éviter de téléverser des images contenant des données EXIF de
-        coordonnées GPS. Les personnes visitant votre site peuvent télécharger
-        et extraire des données de localisation depuis ces images.
       </p>
 
       <h2>Cookies</h2>
@@ -131,143 +119,154 @@ function Terms() {
         service automatisé de détection des commentaires indésirables.
       </p>
 
-      <h1>Politique en matière de remboursements et de retours</h1>
-
-      <h2>Aperçu</h2>
-      <p>
-        Notre politique de remboursement et de retour est valable pendant 30
-        jours. Si 30 jours se sont écoulés depuis votre achat, nous ne pouvons
-        malheureusement pas vous offrir un remboursement complet ni un échange.
-      </p>
-
-      <p>
-        Pour être admissible à un retour, votre article doit être inutilisé et
-        dans le même état que vous l’avez reçu. Il doit également être dans son
-        emballage d’origine.
-      </p>
-
-      <p>
-        Plusieurs types de produits ne peuvent pas être retournés. Les produits
-        périssables tels que la nourriture, les fleurs, les journaux ou les
-        magazines ne peuvent pas être retournés. Nous n’acceptons pas non plus
-        les produits intimes ou sanitaires, les matières dangereuses ou les
-        liquides ou gaz inflammables.
-      </p>
-
-      <div class="refund-box">
-        <h3>Articles supplémentaires non retournables :</h3>
-        <ul>
-          <li>Cartes cadeaux</li>
-          <li>Produits logiciels téléchargeables</li>
-          <li>Certains articles de santé et de soins personnels</li>
-        </ul>
-      </div>
-
-      <p>
-        Pour compléter votre retour, nous exigeons un reçu ou une preuve
-        d’achat.
-      </p>
-
-      <p>
-        <strong>Veuillez ne pas renvoyer votre achat au fabricant.</strong>
-      </p>
-
-      <h3>Remboursements partiels possibles :</h3>
-      <ul>
-        <li>Livre présentant des signes évidents d’utilisation</li>
-        <li>
-          CD, DVD, cassette VHS, logiciel, jeu vidéo, cassette audio ou vinyle
-          ouvert
-        </li>
-        <li>Article non dans son état d’origine, endommagé ou incomplet</li>
-        <li>Article retourné plus de 30 jours après la livraison</li>
-      </ul>
-
-      <h2>Remboursements</h2>
-      <p>
-        Une fois que votre retour est reçu et inspecté, nous vous enverrons un
-        e-mail pour vous informer que nous avons bien reçu votre article
-        retourné et pour vous informer de l’approbation ou du refus du
-        remboursement.
-      </p>
-
-      <p>
-        Si vous êtes approuvé, votre remboursement sera traité et un crédit sera
-        automatiquement appliqué à votre méthode de paiement d’origine, dans un
-        délai donné.
-      </p>
-
-      <h2>Remboursements en retard ou manquants</h2>
-      <p>Si vous n’avez pas reçu votre remboursement :</p>
-
-      <ul>
-        <li>Vérifiez votre compte bancaire.</li>
-        <li>Contactez votre compagnie de carte bancaire.</li>
-        <li>Contactez ensuite votre banque.</li>
-      </ul>
-
-      <p>
-        Si vous avez fait tout cela et que vous n’avez toujours pas reçu votre
-        remboursement, veuillez nous contacter à <strong></strong>.
-      </p>
-
-      <h2>Articles en promotion</h2>
-      <p>
-        Seuls les articles au prix normal peuvent être remboursés. Les articles
-        en promotion ne peuvent pas être remboursés.
-      </p>
-
-      <h2>Échanges</h2>
-      <p>
-        Nous remplaçons uniquement les articles défectueux ou endommagés. Si
-        vous souhaitez échanger un produit contre le même article,
-        contactez-nous à <strong></strong> et envoyez votre article à :{" "}
-        <strong></strong>.
-      </p>
-
-      <h2>Cadeaux</h2>
-      <p>
-        Si l’article a été marqué comme cadeau lors de l’achat et vous a été
-        envoyé directement, vous recevrez un crédit-cadeau pour la valeur de
-        votre retour.
-      </p>
-
-      <p>
-        Si l’article n’était pas marqué comme cadeau ou a été envoyé à la
-        personne qui vous l’a offert, le remboursement sera adressé au donneur
-        du cadeau.
-      </p>
-
-      <h2>Retour d’articles</h2>
-      <p>
-        Pour retourner un produit, envoyez-le à : <strong></strong>.
-      </p>
-
-      <p>
-        Les frais de retour sont à votre charge et ne sont pas remboursables. Si
-        vous recevez un remboursement, les frais de retour seront déduits du
-        montant total.
-      </p>
-
-      <p>
-        Le délai de réception d’un échange peut varier selon votre lieu de
-        résidence.
-      </p>
-
-      <p>
-        Pour des articles de grande valeur, nous recommandons un service
-        d’expédition suivi ou assuré. Nous ne garantissons pas la réception de
-        l’article retourné.
-      </p>
-
       <h2>Besoin d’aide ?</h2>
       <p>
         Pour toute question concernant les retours et
-        remboursements.Contactez-nous via la page:
-        <Nav.Link as={NavLink} to="/contact">
-          Contact
-        </Nav.Link>
+        remboursements.Contactez-nous via la page:{" "}
+        <a href={`./Contact`}>Contact</a>
       </p>
+      <p
+        itemprop="sponsor"
+        itemscope
+        itemtype="https://schema.org/Organization"
+      >
+        patenaire: pouet
+      </p>
+
+      <div className="cgv-container">
+        <h1>Conditions Générales de Vente (CGV)</h1>
+
+        {/* ARTICLE 1 */}
+        <section id="scope">
+          <h2>Article 1 : Champ d'Application et Modification des CGV</h2>
+          <p>
+            Les présentes Conditions Générales de Vente (CGV) s'appliquent à
+            l'ensemble des ventes conclues via le site internet
+            <a href="[VOTRE URL]">[VOTRE URL]</a>, entre la société{" "}
+            <strong>Foot Market</strong> (le "Vendeur") et toute personne
+            physique non professionnelle (le "Client").
+          </p>
+          <p>
+            Toute validation de commande implique l'adhésion sans réserve du
+            Client aux présentes CGV. Le Vendeur se réserve le droit de les
+            modifier. Les conditions applicables sont celles en vigueur à la
+            date de la commande.
+          </p>
+        </section>
+
+        {/* ARTICLE 2 */}
+        <section id="products">
+          <h2>Article 2 : Produits et Disponibilité</h2>
+          <ul>
+            <li>
+              <strong>Caractéristiques :</strong> Les crampons et accessoires
+              sont présentés avec leurs caractéristiques essentielles. Les
+              informations sont aussi précises que possible, mais ne sont pas
+              contractuelles (photos non-contractuelles).
+            </li>
+            <li>
+              <strong>Prix :</strong> Les prix sont indiqués en Euros (€) TTC.
+              Les frais de livraison sont en sus et affichés avant la
+              validation.
+            </li>
+            <li>
+              <strong>Disponibilité :</strong> En cas d'indisponibilité d'un
+              produit après passation de la commande, le Client sera informé
+              dans les meilleurs délais et pourra être remboursé.
+            </li>
+          </ul>
+        </section>
+
+        {/* ARTICLE 3 */}
+        <section id="order">
+          <h2>Article 3 : Commande</h2>
+          <ol>
+            <li>Le Client sélectionne ses produits (taille, couleur, etc.).</li>
+            <li>Le Client vérifie le récapitulatif de son panier.</li>
+            <li>Le Client s'identifie ou crée son compte.</li>
+            <li>Le Client choisit le mode de livraison.</li>
+            <li>Le Client accepte les CGV.</li>
+            <li>Le Client valide le paiement ("Payer la commande").</li>
+          </ol>
+          <p>
+            La confirmation de commande par email formalise la conclusion du
+            contrat.
+          </p>
+        </section>
+
+        {/* ARTICLE 4 */}
+        <section id="payment">
+          <h2>Article 4 : Paiement</h2>
+          <p>
+            Le paiement est exigible immédiatement à la commande. Les modes de
+            paiement acceptés sont :{" "}
+            <strong>
+              [Liste des méthodes : Carte Bancaire, PayPal, Virement, etc.]
+            </strong>
+            .
+          </p>
+          <blockquote className="payment-note">
+            Le Vendeur utilise un système de paiement sécurisé pour garantir la
+            confidentialité des données bancaires.
+          </blockquote>
+        </section>
+
+        {/* ARTICLE 5 */}
+        <section id="delivery">
+          <h2>Article 5 : Livraison</h2>
+          <dl>
+            <dt>Zone de Livraison</dt>
+            <dd>
+              Les produits sont livrables en{" "}
+              <strong>[France métropolitaine, UE, Monde]</strong>.
+            </dd>
+
+            <dt>Délais</dt>
+            <dd>
+              Le délai moyen de livraison est de <strong>3 jours ouvrés</strong>{" "}
+              après expédition. Ce délai est donné à titre indicatif.
+            </dd>
+
+            <dt>Réception</dt>
+            <dd>
+              Le Client doit vérifier l'état du colis à la réception. Toute
+              anomalie (produit manquant, colis endommagé) doit être signalée au
+              transporteur et au Vendeur dans les meilleurs délais.
+            </dd>
+          </dl>
+        </section>
+
+        {/* ARTICLE 6 */}
+        <section id="retraction">
+          <h2>Article 6 : Droit de Rétractation et Retours</h2>
+          <p>
+            Conformément à la loi, le Client dispose d'un délai de{" "}
+            <strong>quatorze (14) jours</strong> à compter de la réception pour
+            exercer son droit de rétractation.
+          </p>
+          <p>
+            <strong>Conditions de retour :</strong> Les crampons doivent être
+            retournés neufs, non portés, non lavés, avec toutes les étiquettes
+            et dans leur emballage d'origine. Les frais de retour sont à la
+            charge du Client.
+          </p>
+          <p>
+            Le remboursement interviendra dans un délai maximum de quatorze (14)
+            jours suivant la réception et la vérification des produits
+            retournés.
+          </p>
+        </section>
+
+        {/* ARTICLE 7 */}
+        <section id="guarantees">
+          <h2>Article 7 : Garanties Légales</h2>
+          <p>
+            Tous les produits bénéficient de la garantie légale de conformité
+            (articles L. 217-4 et suivants du Code de la consommation) et de la
+            garantie des vices cachés (articles 1641 et suivants du Code civil).
+          </p>
+        </section>
+      </div>
     </div>
   );
 }

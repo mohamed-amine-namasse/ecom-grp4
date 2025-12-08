@@ -5,7 +5,7 @@
 .product-detail-container {
   padding: 20px;
   min-height: 70vh; /* Pour s'assurer que le pied de page reste en bas */
-  background-color: #ffc1cc;
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
 }
 
 .back-link {

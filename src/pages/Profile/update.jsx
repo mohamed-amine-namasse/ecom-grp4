@@ -4,7 +4,7 @@ import "./style.css";
 const WP_BASE =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json";
 
-function Profile() {
+function Update() {
   const [form, setForm] = useState({ nom: "", prenom: "", email: "" });
   const [status, setStatus] = useState("");
   const [editingPassword, setEditingPassword] = useState(false);
@@ -86,7 +86,7 @@ function Profile() {
           email: form.email,
         }),
       });
-
+      
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
@@ -222,4 +222,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Update;

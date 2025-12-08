@@ -15,7 +15,12 @@ function Register() {
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const validate = () => {
-    if (!form.username || !form.email || !form.password || !form.confirm_password) {
+    if (
+      !form.username ||
+      !form.email ||
+      !form.password ||
+      !form.confirm_password
+    ) {
       return "Tous les champs sont requis.";
     }
     if (!/\S+@\S+\.\S+/.test(form.email)) {
@@ -55,9 +60,12 @@ function Register() {
       let text = "Erreur d'inscription";
       if (err.response) {
         const data = err.response.data;
-        text = data?.message || (typeof data === "string" ? data : JSON.stringify(data));
+        text =
+          data?.message ||
+          (typeof data === "string" ? data : JSON.stringify(data));
       } else if (err.request) {
-        text = "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+        text =
+          "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
       } else {
         text = err.message;
       }
@@ -70,7 +78,9 @@ function Register() {
   return (
     <div className="form">
       <h1>Inscription</h1>
-      {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+      {message && (
+        <div className={`alert alert-${message.type}`}>{message.text}</div>
+      )}
       <form onSubmit={onSubmit}>
         <div className="form-group">
           <input

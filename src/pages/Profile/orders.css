@@ -1,0 +1,127 @@
+/* Orders.css */
+
+/* --- Styles généraux et conteneur de page --- */
+.orders-page {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: #ffc1cc;
+}
+
+.orders-page h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid black;
+  padding-bottom: 10px;
+}
+
+/* --- Styles pour les messages d'état (Chargement/Erreur/Vide) --- */
+.orders-page > div {
+  /* Cible les messages de chargement, erreur, ou aucune commande */
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1em;
+}
+
+.orders-page > div[style*="color: red"] {
+  /* Style spécifique pour l'erreur */
+  color: #d9534f !important;
+  background-color: #fdd;
+  border: 1px solid #f99;
+  border-radius: 5px;
+}
+
+/* --- Styles de la boîte de commande individuelle --- */
+.order-box {
+  border: 1px solid #ddd;
+  border-left: 5px solid #007bff; /* Barre latérale bleue pour l'accent */
+  border-radius: 8px;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Légère ombre pour l'effet de profondeur */
+  transition: transform 0.2s;
+}
+
+.order-box:hover {
+  transform: translateY(-2px); /* Petit effet au survol */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-box h2 {
+  font-size: 1.5em;
+  margin-top: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #eee;
+  display: flex; /* Utilisation de flexbox pour l'alignement */
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-box h3 {
+  color: #555;
+  font-size: 1.1em;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* --- Styles pour les articles individuels --- */
+.item-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 5px;
+}
+
+.item-list li {
+  padding: 8px 0;
+  border-bottom: 1px dotted #eee;
+  font-size: 0.95em;
+}
+
+.item-list li:last-child {
+  border-bottom: none;
+}
+
+/* --- Statut de la commande (Couleurs) --- */
+.status-tag {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  text-transform: capitalize;
+  background-color: #f0f0f0;
+}
+
+/* Exemples de couleurs de statut (à adapter aux statuts réels de WooCommerce) */
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-processing {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-pending {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* --- Détails de la commande (Date, Total) --- */
+.order-details p {
+  margin: 5px 0;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 15px; /* Pour aligner le Total à droite */
+}
+
+.order-details strong {
+  color: #28a745; /* Couleur verte pour le total */
+  font-size: 1.1em;
+}
+
+ul {
+  list-style: none;
+  padding-left: "0";
+}

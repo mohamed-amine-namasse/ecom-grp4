@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { loginUser } from "../../components/Api";
+import { useAuth } from "../../components/AuthContext";
 import "./style.css";
 
 function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,10 +30,13 @@ function Login() {
     setMessage(null);
     try {
       const data = await loginUser(form.username, form.password);
-      setMessage({ type: "success", text: data?.message || "Connexion réussie." });
+      setMessage({
+        type: "success",
+        text: data?.message || "Connexion réussie.",
+      });
 
       setTimeout(() => {
-        navigate("/profile");
+        navigate("/");
       }, 1000);
 
       setForm({ username: "", password: "" });
@@ -42,7 +47,8 @@ function Login() {
         const d = err.response.data;
         text = d?.message || (typeof d === "string" ? d : JSON.stringify(d));
       } else if (err.request) {
-        text = "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+        text =
+          "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
       } else {
         text = err.message;
       }
@@ -55,7 +61,9 @@ function Login() {
   return (
     <div className="form">
       <h1>Connexion</h1>
-      {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+      {message && (
+        <div className={`alert alert-${message.type}`}>{message.text}</div>
+      )}
       <form onSubmit={onSubmit}>
         <div className="form-group">
           <input

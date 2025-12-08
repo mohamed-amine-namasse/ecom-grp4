@@ -142,25 +142,38 @@ function Checkout() {
     }
   };
 
-  const isShippingCompleted = Object.values(shippingAddress).some(
-    (val) => val.trim() !== ""
-  ); // Vérifie si tous les champs NON-Contact sont remplis
+  // 🎯 NOUVELLE LOGIQUE : L'étape SHIPPING s'active si au moins un champ d'adresse est rempli, SANS compter l'email/phone.
+  const isShippingDataEntered = [
+    shippingAddress.firstName,
+    shippingAddress.lastName,
+    shippingAddress.country,
+    shippingAddress.state,
+    shippingAddress.address,
+    shippingAddress.city,
+    shippingAddress.postalCode,
+  ].some((val) => val.trim() !== "");
 
+  // Vérifie si TOUS les champs d'adresse (sauf email/phone) sont remplis
   const isAllShippingFieldsFilled = Object.entries(shippingAddress).every(
     ([key, val]) =>
       key !== "email" && key !== "phone" ? val.trim() !== "" : true
-  ); // Vérifie si les champs de Contact sont remplis
+  );
 
+  // Vérifie si les champs de Contact sont remplis
   const isContactFilled =
-    shippingAddress.email.trim() !== "" && shippingAddress.phone.trim() !== ""; // Vérifie si toutes les validations (email, phone, postalCode) sont réussies
+    shippingAddress.email.trim() !== "" && shippingAddress.phone.trim() !== "";
 
+  // Vérifie si toutes les validations (email, phone, postalCode) sont réussies
   const isValidationOk =
     validationErrors.postalCode === true &&
     validationErrors.phone === true &&
-    validationErrors.email === true; // ⭐ AJOUT DE LA VALIDATION EMAIL ⭐ // Vérification complète pour activer les boutons
+    validationErrors.email === true;
 
+  // Vérification complète pour activer les boutons
   const canProceedToPayment =
-    isAllShippingFieldsFilled && isContactFilled && isValidationOk; // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
+    isAllShippingFieldsFilled && isContactFilled && isValidationOk;
+
+  // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
 
   const handlePlaceOrderWithCOD = async () => {
     if (!canProceedToPayment || cartItems.length === 0) {
@@ -434,7 +447,8 @@ function Checkout() {
         <h1>CHECKOUT</h1>
         <div className="steps">
           <span className="active">INFORMATION</span>
-          <span className={isShippingCompleted ? "completed" : ""}>
+          {/* 🎯 CHANGEMENT ICI : utilise isShippingDataEntered */}
+          <span className={isShippingDataEntered ? "completed" : ""}>
             SHIPPING
           </span>
 

@@ -16,8 +16,8 @@
 }
 
 .shop-header h1 {
-  margin: 0 0 6px 0;
-  font-size: 1.8rem;
+  color: #fff;
+  font-size: 2rem;
   font-weight: 700;
 }
 
@@ -209,6 +209,8 @@
 .total-products-count {
   display: flex;
   justify-content: end;
+  padding-top: 10px;
+  padding-right: 15px;
   width: 100%;
   font-size: 0.9em;
   font-weight: bold;

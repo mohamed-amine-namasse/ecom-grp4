@@ -333,12 +333,14 @@ function Shop() {
   return (
     <main className="shop-container">
       <header className="shop-header">
-        <h1 className="px-3">Boutique</h1>
-        <p className="total-products-count">
-          {totalProducts > 0
-            ? `Total des produits: ${totalProducts} `
-            : "Aucun produit trouvé sur WooCommerce."}
-        </p>
+        <div className="d-flex align-items-center mt-3  ">
+          <h1 className="px-3">Boutique</h1>
+          <p className="total-products-count">
+            {totalProducts > 0
+              ? `Total des produits: ${totalProducts} `
+              : "Aucun produit trouvé sur WooCommerce."}
+          </p>
+        </div>
       </header>
 
       <div className="shop-layout">

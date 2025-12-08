@@ -8,7 +8,6 @@ body {
 /* Conteneur principal du paiement */
 .checkout-container {
   display: flex;
-
   background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;

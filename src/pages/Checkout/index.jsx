@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../../components/CartContext";
-import { Link, useNavigate } from "react-router-dom"; // ⬅️ AJOUT/VÉRIFICATION : Import de useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { useAuth } from "../../components/AuthContext";
 import {
@@ -27,12 +27,34 @@ const WP_API_BASE =
   process.env.REACT_APP_WP_API_BASE ||
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 
+// ******************************************************
+// ⭐ FONCTIONS DE VALIDATION ⭐
+// ******************************************************
+
+const validatePostalCode = (code) => {
+  // 5 chiffres numériques exacts
+  const regex = /^\d{5}$/;
+  return regex.test(code);
+};
+
+const validatePhone = (phone) => {
+  // 10 chiffres numériques exacts (nettoyés des espaces)
+  const cleaned = phone.replace(/[\s\-\.]/g, "");
+  return cleaned.length === 10 && /^\d+$/.test(cleaned);
+};
+
+const validateEmail = (email) => {
+  // Regex standard simple pour vérifier le format email
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+// ******************************************************
+
 function Checkout() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
-  const navigate = useNavigate(); // ⬅️ Utilisation pour la redirection
+  const navigate = useNavigate();
 
-  const subtotal = formatPrice(cartTotal || 0);
   const totalDisplay = formatPrice(cartTotal || 0);
 
   const [shippingAddress, setShippingAddress] = useState({
@@ -47,48 +69,103 @@ function Checkout() {
     phone: "",
   });
 
-  // ⭐️ useEffect pour pré-remplir l'email de l'utilisateur connecté ⭐️
+  const [validationErrors, setValidationErrors] = useState({
+    postalCode: null, // null (non vérifié), true (valide), 'Error message' (invalide)
+    phone: null,
+    email: null, // ⭐ AJOUT DE L'ÉTAT POUR L'EMAIL ⭐
+  }); // useEffect pour pré-remplir l'email et initier la validation
+
   useEffect(() => {
-    if (user && user.email && !shippingAddress.email) {
-      setShippingAddress((prev) => ({
-        ...prev,
-        email: user.email,
-      }));
+    if (user && user.email) {
+      setShippingAddress((prev) => {
+        // Pré-remplir uniquement si l'email n'est pas déjà saisi
+        const newEmail = prev.email || user.email;
+        // Valider l'email pré-rempli
+        const isValid = validateEmail(newEmail);
+
+        // Mettre à jour l'adresse et l'état de validation
+        setValidationErrors((prevErrors) => ({
+          ...prevErrors,
+          email: isValid ? true : "Veuillez entrer une adresse email valide.",
+        }));
+
+        return {
+          ...prev,
+          email: newEmail,
+        };
+      });
     }
-  }, [user, shippingAddress.email]);
+  }, [user]);
 
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
-  const [orderId, setOrderId] = useState(null); // Pour stocker le numéro de commande
+  const [orderId, setOrderId] = useState(null);
+
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
     setShippingAddress((prev) => ({ ...prev, [name]: value }));
+
+    let error = null;
+
+    if (name === "postalCode") {
+      const isValid = validatePostalCode(value);
+      error =
+        value.trim() === ""
+          ? null
+          : isValid
+          ? true
+          : "Le code postal doit contenir exactement 5 chiffres.";
+      setValidationErrors((prev) => ({ ...prev, postalCode: error }));
+    } else if (name === "phone") {
+      const isValid = validatePhone(value);
+      error =
+        value.trim() === ""
+          ? null
+          : isValid
+          ? true
+          : "Le téléphone doit contenir 10 chiffres (ex: 0123456789).";
+
+      setValidationErrors((prev) => ({ ...prev, phone: error }));
+    }
+    // ⭐ LOGIQUE DE VALIDATION EMAIL AJOUTÉE ⭐
+    else if (name === "email") {
+      const isValid = validateEmail(value);
+      error =
+        value.trim() === ""
+          ? null
+          : isValid
+          ? true
+          : "Veuillez entrer une adresse email valide.";
+
+      setValidationErrors((prev) => ({ ...prev, email: error }));
+    }
   };
 
   const isShippingCompleted = Object.values(shippingAddress).some(
     (val) => val.trim() !== ""
-  );
+  ); // Vérifie si tous les champs NON-Contact sont remplis
 
-  // Vérifie si tous les champs de shipping (sauf email/phone) sont remplis
   const isAllShippingFieldsFilled = Object.entries(shippingAddress).every(
     ([key, val]) =>
       key !== "email" && key !== "phone" ? val.trim() !== "" : true
-  );
+  ); // Vérifie si les champs de Contact sont remplis
 
-  // Vérifie si les champs de Contact sont remplis
   const isContactFilled =
-    shippingAddress.email.trim() !== "" && shippingAddress.phone.trim() !== "";
+    shippingAddress.email.trim() !== "" && shippingAddress.phone.trim() !== ""; // Vérifie si toutes les validations (email, phone, postalCode) sont réussies
 
-  // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
+  const isValidationOk =
+    validationErrors.postalCode === true &&
+    validationErrors.phone === true &&
+    validationErrors.email === true; // ⭐ AJOUT DE LA VALIDATION EMAIL ⭐ // Vérification complète pour activer les boutons
+
+  const canProceedToPayment =
+    isAllShippingFieldsFilled && isContactFilled && isValidationOk; // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
+
   const handlePlaceOrderWithCOD = async () => {
-    if (
-      !isAllShippingFieldsFilled ||
-      !isContactFilled ||
-      cartItems.length === 0
-    ) {
+    if (!canProceedToPayment || cartItems.length === 0) {
       setPaymentMessage(
-        "Veuillez remplir toutes les informations de contact et de livraison, et avoir des articles dans le panier."
+        "Veuillez remplir toutes les informations correctement (y compris email, téléphone et code postal valides) et avoir des articles dans le panier."
       );
       return;
     }
@@ -97,7 +174,6 @@ function Checkout() {
     setShowPaymentForm(false);
     setPaymentSuccess(false);
 
-    // Préparation des données de commande
     const orderData = {
       shipping: shippingAddress,
       items: cartItems.map((item) => ({
@@ -127,14 +203,11 @@ function Checkout() {
       const data = await resp.json();
 
       if (resp.ok && data.order_id) {
-        // 1. Commande générée avec succès
         setPaymentSuccess(true);
         setOrderId(data.order_id);
         setPaymentMessage(
           `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`
         );
-
-        // 2. Vidage du panier (côté serveur et client)
         await clearCart();
       } else {
         const errorMsg =
@@ -146,23 +219,17 @@ function Checkout() {
       setPaymentSuccess(false);
       setPaymentMessage(`Erreur réseau : ${err.message}`);
     }
-  };
-  // FIN LOGIQUE DE COMMANDE (COD)
+  }; // FIN LOGIQUE DE COMMANDE (COD)
+
   const handleFinalizeOrder = () => {
-    navigate("/"); // Redirection vers la page d'accueil
+    navigate("/");
   };
 
   const handleProceedToPayment = () => {
-    if (
-      !isAllShippingFieldsFilled ||
-      shippingAddress.email.trim() === "" ||
-      shippingAddress.phone.trim() === ""
-    )
-      return;
+    if (!canProceedToPayment) return;
     setShowPaymentForm(true);
-  };
+  }; // PaymentForm (Composant de Paiement Stripe)
 
-  // PaymentForm (Composant de Paiement Stripe)
   function PaymentForm({ amountCents, defaultBilling, onSuccess, onError }) {
     const stripe = useStripe();
     const elements = useElements();
@@ -190,8 +257,18 @@ function Checkout() {
       if (!stripe || !elements) {
         setStatus("Stripe non initialisé");
         return;
-      }
+      } // AJOUT DE LA VÉRIFICATION DU CODE POSTAL ET EMAIL DE FACTURATION
 
+      if (!validatePostalCode(billing.postalCode)) {
+        setStatus(
+          "Le code postal de facturation doit être valide (5 chiffres)."
+        );
+        return;
+      }
+      if (!validateEmail(billing.email)) {
+        setStatus("L'adresse email de facturation doit être valide.");
+        return;
+      }
       if (!billing.firstName || !billing.lastName || !billing.email) {
         setStatus("Veuillez renseigner nom, prénom et email.");
         return;
@@ -257,7 +334,6 @@ function Checkout() {
           setStatus("Paiement réussi — merci !");
           onSuccess && onSuccess(result.paymentIntent);
 
-          // ⚠️ Logique pour Stripe: Vider le panier et rediriger APRES succès Stripe
           await clearCart();
         } else {
           setStatus("Échec du paiement");
@@ -275,7 +351,6 @@ function Checkout() {
       <form className="payment-form" onSubmit={handleSubmit}>
         <h3>Informations de facturation & paiement (Carte Bancaire)</h3>
 
-        {/* Champs de facturation pré-remplis par shippingAddress */}
         <div className="row">
           <input
             name="firstName"
@@ -290,7 +365,6 @@ function Checkout() {
             placeholder="Nom"
           />
         </div>
-
         <div className="row">
           <input
             name="email"
@@ -300,7 +374,6 @@ function Checkout() {
             type="email"
           />
         </div>
-
         <div className="row">
           <input
             name="address"
@@ -309,7 +382,6 @@ function Checkout() {
             placeholder="Adresse"
           />
         </div>
-
         <div className="row">
           <input
             name="city"
@@ -317,6 +389,7 @@ function Checkout() {
             onChange={handleChange}
             placeholder="Ville"
           />
+
           <input
             name="postalCode"
             value={billing.postalCode}
@@ -330,14 +403,12 @@ function Checkout() {
             placeholder="Pays (ISO)"
           />
         </div>
-
         <div className="row card-row">
           <label>Carte bancaire</label>
           <div className="card-element">
             <CardElement options={{ hidePostalCode: true }} />
           </div>
         </div>
-
         <div className="actions">
           <button type="submit" disabled={!stripe || processing}>
             {processing
@@ -353,13 +424,10 @@ function Checkout() {
             Annuler
           </button>
         </div>
-
         {status && <p className="status">{status}</p>}
       </form>
     );
-  }
-
-  // RENDU PRINCIPAL DU CHECKOUT
+  } // RENDU PRINCIPAL DU CHECKOUT
   return (
     <div className="checkout-container ">
       <div className="checkout-left ">
@@ -369,7 +437,8 @@ function Checkout() {
           <span className={isShippingCompleted ? "completed" : ""}>
             SHIPPING
           </span>
-          <span className={isAllShippingFieldsFilled ? "completed" : ""}>
+
+          <span className={canProceedToPayment ? "completed" : ""}>
             PAYMENT
           </span>
         </div>
@@ -377,7 +446,7 @@ function Checkout() {
         <div className="section">
           <h3>CONTACT INFO</h3>
           <div className="row">
-            {/* L'input email est pré-rempli via le useEffect */}
+            {/* ⭐ INPUT EMAIL MIS À JOUR AVEC VALIDATION ⭐ */}
             <input
               type="email"
               placeholder="Email"
@@ -385,6 +454,11 @@ function Checkout() {
               value={shippingAddress.email}
               onChange={handleShippingChange}
               required
+              className={
+                validationErrors.email && validationErrors.email !== true
+                  ? "error-input"
+                  : ""
+              }
             />
             <input
               type="text"
@@ -393,10 +467,22 @@ function Checkout() {
               value={shippingAddress.phone}
               onChange={handleShippingChange}
               required
+              className={
+                validationErrors.phone && validationErrors.phone !== true
+                  ? "error-input"
+                  : ""
+              }
             />
           </div>
+          {/* ⭐ MESSAGE D'ERREUR POUR L'EMAIL ⭐ */}
+          {validationErrors.email && validationErrors.email !== true && (
+            <p className="validation-error">❌ {validationErrors.email}</p>
+          )}
+          {/* Message d'erreur pour le téléphone */}
+          {validationErrors.phone && validationErrors.phone !== true && (
+            <p className="validation-error">❌ {validationErrors.phone}</p>
+          )}
         </div>
-
         <div className="section">
           <h3>SHIPPING ADDRESS</h3>
           <div className="row">
@@ -454,33 +540,42 @@ function Checkout() {
           <div className="row">
             <input
               type="text"
-              placeholder="Postal Code"
+              placeholder="Code postal"
               name="postalCode"
               value={shippingAddress.postalCode}
               onChange={handleShippingChange}
+              className={
+                validationErrors.postalCode &&
+                validationErrors.postalCode !== true
+                  ? "error-input"
+                  : ""
+              }
             />
           </div>
-
+          {/* Message d'erreur pour le code postal */}
+          {validationErrors.postalCode &&
+            validationErrors.postalCode !== true && (
+              <p className="validation-error">
+                ❌ {validationErrors.postalCode}
+              </p>
+            )}
           <div className="payment-options">
-            {/* Bouton Paiement à la Livraison (COD) */}
+            {/* Boutons désactivés tant que la validation n'est pas OK */}
             <button
               className="cod-btn"
-              disabled={!isAllShippingFieldsFilled || !isContactFilled}
+              disabled={!canProceedToPayment}
               onClick={handlePlaceOrderWithCOD}
             >
               Payer à la Livraison
             </button>
-
-            {/* Bouton Procéder au Paiement (Stripe) */}
             <button
               className="next-btn"
-              disabled={!isAllShippingFieldsFilled || !isContactFilled}
+              disabled={!canProceedToPayment}
               onClick={handleProceedToPayment}
             >
               Procéder au Paiement par Carte (Stripe) →
             </button>
           </div>
-
           {showPaymentForm && (
             <div className="payment-section">
               <Elements stripe={stripePromise}>
@@ -488,9 +583,7 @@ function Checkout() {
                   amountCents={Math.round((cartTotal || 0) * 100)}
                   defaultBilling={{ ...shippingAddress }}
                   onSuccess={(intent) => {
-                    // La logique clearCart et navigate a été
-                    // déplacée dans PaymentForm
-                    setPaymentSuccess(true); // ⭐️ AJOUTER
+                    setPaymentSuccess(true);
                     setOrderId(intent.id);
                     setPaymentMessage("Paiement Stripe réussi — merci !");
                   }}
@@ -506,12 +599,8 @@ function Checkout() {
       </div>
       <div className="checkout-right">
         <h3>YOUR ORDER</h3>
-        {/* ⭐️ CONDITION D'AFFICHAGE : Afficher le panier SEULEMENT si orderId n'est PAS encore défini ⭐️ */}
-
         {!orderId ? (
           <>
-            {/* Affichage des articles du panier */}
-
             {cartItems.length === 0 ? (
               <p>Votre panier est vide.</p>
             ) : (
@@ -546,7 +635,6 @@ function Checkout() {
                 );
               })
             )}
-            {/* Résumé des totaux : Doit être DANS la condition !orderId */}
             <div className="summary">
               <div className="total">
                 <span>Total</span>
@@ -555,12 +643,10 @@ function Checkout() {
             </div>
           </>
         ) : (
-          // ⭐️ Affichage si orderId EST défini ⭐️
           <div className="order-submitted-message">
             <p>Merci ! Votre commande a bien été enregistrée.</p>
           </div>
         )}
-        {/* Le message de paiement/succès et le bouton Finaliser l'achat restent visibles ici, en dehors du bloc conditionnel précédent */}
         {paymentMessage && (
           <p
             className={`payment-message ${

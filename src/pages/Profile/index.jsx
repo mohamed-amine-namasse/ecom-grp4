@@ -21,66 +21,69 @@ function Profile() {
 
   // 🔑 Détection de la route /profile/orders/:customerId
   const isOrdersRoute = useMatch("/profile/orders/:customerId");
-  // L'email peut être null si user est null
   const userEmail = user ? user.email : null;
 
+  // ----------------------------------------------------------
+  // 🔥 Chargement des données utilisateur (readonly)
+  // ----------------------------------------------------------
   useEffect(() => {
-    // 1. Attendre que le contexte d'authentification ait fini sa vérification initiale
     if (!authLoading) {
-      // 2. Vérifier si l'utilisateur est connecté ET si l'ID Client WooCommerce est disponible
       if (isAuthenticated && user && user.id) {
+        // Remplir formulaire READ ONLY
         setForm({
           user_display_name: user.username || "",
           user_email: user.email || "",
         });
-        // Validation du token (Optionnel)
+
+        // Vérifier le token
         validateStoredToken()
-          .then(() => {
-            setMessage(null);
-          })
-          .catch((err) => {
-            console.error("Token invalide:", err);
+          .then(() => setMessage(null))
+          .catch(() => {
             setMessage({
               type: "error",
               text: "Session expirée. Veuillez vous reconnecter.",
             });
           });
       } else {
-        // CAS ÉCHEC : Utilisateur non connecté après vérification
         setMessage({
           type: "error",
           text: "Vous devez être connecté pour accéder à cette page.",
         });
       }
-      // Mettre fin au chargement local une fois que le contexte est stable
+
       setLocalLoading(false);
     }
   }, [authLoading, isAuthenticated, user]);
 
-  // Afficher un message de chargement tant que le contexte ou le chargement local est actif
+  // ----------------------------------------------------------
+  // CHARGEMENT
+  // ----------------------------------------------------------
   if (authLoading || localLoading) {
     return <div className="page-wrapper">Chargement du profil...</div>;
   }
-  // Afficher un message d'erreur si non connecté
+
+  // ----------------------------------------------------------
+  // ERREUR NON CONNECTÉ
+  // ----------------------------------------------------------
   if (message && message.type === "error" && !isAuthenticated) {
     return (
       <div className="page-wrapper">
-        <div className={`alert alert-error`}>{message.text}</div>
+        <div className="alert alert-error">{message.text}</div>
       </div>
     );
   }
 
-  // 🔑 LOGIQUE CRITIQUE DE RENDU DE LA PAGE COMMANDES
+  // ----------------------------------------------------------
+  // ROUTE COMMANDES
+  // ----------------------------------------------------------
   if (isOrdersRoute) {
-    // 1. Vérifie si l'utilisateur est authentifié ET si l'e-mail est une chaîne non vide
     const isEmailReady =
       isAuthenticated && userEmail && userEmail.trim() !== "";
 
     if (!isEmailReady) {
-      // 2. Si l'e-mail n'est pas prêt, on affiche un message d'erreur strict
       return (
         <div className="page-wrapper">
-          <div className={`alert alert-error`}>
+          <div className="alert alert-error">
             Accès refusé. L'e-mail de session est introuvable. Veuillez vous
             reconnecter.
           </div>
@@ -88,10 +91,12 @@ function Profile() {
       );
     }
 
-    // 3. Si tout est OK, on rend Orders en passant l'email VALIDE
     return <Orders userEmail={userEmail} />;
   }
 
+  // ----------------------------------------------------------
+  // PAGE PROFIL (READ ONLY)
+  // ----------------------------------------------------------
   return (
     <div className="page-wrapper">
       {/* MENU LATÉRAL */}
@@ -102,44 +107,41 @@ function Profile() {
             <a href="/profile/update">Modification du profil</a>
           </li>
           <li>
-            {/* Le lien reste /profile/orders/0 comme demandé */}
             {user && user.id ? (
-              <a href={`/profile/orders/0`}>Commandes (ID Client: {user.id})</a>
+              <a href={`/profile/orders/0`}>
+                Commandes (ID Client: {user.id})
+              </a>
             ) : (
-              <span className="disabled-link" title="ID client non disponible">
-                Commandes
-              </span>
+              <span className="disabled-link">Commandes</span>
             )}
           </li>
         </ul>
       </div>
 
-      {/* 📝 FORMULAIRE DE PROFIL AJOUTÉ ICI */}
+      {/* 📝 FORMULAIRE READ ONLY */}
       <div className="form">
-        <h1>Page de Profil</h1>
+        <h1>Mon Profil</h1>
 
-        {/* Affichage des messages (sauf l'erreur de non-connexion, gérée plus haut) */}
         {message && message.type !== "error" && (
           <div className={`alert alert-${message.type}`}>{message.text}</div>
         )}
 
-        {/* Afficher le formulaire uniquement si l'utilisateur est chargé */}
         {user && (
           <form>
             <div className="form-group">
+              <label>Nom d'utilisateur</label>
               <input
                 name="user_display_name"
-                placeholder="Nom d'utilisateur"
                 value={form.user_display_name}
                 readOnly
               />
             </div>
 
             <div className="form-group">
+              <label>Email</label>
               <input
                 name="user_email"
                 type="email"
-                placeholder="Email"
                 value={form.user_email}
                 readOnly
               />
@@ -147,9 +149,9 @@ function Profile() {
           </form>
         )}
       </div>
-      {/* FIN DU FORMULAIRE */}
     </div>
   );
 }
 
 export default Profile;
+

@@ -275,12 +275,7 @@ function NavScrollExample() {
             as={(props) => <NavLink to="/" {...props} />}
             className=" d-flex align-items-center"
           >
-            <img
-              itemprop="logo"
-              src={logo}
-              alt="Foot Market Logo"
-              className="navbar-logo"
-            />
+            <img src={logo} alt="Foot Market Logo" className="navbar-logo" />
           </Navbar.Brand>
           <Navbar.Collapse id="nav-links-collapse">
             <Nav className="my-2 my-lg-0 nav-links" navbarScroll>

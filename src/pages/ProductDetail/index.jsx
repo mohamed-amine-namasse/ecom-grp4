@@ -872,29 +872,56 @@ function ProductDetail() {
             ))}
         </div>
         <div className="product-info-area">
-          <h1 className="product-name">{product.name}</h1>
-          {totalReviews > 0 && (
-            <div className="product-header-reviews">
-              <RatingStars rating={averageRating} />
-              <span className="review-count">({totalReviews} avis)</span>
-            </div>
-          )}
-          <div className="price-section">
-            {/* ⭐️ AFFICHAGE FIXE DU PRIX DU PARENT ⭐️ */}
-            {displayPrice < displayRegularPrice && (
-              <span className="old-price">
-                {formatPrice(displayRegularPrice)}
-              </span>
+          <div itemScope itemType="https://schema.org/Product">
+            <h1 itemProp="name" className="product-name">
+              {product.name}
+            </h1>
+            {totalReviews > 0 && (
+              <div
+                className="product-header-reviews"
+                itemProp="aggregateRating" /* <-- Propriété principale */
+                itemScope
+                itemType="https://schema.org/AggregateRating" /* <-- Type spécifique */
+              >
+                <span itemProp="ratingValue">{averageRating.toFixed(1)}</span>
+                <RatingStars rating={averageRating} />
+                <span className="review-count">
+                  (<span itemProp="reviewCount">{totalReviews}</span> avis)
+                </span>
+              </div>
             )}
-
-            <span className="current-price">{formatPrice(displayPrice)}</span>
-          </div>
-          {product.displayDescription && (
             <div
-              className="product-excerpt-description"
-              dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+              itemProp="offers"
+              itemScope
+              itemType="https://schema.org/Offer"
+            >
+              <div className="price-section">
+                <span className="current-price" itemProp="price">
+                  {formatPrice(displayPrice)}
+                </span>
+                <meta itemProp="priceCurrency" content="EUR" />
+                <link
+                  itemProp="availability"
+                  href={
+                    isVariationOutOfStock
+                      ? "https://schema.org/OutOfStock"
+                      : "https://schema.org/InStock"
+                  }
+                />
+              </div>
+            </div>
+            <meta
+              itemProp="image"
+              content={stockSource.image?.src || product.image}
             />
-          )}
+            {product.displayDescription && (
+              <div
+                className="product-excerpt-description"
+                itemProp="description"
+                dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+              />
+            )}
+          </div>
           {/* 🚨 SÉLECTEUR DE COULEUR 🚨 */}
           {availableColors.length > 0 && (
             <div className="color-selector-group">

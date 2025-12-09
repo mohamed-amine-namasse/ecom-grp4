@@ -74,9 +74,8 @@
 }
 
 .navbar-logo {
-  height: 70px;
-
-  margin-right: 1rem;
+  max-width: 50px; /* Exemple */
+  height: auto;
 }
 /* Mobile: burger left, brand next, then loupe + icons to the right;
           collapse of links will open full-width under the bar.

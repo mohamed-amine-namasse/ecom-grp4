@@ -1030,7 +1030,11 @@ function ProductDetail() {
           </button>
         </div>
       </div>
-      <div className="product-tabs-section">
+      <div
+        className="product-tabs-section"
+        itemscope
+        itemtype="https://schema.org/Product"
+      >
         <div className="tab-headers">
           <button
             className={`tab-header ${

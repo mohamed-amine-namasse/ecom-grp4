@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
+import Pagination from "../../components/Pagination";
 import { Link } from "react-router";
 
 // ----------------------------------------------------------------------
@@ -61,8 +62,13 @@ function Shop() {
     materials: [],
   });
   const [totalProducts, setTotalProducts] = useState(0);
-
+  // --- NOUVEAUX ÉTATS POUR LA PAGINATION ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(12); // Nombre de produits affichés par page
+  const [apiProducts, setApiProducts] = useState([]); // Pour stocker les 100 produits chargés initialement
+  // ------------------------------------------
   const handleFilterChange = (filterName, value) => {
+    setCurrentPage(1);
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
@@ -70,6 +76,7 @@ function Shop() {
   };
 
   const handleResetFilters = () => {
+    setCurrentPage(1);
     setFilters(initialFilters);
   };
 
@@ -304,7 +311,18 @@ function Shop() {
 
     return workingProducts;
   }, [products, filters]);
+  // --- NOUVEAU useMemo pour extraire les produits de la page courante ---
+  const paginatedProducts = useMemo(() => {
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    return filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  }, [filteredProducts, currentPage, productsPerPage]);
 
+  // Calcul du nombre total de pages
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Fonction pour changer de page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   if (isLoading) {
     return (
       <main className="shop-container loading-state">
@@ -362,19 +380,22 @@ function Shop() {
             {filteredProducts.length > 1 ? "s" : ""} correspondent à vos
             filtres.
           </p>
+          {/* Affiche le message s'il n'y a aucun résultat FILTRÉ */}
           {filteredProducts.length === 0 && (
             <p className="no-results">
               Aucun produit ne correspond à vos critères de recherche.
             </p>
           )}
-          {filteredProducts.map((prod) => {
+
+          {/* IMPORTANT : Utilisation de paginatedProducts pour l'affichage */}
+          {paginatedProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
             const productLink = `/product/${prod.id}`;
             const isVariable = prod.type === "variable";
             const hasPriceRange =
               isVariable &&
               prod.price !== prod.maxPrice &&
-              prod.maxPrice > prod.price; // VRAIE condition de promotion: Le prix de vente est strictement inférieur au prix régulier
+              prod.maxPrice > prod.price;
 
             const isOnSale = prod.price < prod.regularPrice;
 
@@ -424,6 +445,18 @@ function Shop() {
               </article>
             );
           })}
+
+          {/* --- ZONE DE PAGINATION CORRIGÉE --- */}
+          {/* La pagination s'affiche uniquement s'il y a des produits filtrés ET plus d'une page */}
+          {filteredProducts.length > 0 && totalPages > 1 && (
+            <Pagination
+              productsPerPage={productsPerPage}
+              totalProducts={filteredProducts.length}
+              paginate={paginate}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          )}
         </section>
       </div>
     </main>

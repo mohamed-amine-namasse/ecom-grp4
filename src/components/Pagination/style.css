@@ -1,0 +1,59 @@
+/* --- Pagination.css --- */
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.pagination-list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden; /* Pour contenir les bords des boutons */
+}
+
+.page-item {
+  display: inline;
+}
+
+.page-link {
+  color: #333;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  border-right: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+
+.page-link:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+.page-item:last-child .page-link {
+  border-right: none;
+}
+
+/* Style pour la page active */
+.page-item.active .page-link {
+  background-color: #007bff; /* Couleur primaire */
+  color: white;
+  border-color: #007bff;
+  pointer-events: none; /* Empêche de cliquer sur la page courante */
+}
+
+/* Style pour les boutons désactivés (Précédent/Suivant aux extrémités) */
+.page-item.disabled .page-link {
+  color: #ccc;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}

@@ -860,7 +860,7 @@ function ProductDetail() {
         </div>
       )}
       <div className="product-content">
-        <div className="product-image-area" itemProp="image">
+        <div className="product-image-area">
           {/* ⭐️ Utiliser l'image de la variation sélectionnée si elle existe, sinon l'image du produit parent ⭐️ */}
           <img
             src={stockSource.image?.src || product.image}
@@ -871,61 +871,170 @@ function ProductDetail() {
               <div className="product-badge out-of-stock">Rupture de Stock</div>
             ))}
         </div>
-
         <div className="product-info-area">
-          <div itemScope itemType="https://schema.org/Product">
-            <h1 className="product-name" itemProp="name">
-              {product.name}
-            </h1>
-            {totalReviews > 0 && (
-              <div
-                className="product-header-reviews"
-                itemProp="aggregateRating" /* <-- Propriété principale */
-                itemScope
-                itemType="https://schema.org/AggregateRating" /* <-- Type spécifique */
-              >
-                <span itemProp="ratingValue">{averageRating.toFixed(1)}</span>
-                <RatingStars rating={averageRating} />
-                <span className="review-count">
-                  (<span itemProp="reviewCount">{totalReviews}</span> avis)
-                </span>
-              </div>
+          <h1 className="product-name">{product.name}</h1>
+          {totalReviews > 0 && (
+            <div className="product-header-reviews">
+              <RatingStars rating={averageRating} />
+              <span className="review-count">({totalReviews} avis)</span>
+            </div>
+          )}
+          <div className="price-section">
+            {/* ⭐️ AFFICHAGE FIXE DU PRIX DU PARENT ⭐️ */}
+            {displayPrice < displayRegularPrice && (
+              <span className="old-price">
+                {formatPrice(displayRegularPrice)}
+              </span>
             )}
+
+            <span className="current-price">{formatPrice(displayPrice)}</span>
+          </div>
+          {product.displayDescription && (
             <div
-              itemProp="offers"
-              itemScope
-              itemType="https://schema.org/Offer"
-            >
-              <div className="price-section">
-                <span className="current-price" itemProp="price">
-                  {formatPrice(displayPrice)}
-                </span>
-                <meta itemProp="priceCurrency" content="EUR" />
-                <link
-                  itemProp="availability"
-                  href={
-                    isVariationOutOfStock
-                      ? "https://schema.org/OutOfStock"
-                      : "https://schema.org/InStock"
-                  }
-                />
+              className="product-excerpt-description"
+              dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+            />
+          )}
+          {/* 🚨 SÉLECTEUR DE COULEUR 🚨 */}
+          {availableColors.length > 0 && (
+            <div className="color-selector-group">
+              <label htmlFor="product-color">
+                Couleur :<span className="required-star">*</span>
+              </label>
+
+              <select
+                id="product-color"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                required
+                className="color-select-input"
+              >
+                <option value="" disabled>
+                  Choisir une couleur...
+                </option>
+
+                {availableColors.map((color) => (
+                  <option key={color} value={color}>
+                    {color}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          {/* 🚨 SÉLECTEUR DE POINTURE EN CARRÉS 🚨 */}
+          {availableSizes.length > 0 && (
+            <div className="size-selector-group">
+              <label>
+                Pointure sélectionnée :<span className="required-star">*</span>
+              </label>
+
+              <div className="size-buttons-container">
+                {availableSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    className={`size-button ${
+                      selectedSize === size ? "selected" : ""
+                    }`}
+                    onClick={() => setSelectedSize(size)}
+                    // Vous pouvez désactiver les boutons pour les combinaisons en rupture de stock ici si nécessaire
+                  >
+                    {size}
+                  </button>
+                ))}
               </div>
             </div>
-            <meta
-              itemProp="image"
-              content={stockSource.image?.src || product.image}
-            />
-            {product.displayDescription && (
-              <div
-                className="product-excerpt-description"
-                itemProp="description"
-                dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+          )}
+          {/* -------------------------------------------------
+            ⭐️ LOGIQUE D'AFFICHAGE DU STOCK PAR VARIATION ⭐️
+            -------------------------------------------------
+          */}
+          {productVariations.length === 0 ? (
+            // CAS 1: Produit Simple (utilise le stock du parent)
+            displayStock && (
+              <p className="stock-info">
+                {product.isOutOfStock
+                  ? "Rupture de stock (0 disponible)"
+                  : `${product.stockQuantity} articles en stock`}
+              </p>
+            )
+          ) : (
+            // CAS 2: Produit Variable (utilise le stock de la variation)
+            <>
+              {selectedVariation && displayStock && !isVariationOutOfStock && (
+                <p className="stock-info">
+                  {currentStockQuantity === 0
+                    ? "Rupture de stock (0 disponible)"
+                    : `${currentStockQuantity} articles en stock`}
+                </p>
+              )}
+
+              {/* Message pour la variation épuisée */}
+              {selectedVariation && isVariationOutOfStock && (
+                <p className="stock-info out-of-stock-message">
+                  Rupture de stock pour cette option.
+                </p>
+              )}
+
+              {/* Message si les options sont sélectionnées mais aucune variation correspondante n'est trouvée (combo invalide) */}
+              {!selectedVariation && (selectedColor || selectedSize) && (
+                <p className="stock-info out-of-stock-message">
+                  Cette combinaison (Couleur/Pointure) n'est pas disponible.
+                </p>
+              )}
+            </>
+          )}
+
+          {/* 🚨 Champ de sélection de quantité 🚨 */}
+          {!isVariationOutOfStock && !product.isOutOfStock && (
+            <div className="quantity-selector-group">
+              <label htmlFor="product-quantity">Quantité :</label>{" "}
+              <input
+                id="product-quantity"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => {
+                  let val = parseInt(e.target.value, 10);
+                  const maxStock =
+                    stockSource.manage_stock && currentStockQuantity !== null
+                      ? currentStockQuantity
+                      : Infinity;
+
+                  val = Math.max(1, val);
+                  val = Math.min(val, maxStock);
+
+                  setQuantity(val);
+                }}
+                className="quantity-input"
               />
-            )}
-          </div>
+            </div>
+          )}
+
+          <button
+            className="btn-add-to-cart"
+            type="button"
+            disabled={
+              product.isOutOfStock ||
+              isVariationOutOfStock ||
+              quantity < 1 ||
+              (availableColors.length > 0 && !selectedColor) ||
+              (availableSizes.length > 0 && !selectedSize) ||
+              (productVariations.length > 0 && !selectedVariation) // Désactiver si variable et qu'aucune variation valide n'est trouvée
+            }
+            onClick={handleAddToCart}
+          >
+            {product.isOutOfStock || isVariationOutOfStock
+              ? "Indisponible"
+              : `Ajouter au panier`}
+          </button>
         </div>
       </div>
-      <div className="product-tabs-section">
+      <div
+        className="product-tabs-section"
+        itemscope
+        itemtype="https://schema.org/Product"
+      >
         <div className="tab-headers">
           <button
             className={`tab-header ${
@@ -952,8 +1061,8 @@ function ProductDetail() {
             Avis ({reviews.length})
           </button>
         </div>
+        <div className="tab-content-wrapper">{renderTabContent()}</div>
       </div>
-      <div className="tab-content-wrapper">{renderTabContent()}</div>
     </main>
   );
 }

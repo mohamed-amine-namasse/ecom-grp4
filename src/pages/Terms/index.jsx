@@ -2,7 +2,7 @@ import "./style.css";
 function Terms() {
   return (
     <div className="background">
-      <h1>
+      <h1 className="title-terms">
         Conditions Générales d'utilisation / Conditions Générales de Vente
         (CGU/CGV)
       </h1>
@@ -149,7 +149,7 @@ function Terms() {
         </p>
       </section>
 
-      <hr />
+      <hr className="line" />
       <h2>Conditions Générales de Vente (CGV)</h2>
       {/* ARTICLE 1 */}
       <section id="scope">

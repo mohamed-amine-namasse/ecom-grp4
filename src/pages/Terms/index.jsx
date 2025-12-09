@@ -109,13 +109,6 @@ function Terms() {
         remboursements.Contactez-nous via la page:{" "}
         <a href={`./Contact`}>Contact</a>
       </p>
-      <p
-        itemprop="sponsor"
-        itemscope
-        itemtype="https://schema.org/Organization"
-      >
-        patenaire: pouet
-      </p>
 
       <div className="cgv-container">
         <h1>Conditions Générales de Vente (CGV)</h1>

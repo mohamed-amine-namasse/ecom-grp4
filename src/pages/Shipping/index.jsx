@@ -97,9 +97,7 @@ function Shipping() {
 
         {/* Affichage des détails de la commande */}
         {orderData && (
-          <div
-            style={{ marginTop: 20, border: "1px solid #ccc", padding: "10px" }}
-          >
+          <div className="contain-order">
             <h3>Détails de la commande #{orderData.id}</h3>
             <ul>
               <li>**Statut :** {orderData.status}</li>
@@ -133,10 +131,10 @@ function Shipping() {
           </div>
         )}
 
-        <h2 style={{ marginTop: 18 }}>Délais & retours</h2>
+        <h2>Délais & retours</h2>
         <p>France: 2–5 jours. Retours possibles sous 14 jours.</p>
 
-        <div className="actions" style={{ marginTop: 14 }}>
+        <div className="actions">
           <a href="/contact" className="btn">
             Contactez le support
           </a>

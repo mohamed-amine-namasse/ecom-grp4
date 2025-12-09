@@ -16,3 +16,12 @@
 .background a {
   color: var(--number) !important;
 }
+
+hr {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}

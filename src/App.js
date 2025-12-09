@@ -9,7 +9,7 @@ import Error from "./pages/Error";
 import Shop from "./pages/Shop";
 import Terms from "./pages/Terms";
 import About from "./pages/About";
-import LoginSimulator from "./pages/LoginSimulator";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
 import Cart from "./pages/Cart";
@@ -36,7 +36,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
-            <Route path="/login" element={<LoginSimulator />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/product/:id" element={<ProductDetail />} />

@@ -1,15 +1,42 @@
 import React, { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router";
+
+// ⚠️ ASSUREZ-VOUS QUE LES CHEMINS CI-DESSOUS SONT CORRECTS
 import { loginUser } from "../../components/Api";
 import { useAuth } from "../../components/AuthContext";
+import { setAuthDataState } from "../../components/NavScrollExample";
+
 import "./style.css";
 
-function Login() {
+// ----------------------------------------------------------------------
+// --- DONNÉES DE SIMULATION (GARDER POUR DEBUG SEULEMENT) ---
+// ----------------------------------------------------------------------
+const mockLoginData = {
+  token:
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21vaGFtZWQtYW1pbmUtbmFtYXNzZS5zdHVkZW50cy1sYXBsYXRlZm9ybWUuaW8vd29yZHByZXNzLWVjby93b3JkcHJlc3MiLCJpYXQiOjE3NjQ5MjQ0MTQsIm5iZiI6MTc2NDkyNDQxNCwiZXhwIjoxNzY1NTI5MjE0LCJkYXRhIjp7InVzZXIiOnsiaWQiOiIzMyJ9fX0.yEVa9owL6rvC7brNqv7guENi0YZAIgdIpvlk6mgygYc",
+  user_email: "mock.user@yahoo.com",
+  user_nicename: "mockuser",
+  user_display_name: "Mock User",
+  customerId: 33,
+};
+
+/**
+ * Composant de la page de connexion, gérant la soumission du formulaire et la mise à jour de l'état.
+ */
+const Login = () => {
+  // Hooks React
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+
+  // ----------------------------------------------------------------------
+  // --- LOGIQUE DE GESTION DU FORMULAIRE ---
+  // ----------------------------------------------------------------------
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -20,62 +47,88 @@ function Login() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const v = validate();
-    if (v) {
-      setMessage({ type: "error", text: v });
+    const validationError = validate();
+    if (validationError) {
+      setMessage({ type: "danger", text: validationError });
       return;
     }
 
     setLoading(true);
     setMessage(null);
+
     try {
-      const data = await loginUser(form.username, form.password);
+      // 1. Appel de l'API avec les données du formulaire
+      const apiData = await loginUser(form.username, form.password);
+
+      // ⚠️ Pour utiliser l'API réelle, la ligne ci-dessous DOIT ÊTRE COMMENTÉE OU SUPPRIMÉE.
+      // const apiData = mockLoginData;
+
+      // 2. Normalisation des données pour le Contexte
+      // Cette étape adapte la structure de l'objet API aux besoins de votre application (Profile.jsx).
+      const normalizedUser = {
+        token: apiData.token,
+        // Ces clés doivent être celles que Profile.jsx attend (username, email, id)
+        username: apiData.user_display_name || apiData.user_nicename,
+        email: apiData.user_email,
+        id: apiData.customerId,
+      };
+
+      // 3. Mise à jour du Contexte Global
+      login(normalizedUser);
+
+      // 4. Mise à jour de la Navbar (mécanisme custom)
+      setAuthDataState(normalizedUser); // Mise à jour explicite du Local Storage pour la navbar
+      window.dispatchEvent(new Event("storageUpdate"));
+
       setMessage({
         type: "success",
-        text: data?.message || "Connexion réussie.",
+        text: "Connexion réussie. Redirection en cours...",
       });
 
+      // 5. Redirection
       setTimeout(() => {
         navigate("/");
       }, 1000);
-
-      setForm({ username: "", password: "" });
     } catch (err) {
-      console.error(err);
-      let text = "Erreur de connexion";
+      console.error("Erreur de connexion:", err);
+      let text = "Erreur de connexion inconnue.";
       if (err.response) {
-        const d = err.response.data;
-        text = d?.message || (typeof d === "string" ? d : JSON.stringify(d));
+        text = err.response.data?.message || JSON.stringify(err.response.data);
       } else if (err.request) {
-        text =
-          "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
-      } else {
+        text = "Impossible de contacter le serveur. Vérifiez la connexion.";
+      } else if (err.message) {
         text = err.message;
       }
-      setMessage({ type: "error", text });
+      setMessage({ type: "danger", text });
     } finally {
       setLoading(false);
     }
   };
 
+  // ----------------------------------------------------------------------
+  // --- RENDU ---
+  // ----------------------------------------------------------------------
+
   return (
     <div className="form">
       <h1>Connexion</h1>
+      {/* Affichage des messages d'erreur ou de succès */}
       {message && (
         <div className={`alert alert-${message.type}`}>{message.text}</div>
       )}
-      <form onSubmit={onSubmit}>
-        <div className="form-group">
-          <input
+
+      <Form onSubmit={onSubmit}>
+        <Form.Group className="form-group">
+          <Form.Control
             name="username"
             placeholder="Nom d'utilisateur ou email"
             value={form.username}
             onChange={onChange}
             required
           />
-        </div>
-        <div className="form-group">
-          <input
+        </Form.Group>
+        <Form.Group className="form-group">
+          <Form.Control
             name="password"
             type="password"
             placeholder="Mot de passe"
@@ -83,13 +136,18 @@ function Login() {
             onChange={onChange}
             required
           />
-        </div>
-        <button type="submit" disabled={loading}>
+        </Form.Group>
+        <Button
+          type="submit"
+          disabled={loading}
+          variant="primary"
+          className="w-100 mt-3"
+        >
           {loading ? "Connexion..." : "Se connecter"}
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   );
-}
+};
 
 export default Login;

@@ -10,18 +10,6 @@ import { setAuthDataState } from "../../components/NavScrollExample";
 
 import "./style.css";
 
-// ----------------------------------------------------------------------
-// --- DONNÉES DE SIMULATION (GARDER POUR DEBUG SEULEMENT) ---
-// ----------------------------------------------------------------------
-const mockLoginData = {
-  token:
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL21vaGFtZWQtYW1pbmUtbmFtYXNzZS5zdHVkZW50cy1sYXBsYXRlZm9ybWUuaW8vd29yZHByZXNzLWVjby93b3JkcHJlc3MiLCJpYXQiOjE3NjQ5MjQ0MTQsIm5iZiI6MTc2NDkyNDQxNCwiZXhwIjoxNzY1NTI5MjE0LCJkYXRhIjp7InVzZXIiOnsiaWQiOiIzMyJ9fX0.yEVa9owL6rvC7brNqv7guENi0YZAIgdIpvlk6mgygYc",
-  user_email: "mock.user@yahoo.com",
-  user_nicename: "mockuser",
-  user_display_name: "Mock User",
-  customerId: 33,
-};
-
 /**
  * Composant de la page de connexion, gérant la soumission du formulaire et la mise à jour de l'état.
  */

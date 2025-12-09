@@ -1,11 +1,19 @@
-/* --- Pagination.css --- */
+/* --- Pagination.css : Style Minimaliste et Épuré --- */
+
+:root {
+  --text-color: #333;
+  --active-color: #000;
+  --hover-bg: #f0f0f0;
+  --divider-color: #ccc;
+  --font-size: 1rem;
+}
 
 .pagination-container {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  width: 100%;
+  margin: 40px 0; /* Plus d'espace vertical */
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  grid-column: 1 / -1;
 }
 
 .pagination-list {
@@ -13,47 +21,60 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  overflow: hidden; /* Pour contenir les bords des boutons */
 }
 
 .page-item {
-  display: inline;
+  margin: 0 5px; /* Espace entre les éléments */
 }
 
 .page-link {
-  color: #333;
-  float: left;
-  padding: 8px 16px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-  border-right: 1px solid #ddd;
-  background-color: #fff;
-  cursor: pointer;
+  /* Style de base */
+  background: none;
   border: none;
-  font-size: 14px;
+  color: var(--text-color);
+  padding: 8px 12px;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: var(--font-size);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  min-width: 30px; /* Assure une taille minimale */
+  text-align: center;
 }
 
-.page-link:hover:not(.active) {
-  background-color: #f0f0f0;
+/* Style de survol */
+.page-link:hover {
+  background-color: var(--hover-bg);
+  color: var(--active-color);
 }
 
-.page-item:last-child .page-link {
-  border-right: none;
-}
-
-/* Style pour la page active */
+/* Style de la page active */
 .page-item.active .page-link {
-  background-color: #007bff; /* Couleur primaire */
+  background-color: var(--active-color);
   color: white;
-  border-color: #007bff;
-  pointer-events: none; /* Empêche de cliquer sur la page courante */
+  font-weight: 600;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Petite ombre pour la mise en évidence */
 }
 
-/* Style pour les boutons désactivés (Précédent/Suivant aux extrémités) */
+/* Style des liens désactivés (Précédent/Suivant) */
 .page-item.disabled .page-link {
-  color: #ccc;
+  color: var(--divider-color);
   cursor: not-allowed;
-  background-color: #f9f9f9;
+  opacity: 0.7;
+}
+
+/* Utilisation des séparateurs pour un look épuré */
+.page-item:not(:last-child)::after {
+  color: var(--divider-color);
+  margin-left: 5px;
+  opacity: 0.4;
+  line-height: 2; /* Alignement vertical */
+}
+
+/* Retirer le séparateur après le bouton Précédent/Suivant s'ils sont des liens/boutons simples */
+.page-item:first-child::after,
+.page-item:last-child::after {
+  content: none;
 }

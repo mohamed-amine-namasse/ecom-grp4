@@ -401,44 +401,82 @@ function Shop() {
 
             return (
               <article className="product-card" key={prod.id}>
-                <div className="product-media">
-                  <Link to={productLink} className="product-image-link">
-                    <img src={prod.image} alt={prod.name} />
-                  </Link>
-
-                  {isOutOfStock && (
-                    <div className="product-badge out-of-stock">
-                      Rupture de Stock
-                    </div>
-                  )}
-                </div>
-
-                <div className="product-body">
-                  <h3 className="product-title">
-                    <Link className="text-dark " to={productLink}>
-                      {prod.name}
+                <div itemScope itemType="https://schema.org/Product">
+                  <div className="product-media">
+                    <Link to={productLink} className="product-image-link">
+                      <img itemProp="image" src={prod.image} alt={prod.name} />
                     </Link>
-                  </h3>
-                  {prod.desc && prod.desc.trim() && (
-                    <p className="product-desc">{prod.desc}</p>
-                  )}
-                  <div className="product-footer">
-                    <div className="flex">
-                      {/* Affichage du prix régulier barré SI le produit est en promotion */}
-                      {isOnSale && (
-                        <span className="product-price old-price">
-                          {formatPrice(prod.regularPrice)}
-                        </span>
-                      )}
-                      {/* Prix actuel (prix de vente ou prix régulier) */}
-                      <span className="product-price current-price">
-                        {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
-                        {hasPriceRange && !isOnSale
-                          ? `${formatPrice(prod.price)} - ${formatPrice(
-                              prod.maxPrice
-                            )}`
-                          : formatPrice(prod.price)}
-                      </span>
+
+                    {isOutOfStock && (
+                      <div className="product-badge out-of-stock">
+                        Rupture de Stock
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="product-body">
+                    <h3 itemProp="name" className="product-title">
+                      <Link className="text-dark " to={productLink}>
+                        {prod.name}
+                      </Link>
+                    </h3>
+                    {prod.desc && prod.desc.trim() && (
+                      <p className="product-desc">{prod.desc}</p>
+                    )}
+                    <div className="product-footer">
+                      <div className="flex">
+                        {/* Affichage du prix régulier barré SI le produit est en promotion */}
+                        {isOnSale && (
+                          <div
+                            itemProp="offers"
+                            itemScope
+                            itemType="https://schema.org/Offer"
+                          >
+                            <span
+                              itemProp="price"
+                              className="product-price old-price"
+                            >
+                              {formatPrice(prod.regularPrice)}
+                            </span>
+                            <meta
+                              itemProp="availability"
+                              content={
+                                prod.stock_status === "instock"
+                                  ? "https://schema.org/InStock"
+                                  : "https://schema.org/OutOfStock"
+                              }
+                            />
+                            <meta itemProp="priceCurrency" content="EUR" />
+                          </div>
+                        )}
+                        {/* Prix actuel (prix de vente ou prix régulier) */}
+                        <div
+                          itemProp="offers"
+                          itemScope
+                          itemType="https://schema.org/Offer"
+                        >
+                          <span
+                            itemProp="price"
+                            className="product-price current-price"
+                          >
+                            {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
+                            {hasPriceRange && !isOnSale
+                              ? `${formatPrice(prod.price)} - ${formatPrice(
+                                  prod.maxPrice
+                                )}`
+                              : formatPrice(prod.price)}
+                          </span>
+                          <meta
+                            itemProp="availability"
+                            content={
+                              prod.stock_status === "instock"
+                                ? "https://schema.org/InStock"
+                                : "https://schema.org/OutOfStock"
+                            }
+                          />
+                          <meta itemProp="priceCurrency" content="EUR" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

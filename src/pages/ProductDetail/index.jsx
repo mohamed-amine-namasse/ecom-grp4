@@ -860,7 +860,7 @@ function ProductDetail() {
         </div>
       )}
       <div className="product-content">
-        <div className="product-image-area" itemprop="image">
+        <div className="product-image-area" itemProp="image">
           {/* ⭐️ Utiliser l'image de la variation sélectionnée si elle existe, sinon l'image du produit parent ⭐️ */}
           <img
             src={stockSource.image?.src || product.image}

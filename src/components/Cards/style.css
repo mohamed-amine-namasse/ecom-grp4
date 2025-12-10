@@ -39,10 +39,38 @@
   opacity: 1;
 }
 
-.pagination {
+.pagination2 {
   display: flex;
   gap: 10px;
   list-style: none;
   font-size: 18px;
   padding: 0;
+}
+
+.pagination2 li {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+
+.pagination2 li:hover {
+  background-color: #eaeaea;
+}
+
+.active-page {
+  background-color: #007bff !important;
+  color: white !important;
+  border-color: #007bff !important;
+}
+
+.pagination2 a {
+  text-decoration: none;
+  color: black;
+}
+
+.pagination-container {
+  margin-top: "30px";
+  display: "flex";
+  justify-content: "center";
 }

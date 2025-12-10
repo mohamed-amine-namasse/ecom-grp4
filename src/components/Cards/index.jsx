@@ -84,7 +84,7 @@ function Cards() {
         })}
       </div>
 
-      <div className="pagination-wrapper">
+      <div className="pagination-container">
         <ReactPaginate
           breakLabel="..."
           nextLabel="Suivant >"
@@ -92,7 +92,7 @@ function Cards() {
           onPageChange={handlePageClick}
           pageRangeDisplayed={3}
           pageCount={pageCount}
-          containerClassName="pagination"
+          containerClassName="pagination2"
           activeClassName="active-page"
         />
       </div>

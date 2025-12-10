@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../../components/CartContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { loadStripe } from "@stripe/stripe-js";
 import { useAuth } from "../../components/AuthContext";
 import {

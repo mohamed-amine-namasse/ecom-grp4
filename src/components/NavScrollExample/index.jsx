@@ -18,7 +18,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
 import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom"; // Pour la redirection
+import { useNavigate } from "react-router"; // Pour la redirection
 import "./style.css";
 
 // ----------------------------------------------------------------------

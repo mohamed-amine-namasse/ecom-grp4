@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Initialisation à true pour la vérification
 
-  // Fonction pour la connexion (utilisée par LoginSimulator.js)
+  // Fonction pour la connexion (utilisée par Login.js)
   const login = (userData) => {
     // 1. Mise à jour de l'état du Contexte (déclenche le re-rendu de Profile.jsx)
     setUser(userData);

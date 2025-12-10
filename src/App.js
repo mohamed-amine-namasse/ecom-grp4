@@ -25,7 +25,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router";
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/FootMarket">
         <ScrollToTop />
         <CartProvider>
           <NavScrollExample />

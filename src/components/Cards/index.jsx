@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
+import { Link } from "react-router";
 
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
@@ -17,7 +18,9 @@ function Cards() {
   const [itemOffset, setItemOffset] = useState(0);
 
   useEffect(() => {
-    fetch(`${API_URL}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`)
+    fetch(
+      `${API_URL}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Erreur réseau");
         return res.json();
@@ -47,7 +50,7 @@ function Cards() {
 
   return (
     <>
-      {/* AFFICHAGE DES PRODUITS */}
+      
       <div
         style={{
           display: "flex",
@@ -58,6 +61,8 @@ function Cards() {
       >
         {currentItems.map((p) => {
           const hover = hoverId === p.id;
+        
+          const detailPath = `/product/${p.id}`;
           return (
             <Card
               key={p.id}
@@ -86,10 +91,12 @@ function Cards() {
               />
 
               <Button
+                as={Link}
+                to={detailPath}
                 variant="primary"
                 style={{
                   position: "absolute",
-                  bottom: "20px",
+                  bottom: "50%",
                   left: "50%",
                   transform: "translateX(-50%)",
                   opacity: hover ? 1 : 0,
@@ -107,8 +114,10 @@ function Cards() {
         })}
       </div>
 
-      {/* PAGINATION */}
-      <div style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}>
+    
+      <div
+        style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}
+      >
         <ReactPaginate
           breakLabel="..."
           nextLabel="Suivant >"
@@ -117,11 +126,11 @@ function Cards() {
           pageRangeDisplayed={3}
           pageCount={pageCount}
           containerClassName="pagination"
-          activeClassName="active-page"   // 👈 classe appliquée au numéro actif
+          activeClassName="active-page"
         />
       </div>
 
-      {/* STYLE DE LA PAGINATION */}
+    
       <style>{`
         .pagination {
           display: flex;

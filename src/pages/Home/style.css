@@ -1,0 +1,166 @@
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #fff7fb; /* rose très léger */
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+p {
+  color: #555;
+}
+
+
+/* ============================
+   HEADER
+============================ */
+.home-header {
+  background: linear-gradient(
+      rgba(255, 105, 180, 0.4),
+      rgba(255, 105, 180, 0.4)
+    ),
+    url("https://images.pexels.com/photos/5480694/pexels-photo-5480694.jpeg") center/cover;
+  padding: 90px 20px;
+  text-align: center;
+  border-radius: 0 0 30px 30px;
+}
+
+.home-header h1 {
+  color: white;
+  font-size: 3rem;
+  text-transform: uppercase;
+}
+
+.home-header p {
+  color: #ffe3ef;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+
+/* ============================
+   SECTION TITRES
+============================ */
+section h2 {
+  color: #ff3c88; /* rose vif sportif */
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+section p {
+  margin-top: -3px;
+}
+
+
+/* ============================
+   CARDS PRODUITS
+   (si tes cards utilisent .card par défaut bootstrap)
+============================ */
+.card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0px 5px 20px rgba(255, 105, 180, 0.15);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 25px rgba(255, 105, 180, 0.25);
+}
+
+.card img {
+  border-bottom: 3px solid #ff3c88;
+}
+
+.card-title {
+  font-weight: 600;
+  color: #ff3c88;
+}
+
+
+/* ============================
+   FIGURES (logos marques)
+============================ */
+.figures-container {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  flex-wrap: wrap;
+  margin: 30px 0;
+}
+
+.figures-container img {
+  width: 130px;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: 0.3s;
+}
+
+.figures-container img:hover {
+  filter: grayscale(0);
+  opacity: 1;
+}
+
+
+/* ============================
+   SECTION "Notre approche"
+============================ */
+.approche-text {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  padding: 0 20px;
+  color: #333;
+}
+
+
+/* ============================
+   LOADER
+============================ */
+.shopping-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: white;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  animation: fadeOut 1s ease forwards;
+  animation-delay: 1.5s; /* en lien avec ton MINIMUM_LOAD_TIME */
+}
+
+.shopping-loader-icon {
+  font-size: 60px;
+  color: #ff3c88;
+  animation: bounce 1s infinite alternate ease-in-out;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-20px); }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 768px) {
+  .home-header h1 {
+    font-size: 2.3rem;
+  }
+
+  .figures-container img {
+    width: 100px;
+  }
+}

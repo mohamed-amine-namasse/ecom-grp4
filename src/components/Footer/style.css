@@ -4,8 +4,8 @@
   /* Positionnement et apparence */
   /*margin-top: auto; /* Pousse le footer vers le bas si .App est un flex-column */
   padding: 30px 0px;
-  background-color: #282c34; /* Couleur de fond sombre */
-  color: #f8f9fa; /* Texte blanc/gris clair */
+  background-color: white; /* Couleur de fond sombre */
+  color: black; /* Texte blanc/gris clair */
 }
 
 .footer-content {
@@ -29,18 +29,12 @@ nav.links {
   display: flex;
   flex-direction: column;
 }
-a {
-  color: white;
+.footer-container a {
+  color: black;
   text-decoration: none;
 }
 
-h3 {
-  color: white;
-  font-family: "Trebuchet MS"; /*a modifier*/
-  margin-bottom: 10px;
-}
-
-.hr_milieu {
+.hr-milieu {
   margin-left: 25%;
   margin-right: 25%;
   border: solid gray 1px;

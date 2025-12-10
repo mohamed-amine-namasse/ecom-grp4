@@ -1,6 +1,5 @@
-// src/components/Footer.jsx
-
 import React from "react";
+import { NavLink } from "react-router-dom";
 import "./style.css";
 
 function Footer() {
@@ -10,35 +9,59 @@ function Footer() {
       <div className="footer-content">
         <div className="container">
           <div>
-            <h3>Services</h3>
+            <h5>Entreprise</h5>
             <nav className="links">
-              <a href="#">Web design</a>
-              <a href="#">Development</a>
-              <a href="#">Hosting</a>
+              <NavLink
+                to="/about"
+                className={({ isActive }) =>
+                  isActive ? "footer-link active" : "footer-link"
+                }
+              >
+                A propos
+              </NavLink>
+              <NavLink
+                to="/terms"
+                className={({ isActive }) =>
+                  isActive ? "footer-link active" : "footer-link"
+                }
+              >
+                CGV/CGU
+              </NavLink>
             </nav>
           </div>
+
           <div>
-            <h3>La boutique</h3>
+            <h5>La boutique</h5>
             <nav className="links">
-              <a href="#">Company</a>
-              <a href="#">Team</a>
-              <a href="#">Careers</a>
+              <NavLink
+                to="/shop"
+                className={({ isActive }) =>
+                  isActive ? "footer-link active" : "footer-link"
+                }
+              >
+                La boutique
+              </NavLink>
             </nav>
           </div>
+
           <div>
-            <h3>Besoin d'aide </h3>
+            <h5>Besoin d'aide</h5>
             <nav className="links">
-              <a href="#">Awards</a>
-              <a href="#">Method</a>
-              <a href="#">Contact</a>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  isActive ? "footer-link active" : "footer-link"
+                }
+              >
+                Contact
+              </NavLink>
             </nav>
           </div>
         </div>
-        <hr className="hr_milieu"></hr>
-        <p>
-          &copy; {currentYear} Mon Blog WordPress / React. Tous droits
-          réservées.
-        </p>
+
+        <hr className="hr-milieu" />
+
+        <p>&copy; {currentYear} Foot Market. Tous droits réservés.</p>
       </div>
     </footer>
   );

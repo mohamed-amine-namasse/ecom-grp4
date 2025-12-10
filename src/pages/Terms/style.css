@@ -1,0 +1,18 @@
+/* ...existing code... */
+:root {
+  --pink-bg: #ffc1cc;
+  --card: #ffffff;
+  --accent: #ff5c9e;
+  --text: #222;
+  --muted: #6b6b6b;
+  --number: #000e8a;
+}
+
+.background {
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
+  padding: 25px;
+}
+
+.background a {
+  color: var(--number) !important;
+}

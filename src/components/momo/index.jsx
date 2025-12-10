@@ -4,22 +4,22 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-function ProductCards() {
+function Momo() {
   const products = [
     {
       title: "Nike Mercurial",
       description: "Crampons légers et rapides pour dominer le terrain.",
-      image: "images/unnamed (2).jpg",
+      image: "images/images1.jpg",
     },
     {
       title: "Adidas Predator",
       description: "Contrôle et puissance, le choix des champions.",
-      image: "images/crampons-unitedpack-2023-nike-800x800-c-center.jpeg",
+      image: "images/images2.jpg",
     },
     {
       title: "Puma Future",
-      description: "Agilité et confort pour vos mouvements les plus rapides.", 
-      image: "images/nike-présente-la-phantom-luna-une-nouvelle-chaussure-de-foot-pensée-pour-les-femmes.avif",
+      description: "Agilité et confort pour vos mouvements les plus rapides.",
+      image: "images/images3.jpg",
     },
     {
       title: "Nike Phantom",
@@ -31,14 +31,13 @@ function ProductCards() {
   return (
     <Row className="g-4">
       {products.map((product, index) => (
-        <Col xs={12} md={6} lg={3} key={index}>
+        <Col key={index}>
           <Card className="h-100 text-center">
             <Card.Img
               variant="top"
               src={product.image}
               style={{ height: "200px", objectFit: "cover" }}
             />
-            
           </Card>
         </Col>
       ))}
@@ -46,4 +45,4 @@ function ProductCards() {
   );
 }
 
-export default ProductCards;
+export default Momo;

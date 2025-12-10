@@ -62,7 +62,7 @@ function Shop() {
     materials: [],
   });
   const [totalProducts, setTotalProducts] = useState(0);
-  // --- NOUVEAUX ÉTATS POUR LA PAGINATION ---
+  // ---  ÉTATS POUR LA PAGINATION ---
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(12); // Nombre de produits affichés par page
   const [apiProducts, setApiProducts] = useState([]); // Pour stocker les 100 produits chargés initialement
@@ -160,7 +160,7 @@ function Shop() {
 
           price = isNaN(price) ? 0 : price;
           regularPrice = isNaN(regularPrice) ? 0 : regularPrice;
-          maxPrice = isNaN(maxPrice) ? 0 : maxPrice; // Correction de cohérence finale : S'assurer que regularPrice n'est jamais 0 // quand un prix est trouvé, ou qu'il n'est pas inférieur au prix de vente.
+          maxPrice = isNaN(maxPrice) ? 0 : maxPrice; // S'assurer que regularPrice n'est jamais 0 // quand un prix est trouvé, ou qu'il n'est pas inférieur au prix de vente.
 
           if (regularPrice === 0 && price > 0) {
             regularPrice = price;
@@ -218,8 +218,7 @@ function Shop() {
           };
         }); // Attendre que tous les appels API (variations) soient terminés
 
-        const formattedProducts = await Promise.all(productsPromises); // Calcul des options uniques (inchangé)
-
+        const formattedProducts = await Promise.all(productsPromises); // Calcul des options de filtrage
         const allMaterials = formattedProducts
           .map((p) => p.attributes.material)
           .filter((m) => m && String(m).trim() !== "");
@@ -267,7 +266,7 @@ function Shop() {
     };
 
     fetchProducts();
-  }, []); // 2. Fonction de filtrage principale (inchangé)
+  }, []); // 2. Fonction de filtrage principale
 
   const filteredProducts = useMemo(() => {
     if (products.length === 0) return [];
@@ -311,7 +310,7 @@ function Shop() {
 
     return workingProducts;
   }, [products, filters]);
-  // --- NOUVEAU useMemo pour extraire les produits de la page courante ---
+  // ---  useMemo pour extraire les produits de la page courante ---
   const paginatedProducts = useMemo(() => {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -484,8 +483,8 @@ function Shop() {
             );
           })}
 
-          {/* --- ZONE DE PAGINATION CORRIGÉE --- */}
-          {/* La pagination s'affiche uniquement s'il y a des produits filtrés ET plus d'une page */}
+          {/* --- ZONE DE PAGINATION  --- */}
+          {/* La pagination s'affiche uniquement si on trouve des produits via les filtres ET plus d'une page */}
           {filteredProducts.length > 0 && totalPages > 1 && (
             <Pagination
               productsPerPage={productsPerPage}

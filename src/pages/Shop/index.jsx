@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import "./style.css";
-
-function Shop() {
-  return (
-    <div className="shop-container">
-      <p>iiii</p>
-    </div>
-=======
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
@@ -506,7 +497,6 @@ function Shop() {
         </section>
       </div>
     </main>
->>>>>>> mohamed-amine
   );
 }
 

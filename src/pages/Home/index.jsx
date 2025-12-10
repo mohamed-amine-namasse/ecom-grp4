@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import "./style.css";
-
-function Home() {
-  return (
-    <div>
-      <p>ICI TA PAGE DACCUEIL!</p>
-    </div>
-=======
 import { useState, useEffect } from "react";
 import "./style.css";
 import Cards from "../../components/Cards";
@@ -121,7 +112,6 @@ function Home() {
         </div>
       </div>
     </>
->>>>>>> mohamed-amine
   );
 }
 

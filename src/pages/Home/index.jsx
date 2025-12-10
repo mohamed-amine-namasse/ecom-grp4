@@ -39,11 +39,10 @@ function Home() {
 
   return (
     <>
-      {/* Assurez-vous que ShoppingLoader utilise la classe .shopping-loader-overlay si vous voulez centrer le loader */}
       {isLoading && <ShoppingLoader isLoading={isLoading} />}
 
       <div
-        className="home-page border border-bottom-dark" // <-- Classe principale ajoutée ici
+        className="home-page border border-bottom-dark"
         style={{
           opacity: isLoading ? 0 : 1,
           transition: "opacity 0.5s ease-in-out",

@@ -1,0 +1,99 @@
+/* --- Conteneur Général --- */
+.shopping-loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #f8f8f8; /* Fond légèrement gris clair */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.5s ease-out; /* Pour le fondu de sortie */
+}
+
+/* Animation de Disparition (Fondu) */
+.shopping-loader-container.fade-out {
+  opacity: 0;
+  pointer-events: none; /* Empêche les clics une fois le fondu lancé */
+}
+
+/* --- Le Sac de Shopping --- */
+.shopping-bag {
+  position: relative;
+  width: 70px;
+  height: 80px;
+  margin-bottom: 30px;
+  /* Démarrer l'animation de translation de l'ensemble du sac */
+  animation: pulseBag 2s infinite ease-in-out;
+}
+
+/* Le Corps du Sac */
+.bag-body {
+  width: 100%;
+  height: 100%;
+  background-color: #3498db; /* Couleur vive, typique du web */
+  border-radius: 8px 8px 20px 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Les Poignées du Sac */
+.bag-handle {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 10px;
+  border: 5px solid #3498db;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  background-color: transparent;
+}
+
+/* L'Étiquette/L'Article à l'intérieur (Animation de Saut) */
+.item-tag {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 25px;
+  background-color: #e74c3c; /* Couleur d'accent (rouge/prix) */
+  border-radius: 2px;
+
+  /* Animation de saut de l'étiquette */
+  animation: tagJump 1.5s infinite ease-in-out;
+}
+
+/* --- Animations Keyframes --- */
+@keyframes tagJump {
+  0%,
+  100% {
+    transform: translate(-50%, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -20px) rotate(5deg); /* Monte et tourne légèrement */
+  }
+}
+
+@keyframes pulseBag {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05); /* Petite impulsion du sac */
+  }
+}
+
+/* Texte de chargement */
+.loading-message {
+  font-size: 1.1rem;
+  color: #333;
+  font-family: "Arial", sans-serif;
+  font-weight: 500;
+}

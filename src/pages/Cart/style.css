@@ -1,0 +1,208 @@
+.cart-container {
+  padding: 20px;
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
+}
+
+.cart-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.cart-empty-state {
+  text-align: center;
+  padding: 50px;
+  border: 1px dashed #ccc;
+  background-color: #f9f9f9;
+}
+
+/* Contenu principal (liste d'articles + récapitulatif) */
+.cart-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.cart-items-list {
+  flex-grow: 1;
+  min-width: 60%;
+}
+
+/* Carte d'un seul article */
+.cart-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.item-info {
+  flex: 2; /* Prend plus d'espace */
+}
+
+.item-name {
+  font-size: 1.2em;
+  margin: 0;
+}
+
+.item-price {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.item-quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-quantity {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background 0.2s;
+}
+
+.btn-quantity:hover {
+  background: #e0e0e0;
+}
+
+.item-subtotal {
+  flex: 1;
+  text-align: right;
+  font-weight: 500;
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  color: #cc0000;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 10px;
+  transition: color 0.2s;
+}
+
+.btn-remove:hover {
+  color: #ff0000;
+}
+
+/* --- Cart Summary (Récapitulatif) --- */
+.cart-summary {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  width: 100%;
+}
+
+.cart-summary h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.summary-line.total {
+  font-size: 1.2em;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.btn-checkout {
+  width: 100%;
+  padding: 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+}
+
+.btn-checkout:hover {
+  background-color: #0056b3;
+}
+
+/* Point de rupture pour Tablette/Desktop (ex: 992px) */
+@media (min-width: 992px) {
+  .cart-content {
+    flex-direction: row; /* Desktop : deux colonnes */
+    align-items: flex-start; /* Aligne en haut */
+  }
+
+  .cart-items-list {
+    /* Prend plus d'espace sur desktop */
+    flex: 3;
+  }
+
+  .cart-summary {
+    /* Prend moins d'espace, mais fixe */
+    flex: 1;
+    min-width: 300px;
+    position: sticky; /* Reste visible au défilement (optionnel) */
+    top: 20px;
+  }
+}
+
+/* ====================================================================== */
+/* 2. Style des cartes d'articles (cart-item-card) */
+/* ====================================================================== */
+
+.cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.cart-item-card {
+  display: flex;
+  flex-wrap: wrap; /* Permet aux éléments de passer à la ligne sur mobile */
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.item-info {
+  /* Sur mobile, prend toute la largeur */
+  flex-basis: 100%;
+  margin-bottom: 10px;
+}
+
+.item-name {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+/* Responsive pour les éléments internes de la carte */
+@media (min-width: 768px) {
+  .cart-item-card {
+    flex-wrap: nowrap; /* Plus de passage à la ligne sur desktop */
+  }
+  .item-info {
+    flex-basis: 30%; /* Laisse de la place pour les contrôles */
+    margin-bottom: 0;
+  }
+  .item-subtotal {
+    min-width: 120px;
+    text-align: right;
+  }
+}

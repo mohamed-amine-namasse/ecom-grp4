@@ -1,0 +1,60 @@
+/* Styles du conteneur de la vignette (in changés ou ajustés si besoin) */
+.thumbnail-card {
+  width: 20vw; /* Taille fixe */
+  height: fit-content;
+  margin-bottom: 70px;
+  background-color: #f0f0f0; /* Gardez le fond pour la carte elle-même */
+  border-radius: 8px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ⭐️ NOUVEAU STYLE POUR L'IMAGE ⭐️ */
+.thumbnail-image {
+  width: 100%; /* L'image prend toute la largeur du conteneur */
+  height: 100%; /* L'image prend toute la hauteur du conteneur */
+  display: block;
+
+  /* CLÉ : Comment l'image remplit l'espace */
+  /* 1. cover: L'image remplit tout l'espace, mais peut être coupée (souvent le meilleur choix ici).
+     2. fill: L'image remplit tout l'espace, mais peut être déformée.
+  */
+  object-fit: fill;
+
+  /* Supprimez les transformations ou ombres indésirables */
+  transform: none;
+  filter: none;
+}
+
+.thumbnail-card.selected {
+  border-color: #e3002b; /* Bordure rouge pour la sélection */
+  box-shadow: 0 0 10px rgba(227, 0, 43, 0.5);
+}
+/* =======================================================
+   MEDIA QUERIES pour la Réactivité (Petits Écrans / iPhone)
+   ======================================================= */
+
+@media (max-width: 575.98px) {
+  /* ... (autres règles d'optimisation mobile) ... */
+
+  /* Optimisation des vignettes (TAILLE FORCÉE) */
+  .thumbnail-list {
+    gap: 0.5rem !important; /* Réduit l'espace entre les vignettes */
+    padding: 0 5px !important; /* Réduit le padding du conteneur des vignettes */
+  }
+
+  /* On force la taille et on assure que le contenu image s'adapte */
+  .thumbnail-item {
+    width: 20px !important; /* Forcer la largeur sur 60px */
+    height: 20px !important; /* Forcer la hauteur sur 60px */
+    min-width: 20px !important;
+  }
+
+  /* Si l'image elle-même est le problème (rare si max-width: 100% est appliqué) */
+  .thumbnail-item img {
+    max-width: 40% !important;
+    max-height: 40% !important;
+  }
+}

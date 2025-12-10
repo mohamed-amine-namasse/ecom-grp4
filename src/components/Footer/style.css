@@ -3,9 +3,16 @@
 .footer-container {
   /* Positionnement et apparence */
   /*margin-top: auto; /* Pousse le footer vers le bas si .App est un flex-column */
+<<<<<<< HEAD
   padding: 30px 0px;
   background-color: #282c34; /* Couleur de fond sombre */
   color: #f8f9fa; /* Texte blanc/gris clair */
+=======
+
+  padding: 30px 0px;
+  background-color: white; /* Couleur de fond sombre */
+  color: black; /* Texte blanc/gris clair */
+>>>>>>> mohamed-amine
 }
 
 .footer-content {
@@ -29,6 +36,7 @@ nav.links {
   display: flex;
   flex-direction: column;
 }
+<<<<<<< HEAD
 a {
   color: white;
   text-decoration: none;
@@ -41,6 +49,14 @@ h3 {
 }
 
 .hr_milieu {
+=======
+.footer-container a {
+  color: black;
+  text-decoration: none;
+}
+
+.hr-milieu {
+>>>>>>> mohamed-amine
   margin-left: 25%;
   margin-right: 25%;
   border: solid gray 1px;

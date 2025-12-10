@@ -1,0 +1,27 @@
+/* Conteneur principal qui définit la zone d'affichage */
+.main-shoe-display-area {
+  /* Dimensions et centrage du conteneur (in changés) */
+
+  display: flex;
+  overflow: hidden;
+  /* Arrière-plan (supprimé pour un look plus épuré, ou ajustez selon vos besoins) */
+  background-color: transparent;
+  border-radius: 10px;
+}
+
+/* ⭐️ NOUVEAU STYLE DE L'IMAGE ⭐️ */
+.main-shoe-image {
+  /* L'image prend toute la largeur et la hauteur du conteneur */
+  height: 40%;
+  width: 40%;
+  display: block;
+
+  /* CLÉ : L'image remplit tout l'espace, potentiellement coupée mais pas d'espace vide */
+  object-fit: contain;
+
+  /* Suppression de tout effet visuel ou de positionnement */
+  transform: none;
+  filter: none;
+
+  transition: all 0.5s ease-in-out;
+}

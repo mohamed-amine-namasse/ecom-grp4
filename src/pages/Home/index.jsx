@@ -9,9 +9,9 @@ import Thumbnail from "../../components/Thumbnail";
 import { useCart } from "../../components/CartContext";
 
 const SHOE_DATA = [
-  { id: 1, name: "Beige & Maroon", imageURL: "/images/unnamed.jpg" },
-  { id: 2, name: "Tan & Black", imageURL: "/images/unnamed2.jpg" },
-  { id: 3, name: "Blue Trail", imageURL: "/images/unnamed3.jpg" },
+  { id: 1, name: "Beige & Maroon", imageURL: "/images/crampon1.jpg" },
+  { id: 2, name: "Tan & Black", imageURL: "/images/crampon2.jpg" },
+  { id: 3, name: "Blue Trail", imageURL: "/images/crampon3.jpg" },
 ];
 
 const API_URL =

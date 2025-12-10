@@ -126,12 +126,14 @@ function Cards() {
           pageRangeDisplayed={3}
           pageCount={pageCount}
           containerClassName="pagination"
-          activeClassName="active-page" // 👈 classe appliquée au numéro actif
+          activeClassName="active-page"
         />
       </div>
 
       {/* STYLE DE LA PAGINATION */}
       <style>{`
+      a{color:black;
+      text-decoration:none;}
         .pagination {
           display: flex;
           gap: 10px;
@@ -145,7 +147,7 @@ function Cards() {
           padding: 8px 12px;
           border-radius: 8px;
           transition: 0.2s ease;
-          border: 1px solid #ccc;
+          
         }
 
         .pagination li:hover {
@@ -158,6 +160,7 @@ function Cards() {
           color: white !important;
           border-color: #007bff !important;
         }
+          
       `}</style>
     </>
   );

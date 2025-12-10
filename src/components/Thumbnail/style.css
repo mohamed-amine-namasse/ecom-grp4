@@ -2,7 +2,7 @@
 .thumbnail-card {
   width: 20vw; /* Taille fixe */
   height: fit-content;
-  margin-bottom: 100px;
+  margin-bottom: 70px;
   background-color: #f0f0f0; /* Gardez le fond pour la carte elle-même */
   border-radius: 8px;
   border: 3px solid transparent;

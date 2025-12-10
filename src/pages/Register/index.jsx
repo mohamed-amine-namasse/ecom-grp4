@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { registerUserPublic } from "../../components/Api/";
+=======
+import { registerUserPublic } from "../../components/Api";
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
 import "./style.css";
 
 function Register() {
@@ -15,12 +19,16 @@ function Register() {
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const validate = () => {
+<<<<<<< HEAD
     if (
       !form.username ||
       !form.email ||
       !form.password ||
       !form.confirm_password
     ) {
+=======
+    if (!form.username || !form.email || !form.password || !form.confirm_password) {
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
       return "Tous les champs sont requis.";
     }
     if (!/\S+@\S+\.\S+/.test(form.email)) {
@@ -60,12 +68,18 @@ function Register() {
       let text = "Erreur d'inscription";
       if (err.response) {
         const data = err.response.data;
+<<<<<<< HEAD
         text =
           data?.message ||
           (typeof data === "string" ? data : JSON.stringify(data));
       } else if (err.request) {
         text =
           "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+=======
+        text = data?.message || (typeof data === "string" ? data : JSON.stringify(data));
+      } else if (err.request) {
+        text = "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
       } else {
         text = err.message;
       }
@@ -78,9 +92,13 @@ function Register() {
   return (
     <div className="form">
       <h1>Inscription</h1>
+<<<<<<< HEAD
       {message && (
         <div className={`alert alert-${message.type}`}>{message.text}</div>
       )}
+=======
+      {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
       <form onSubmit={onSubmit}>
         <div className="form-group">
           <input

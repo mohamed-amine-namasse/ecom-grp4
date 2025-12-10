@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router";
@@ -22,6 +23,17 @@ const Login = () => {
   // ----------------------------------------------------------------------
   // --- LOGIQUE DE GESTION DU FORMULAIRE ---
   // ----------------------------------------------------------------------
+=======
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../components/Api";
+import "./style.css";
+
+function Login() {
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+  const navigate = useNavigate();
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -32,14 +44,21 @@ const Login = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     const validationError = validate();
     if (validationError) {
       setMessage({ type: "danger", text: validationError });
+=======
+    const v = validate();
+    if (v) {
+      setMessage({ type: "error", text: v });
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
       return;
     }
 
     setLoading(true);
     setMessage(null);
+<<<<<<< HEAD
 
     try {
       // 1. Appel de l'API avec les données du formulaire
@@ -81,11 +100,41 @@ const Login = () => {
         text = err.message;
       }
       setMessage({ type: "danger", text });
+=======
+    try {
+      const data = await loginUser(form.username, form.password);
+      setMessage({ type: "success", text: data?.message || "Connexion réussie." });
+
+      // Stocker les données utilisateur
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("email", data.email);
+
+      // Redirection vers Shop après 1 seconde
+      setTimeout(() => {
+        navigate("/shop");
+      }, 1000);
+
+      setForm({ username: "", password: "" });
+    } catch (err) {
+      console.error(err);
+      let text = "Erreur de connexion";
+      if (err.response) {
+        const d = err.response.data;
+        text = d?.message || (typeof d === "string" ? d : JSON.stringify(d));
+      } else if (err.request) {
+        text = "Impossible de contacter le serveur. Vérifie l'URL de l'API, la configuration CORS et ta connexion.";
+      } else {
+        text = err.message;
+      }
+      setMessage({ type: "error", text });
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
     } finally {
       setLoading(false);
     }
   };
 
+<<<<<<< HEAD
   // ----------------------------------------------------------------------
   // --- RENDU ---
   // ----------------------------------------------------------------------
@@ -101,15 +150,30 @@ const Login = () => {
       <Form onSubmit={onSubmit}>
         <Form.Group className="form-group">
           <Form.Control
+=======
+  return (
+    <div className="form">
+      <h1>Connexion</h1>
+      {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+      <form onSubmit={onSubmit}>
+        <div className="form-group">
+          <input
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
             name="username"
             placeholder="Nom d'utilisateur ou email"
             value={form.username}
             onChange={onChange}
             required
           />
+<<<<<<< HEAD
         </Form.Group>
         <Form.Group className="form-group">
           <Form.Control
+=======
+        </div>
+        <div className="form-group">
+          <input
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
             name="password"
             type="password"
             placeholder="Mot de passe"
@@ -117,6 +181,7 @@ const Login = () => {
             onChange={onChange}
             required
           />
+<<<<<<< HEAD
         </Form.Group>
         <Button
           type="submit"
@@ -130,5 +195,15 @@ const Login = () => {
     </div>
   );
 };
+=======
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Connexion..." : "Se connecter"}
+        </button>
+      </form>
+    </div>
+  );
+}
+>>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
 
 export default Login;

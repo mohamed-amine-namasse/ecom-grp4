@@ -44,7 +44,7 @@ function Cart() {
               const isMaxQuantityReached =
                 isStockManaged && item.quantity >= item.stockQuantity;
 
-              // 🚨 LOGIQUE POUR RÉCUPÉRER ET AFFICHER LES OPTIONS
+              //  LOGIQUE POUR RÉCUPÉRER ET AFFICHER LES OPTIONS
               const optionsArray = [];
 
               if (item.selectedColor) {
@@ -60,7 +60,6 @@ function Cart() {
                 <article key={item.id} className="cart-item-card">
                   <div className="item-info">
                     <h2 className="item-name">{item.name}</h2>
-                    {/* 🚨 AFFICHAGE DES OPTIONS (COULEUR/POINTURE) */}
                     {optionsDisplay && (
                       <p className="item-options-info">{optionsDisplay}</p>
                     )}

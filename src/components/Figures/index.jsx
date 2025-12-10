@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
-
+import "./Figures.css"; // ← Import du CSS séparé
 
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
 
 const CONSUMER_KEY = "ck_89f4f1f6552d002670c02d923f080ae18083fc61";
 const CONSUMER_SECRET = "cs_075f8a5e20aed7a6a802834eab69795a5ac8da07";
-
 
 const FALLBACK_PRODUCTS = {
   nike: {
@@ -39,7 +38,6 @@ const FALLBACK_PRODUCTS = {
 };
 
 function Figures() {
- 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -51,7 +49,7 @@ function Figures() {
         const nike = await getProductByBrand("nike");
         const adidas = await getProductByBrand("adidas");
         const puma = await getProductByBrand("puma");
-        
+
         setProducts([
           nike || FALLBACK_PRODUCTS.nike,
           adidas || FALLBACK_PRODUCTS.adidas,
@@ -80,7 +78,6 @@ function Figures() {
         return null;
       }
       const products = await response.json();
-      console.log(brand, products);
       if (!Array.isArray(products) || products.length === 0) return null;
       return products[0];
     } catch (err) {
@@ -113,22 +110,18 @@ function Figures() {
     <Container>
       <Row>
         {products.map((product, index) => (
-          <Col key={index} className="text-center mb-3">
+          <Col key={index} className="figure-col">
             <img
+              className="figure-img"
               src={product?.images?.[0]?.src}
               alt={product?.name || "Produit"}
-              style={{
-                maxWidth: "100%",
-                height: "200px",
-                objectFit: "cover",
-                marginBottom: 8,
-              }}
             />
-            <h5>{product?.name || "Aucun produit trouvé"}</h5>
+            <h5 className="figure-title">{product?.name}</h5>
           </Col>
         ))}
       </Row>
     </Container>
   );
 }
+
 export default Figures;

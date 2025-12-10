@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
+import "./MonCarousel.css"; 
 
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
@@ -21,14 +22,14 @@ function MonCarousel() {
 
   return (
     <Carousel data-bs-theme="dark">
-      
       {products.map((product) => (
         <Carousel.Item key={product.id}>
           <img
+            className="carousel-image"
             src={product.images[0]?.src}
             alt={product.name}
-            style={{ width: "80%", height: "650px", objectFit: "cover" }}
           />
+
           <Carousel.Caption>
             <h5 dangerouslySetInnerHTML={{ __html: product.name }} />
             <p dangerouslySetInnerHTML={{ __html: product.price_html }} />

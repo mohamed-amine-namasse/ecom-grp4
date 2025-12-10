@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import "./style.css";
-
 import Cards from "../../components/Cards";
 import Figures from "../../components/Figures";
 import Momo from "../../components/Momo";
 import ShoppingLoader from "../../components/ShoppingLoader";
-
 import MainShoeDisplay from "../../components/MainShoeDisplay";
 import Thumbnail from "../../components/Thumbnail";
-
 import { useCart } from "../../components/CartContext";
 
 const SHOE_DATA = [
@@ -84,8 +81,6 @@ function Home() {
                     imageURL={shoe.imageURL}
                     isSelected={shoe.id === selectedShoe.id}
                     onSelect={handleShoeSelect}
-                    // IMPORTANT : Le composant Thumbnail doit utiliser les classes :
-                    // className={`thumbnail-item ${shoe.id === selectedShoe.id ? 'is-selected' : ''}`}
                   />
                 ))}
               </div>
@@ -114,7 +109,6 @@ function Home() {
           garantissant une finition d'une qualité exceptionnelle.
         </p>
         <div className="container-fluid mb-5">
-          {/* Si Momo est une bannière ou une section pleine largeur, assurez-vous qu'elle utilise .momo-banner */}
           <Momo />
         </div>
       </div>

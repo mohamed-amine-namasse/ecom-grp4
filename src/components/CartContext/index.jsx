@@ -106,7 +106,6 @@ export const CartProvider = ({ children }) => {
     });
   };
   const updateQuantity = (id, newQuantity) => {
-    // ... (Logique updateQuantity inchangée)
     setCartItems((prevItems) => {
       return prevItems.map((item) => {
         if (item.id === id) {
@@ -136,7 +135,7 @@ export const CartProvider = ({ children }) => {
   };
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  }; // ⭐️ NOUVELLE FONCTION : Vide complètement le panier et le localStorage ⭐️
+  }; //  Vider complètement le panier et le localStorage
   const clearCart = () => {
     setCartItems([]); // Vider l'état React
     localStorage.removeItem(CART_STORAGE_KEY); // Vider le Local Storage
@@ -159,7 +158,7 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     updateQuantity,
     removeFromCart,
-    clearCart, // ⬅️ EXPOSER LA NOUVELLE FONCTION
+    clearCart,
     cartTotal,
   };
 

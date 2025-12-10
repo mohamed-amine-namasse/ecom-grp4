@@ -57,13 +57,13 @@ function ProductDetail() {
   const [displayPrice, setDisplayPrice] = useState(null);
   const [displayRegularPrice, setDisplayRegularPrice] = useState(null);
 
-  // NOUVELLE FONCTION pour fermer le flash de stock
+  // FONCTION pour fermer le flash de stock
   const handleCloseStockFlash = () => {
     setShowStockFlash(false);
     setStockFlashMessage("");
   };
 
-  // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
+  // ---  ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
     reviewer_email: "",

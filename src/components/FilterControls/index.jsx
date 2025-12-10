@@ -21,7 +21,6 @@ const colorMap = {
   Vert: "#008000",
 };
 
-//   dynamicMarques comme prop pour les marques dynamiques
 function FilterControls({
   filters,
   onFilterChange,

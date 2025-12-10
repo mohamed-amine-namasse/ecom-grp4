@@ -70,7 +70,7 @@ function Terms() {
             <p>
               <b>Nature du Projet :</b> Le site web Foot Market est développé et
               exploité dans un cadre purement <b>académique</b> et
-              <b>pédagogique</b> . Il s'agit d'une{" "}
+              <b> pédagogique</b> . Il s'agit d'une{" "}
               <b>simulation de commerce électronique</b> et ne constitue en
               aucun cas une activité commerciale réelle.
             </p>

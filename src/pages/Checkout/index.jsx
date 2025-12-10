@@ -22,13 +22,13 @@ const stripePromise = loadStripe(
     "pk_test_51SaCaURpucHWGHGFLujFQb5NuwDLONlNeyaLq6Gj74vHNxJJhom8NbTZdEE6yZIrxCR3heI92DnJDphekVTJjxTz00pYKhG5M2"
 );
 
-// Base URL WordPress (mettre dans .env.local REACT_APP_WP_API_BASE)
+// Base URL WordPress
 const WP_API_BASE =
   process.env.REACT_APP_WP_API_BASE ||
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 
 // ******************************************************
-// ⭐ FONCTIONS DE VALIDATION ⭐
+//  FONCTIONS DE VALIDATION
 // ******************************************************
 
 const validatePostalCode = (code) => {
@@ -72,7 +72,7 @@ function Checkout() {
   const [validationErrors, setValidationErrors] = useState({
     postalCode: null, // null (non vérifié), true (valide), 'Error message' (invalide)
     phone: null,
-    email: null, // ⭐ AJOUT DE L'ÉTAT POUR L'EMAIL ⭐
+    email: null, //
   }); // useEffect pour pré-remplir l'email et initier la validation
 
   useEffect(() => {
@@ -128,7 +128,7 @@ function Checkout() {
 
       setValidationErrors((prev) => ({ ...prev, phone: error }));
     }
-    // ⭐ LOGIQUE DE VALIDATION EMAIL AJOUTÉE ⭐
+    //  VALIDATION EMAIL
     else if (name === "email") {
       const isValid = validateEmail(value);
       error =
@@ -142,7 +142,7 @@ function Checkout() {
     }
   };
 
-  // 🎯 NOUVELLE LOGIQUE : L'étape SHIPPING s'active si au moins un champ d'adresse est rempli, SANS compter l'email/phone.
+  //  L'étape SHIPPING s'active si au moins un champ d'adresse est rempli.
   const isShippingDataEntered = [
     shippingAddress.firstName,
     shippingAddress.lastName,
@@ -173,8 +173,7 @@ function Checkout() {
   const canProceedToPayment =
     isAllShippingFieldsFilled && isContactFilled && isValidationOk;
 
-  // 🚀 LOGIQUE DE COMMANDE (Paiement à la Livraison - COD) 🚀
-
+  //Paiement à la livraison
   const handlePlaceOrderWithCOD = async () => {
     if (!canProceedToPayment || cartItems.length === 0) {
       setPaymentMessage(
@@ -232,8 +231,8 @@ function Checkout() {
       setPaymentSuccess(false);
       setPaymentMessage(`Erreur réseau : ${err.message}`);
     }
-  }; // FIN LOGIQUE DE COMMANDE (COD)
-
+  };
+  // Finaliser paiement
   const handleFinalizeOrder = () => {
     navigate("/");
   };
@@ -270,7 +269,7 @@ function Checkout() {
       if (!stripe || !elements) {
         setStatus("Stripe non initialisé");
         return;
-      } // AJOUT DE LA VÉRIFICATION DU CODE POSTAL ET EMAIL DE FACTURATION
+      } //  VÉRIFICATION DU CODE POSTAL ET EMAIL DE FACTURATION
 
       if (!validatePostalCode(billing.postalCode)) {
         setStatus(
@@ -447,7 +446,7 @@ function Checkout() {
         <h1>CHECKOUT</h1>
         <div className="steps">
           <span className="active">INFORMATION</span>
-          {/* 🎯 CHANGEMENT ICI : utilise isShippingDataEntered */}
+
           <span className={isShippingDataEntered ? "completed" : ""}>
             SHIPPING
           </span>
@@ -460,7 +459,6 @@ function Checkout() {
         <div className="section">
           <h3>CONTACT INFO</h3>
           <div className="row">
-            {/* ⭐ INPUT EMAIL MIS À JOUR AVEC VALIDATION ⭐ */}
             <input
               type="email"
               placeholder="Email"
@@ -488,11 +486,11 @@ function Checkout() {
               }
             />
           </div>
-          {/* ⭐ MESSAGE D'ERREUR POUR L'EMAIL ⭐ */}
+
           {validationErrors.email && validationErrors.email !== true && (
             <p className="validation-error">❌ {validationErrors.email}</p>
           )}
-          {/* Message d'erreur pour le téléphone */}
+
           {validationErrors.phone && validationErrors.phone !== true && (
             <p className="validation-error">❌ {validationErrors.phone}</p>
           )}

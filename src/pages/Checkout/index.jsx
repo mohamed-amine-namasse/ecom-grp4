@@ -32,7 +32,6 @@ function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate(); // ⬅️ Utilisation pour la redirection
 
-  const subtotal = formatPrice(cartTotal || 0);
   const totalDisplay = formatPrice(cartTotal || 0);
 
   const [shippingAddress, setShippingAddress] = useState({

@@ -27,6 +27,10 @@ function Update() {
         const id = await fetchWordPressUserId(t);
         setUserId(id);
 
+        if (!validation.valid) {
+          setStatus("Session expirée. Veuillez vous reconnecter.");
+          return;
+        }
         const res = await fetch(`${WP_BASE}/wp/v2/users/${id}`, {
           headers: { Authorization: `Bearer ${t}` },
         });

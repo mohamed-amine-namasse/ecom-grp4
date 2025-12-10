@@ -7,11 +7,14 @@ import ShoppingLoader from "../../components/ShoppingLoader";
 import MainShoeDisplay from "../../components/MainShoeDisplay";
 import Thumbnail from "../../components/Thumbnail";
 import { useCart } from "../../components/CartContext";
+import imgfirst from "./crampon1.jpg";
+import imgsecond from "./crampon2.jpg";
+import imgthird from "./crampon3.jpg";
 
 const SHOE_DATA = [
-  { id: 1, name: "Beige & Maroon", imageURL: "/images/crampon1.jpg" },
-  { id: 2, name: "Tan & Black", imageURL: "/images/crampon2.jpg" },
-  { id: 3, name: "Blue Trail", imageURL: "/images/crampon3.jpg" },
+  { id: 1, name: "Beige & Maroon", imageURL: imgfirst },
+  { id: 2, name: "Tan & Black", imageURL: imgsecond },
+  { id: 3, name: "Blue Trail", imageURL: imgthird },
 ];
 
 const API_URL =

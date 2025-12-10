@@ -2,7 +2,7 @@
   "name": "ecom-grp4",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://mohamed-amine-namasse.students-laplateforme.io/FootMarket",
+  "homepage": "http://mohamed-amine-namasse.students-laplateforme.io/FootMarket/",
   "dependencies": {
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.5.3",

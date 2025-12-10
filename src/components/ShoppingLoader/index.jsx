@@ -1,4 +1,5 @@
 import React from "react";
+import loader from "./shoe.gif";
 import "./style.css";
 
 function ShoppingLoader({ isLoading }) {
@@ -13,7 +14,7 @@ function ShoppingLoader({ isLoading }) {
   return (
     <div className={loaderClass}>
       <img
-        src="/images/shoe.gif"
+        src={loader}
         alt="gif du loader"
         style={{ width: "30%", height: "30%", objectFit: "cover" }}
       />

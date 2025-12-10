@@ -2,6 +2,10 @@ import React from "react";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import pic1 from "./images1.jpg";
+import pic2 from "./images2.jpg";
+import pic3 from "./images3.jpg";
+import pic4 from "./images4.jpg";
 import "./style.css";
 
 function Momo() {
@@ -9,22 +13,22 @@ function Momo() {
     {
       title: "Nike Mercurial",
       description: "Crampons légers et rapides pour dominer le terrain.",
-      image: "images/images1.jpg",
+      image: pic1,
     },
     {
       title: "Adidas Predator",
       description: "Contrôle et puissance, le choix des champions.",
-      image: "images/images2.jpg",
+      image: pic2,
     },
     {
       title: "Puma Future",
       description: "Agilité et confort pour vos mouvements les plus rapides.",
-      image: "images/images3.jpg",
+      image: pic3,
     },
     {
       title: "Nike Phantom",
       description: "Précision et performance pour chaque frappe.",
-      image: "images/images4.jpg",
+      image: pic4,
     },
   ];
 

@@ -50,7 +50,7 @@ function Cards() {
 
   return (
     <>
-      <div className="cards-container">
+      <div className="cards-container2">
         {currentItems.map((p) => {
           const isHover = hoverId === p.id;
           const detailPath = `/product/${p.id}`;
@@ -58,7 +58,7 @@ function Cards() {
           return (
             <Card
               key={p.id}
-              className={`product-card ${isHover ? "hover" : ""}`}
+              className={`product-card2 ${isHover ? "hover" : ""}`}
               onMouseEnter={() => setHoverId(p.id)}
               onMouseLeave={() => setHoverId(null)}
             >

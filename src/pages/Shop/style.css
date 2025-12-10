@@ -267,7 +267,7 @@
 }
 
 @media (max-width: 576px) {
-  /* 4. Sur très petit écran, on passe à 1 seule colonne*/
+  /* 4. Sur très petit écran, on passe à 1 seule colonne */
   .products-grid {
     grid-template-columns: 1fr;
   }

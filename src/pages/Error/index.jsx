@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import "./style.css";
-
-function Error() {
-  return (
-    <div>
-      <p>Error 404</p>
-    </div>
-=======
 import React from "react";
 import { Link } from "react-router";
 import "../Contact/style.css";
@@ -41,7 +32,6 @@ function Error() {
         </p>
       </section>
     </main>
->>>>>>> mohamed-amine
   );
 }
 

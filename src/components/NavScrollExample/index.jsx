@@ -135,7 +135,7 @@ function NavScrollExample() {
       window.removeEventListener("storageUpdate", updateAuthFromStorage);
     };
   }, [updateAuthFromStorage]);
-  const { isAuthenticated, logout } = useAuth(); // ⬅️ Récupérer la fonction logout
+  const { logout } = useAuth(); // ⬅️ Récupérer la fonction logout
   const navigate = useNavigate();
   // Fonction de déconnexion
   const handleLogout = () => {

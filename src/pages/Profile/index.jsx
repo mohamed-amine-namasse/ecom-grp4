@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-// Assurez-vous que le chemin vers Api et AuthContext est correct
 import { validateStoredToken } from "../../components/Api";
 import { useAuth } from "../../components/AuthContext";
-// 🎯 Importez useMatch pour détecter la sous-route
-import { useMatch } from "react-router-dom";
-// 🎯 Importez le composant Orders
+import { useMatch } from "react-router-dom"; //  useMatch pour détecter la sous-route
 import Orders from "./orders";
 
 function Profile() {
@@ -19,7 +16,7 @@ function Profile() {
   const [message, setMessage] = useState(null);
   const [localLoading, setLocalLoading] = useState(true);
 
-  // 🔑 Détection de la route /profile/orders/:customerId
+  // Détection de la route /profile/orders/:customerId
   const isOrdersRoute = useMatch("/profile/orders/:customerId");
   // L'email peut être null si user est null
   const userEmail = user ? user.email : null;
@@ -70,7 +67,7 @@ function Profile() {
     );
   }
 
-  // 🔑 LOGIQUE CRITIQUE DE RENDU DE LA PAGE COMMANDES
+  //  LOGIQUE DE RENDU DE LA PAGE COMMANDES
   if (isOrdersRoute) {
     // 1. Vérifie si l'utilisateur est authentifié ET si l'e-mail est une chaîne non vide
     const isEmailReady =
@@ -94,7 +91,6 @@ function Profile() {
 
   return (
     <div className="page-wrapper">
-      {/* MENU LATÉRAL */}
       <div className="side-menu">
         <h2>Menu</h2>
         <ul>
@@ -102,7 +98,6 @@ function Profile() {
             <a href="/profile/update">Modification du profil</a>
           </li>
           <li>
-            {/* Le lien reste /profile/orders/0 comme demandé */}
             {user && user.id ? (
               <a href={`/profile/orders/0`}>Commandes (ID Client: {user.id})</a>
             ) : (
@@ -114,7 +109,6 @@ function Profile() {
         </ul>
       </div>
 
-      {/* 📝 FORMULAIRE DE PROFIL AJOUTÉ ICI */}
       <div className="form">
         <h1>Page de Profil</h1>
 
@@ -147,7 +141,6 @@ function Profile() {
           </form>
         )}
       </div>
-      {/* FIN DU FORMULAIRE */}
     </div>
   );
 }

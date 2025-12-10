@@ -16,7 +16,7 @@ function Update() {
   const [userId, setUserId] = useState(null);
 
   // --------------------------------------------------------
-  // 1️⃣ Charger infos utilisateur au chargement de la page
+  //  Charger infos utilisateur au chargement de la page
   // --------------------------------------------------------
   useEffect(() => {
     async function loadUser() {
@@ -50,7 +50,7 @@ function Update() {
   }, []);
 
   // --------------------------------------------------------
-  // 2️⃣ Update champs texte
+  // Update champs texte
   // --------------------------------------------------------
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -65,7 +65,7 @@ function Update() {
   }
 
   // --------------------------------------------------------
-  // 3️⃣ Sauvegarde des données utilisateur WP
+  //  Sauvegarde des données utilisateur WP
   // --------------------------------------------------------
   async function handleSubmit(e) {
     e.preventDefault();
@@ -103,7 +103,7 @@ function Update() {
   }
 
   // --------------------------------------------------------
-  // 4️⃣ Update du mot de passe WP
+  //  Update du mot de passe WP
   // --------------------------------------------------------
   async function handlePasswordSave(e) {
     e.preventDefault();

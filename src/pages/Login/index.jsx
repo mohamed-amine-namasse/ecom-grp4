@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router";
-
-// ⚠️ ASSUREZ-VOUS QUE LES CHEMINS CI-DESSOUS SONT CORRECTS
 import { loginUser } from "../../components/Api";
 import { useAuth } from "../../components/AuthContext";
 import { setAuthDataState } from "../../components/NavScrollExample";
-
 import "./style.css";
 
 /**
@@ -48,14 +45,10 @@ const Login = () => {
       // 1. Appel de l'API avec les données du formulaire
       const apiData = await loginUser(form.username, form.password);
 
-      // ⚠️ Pour utiliser l'API réelle, la ligne ci-dessous DOIT ÊTRE COMMENTÉE OU SUPPRIMÉE.
-      // const apiData = mockLoginData;
-
       // 2. Normalisation des données pour le Contexte
-      // Cette étape adapte la structure de l'objet API aux besoins de votre application (Profile.jsx).
+      // Cette étape adapte la structure de l'objet API aux besoins de (Profile.jsx).
       const normalizedUser = {
         token: apiData.token,
-        // Ces clés doivent être celles que Profile.jsx attend (username, email, id)
         username: apiData.user_display_name || apiData.user_nicename,
         email: apiData.user_email,
         id: apiData.customerId,
@@ -64,7 +57,7 @@ const Login = () => {
       // 3. Mise à jour du Contexte Global
       login(normalizedUser);
 
-      // 4. Mise à jour de la Navbar (mécanisme custom)
+      // 4. Mise à jour de la Navbar
       setAuthDataState(normalizedUser); // Mise à jour explicite du Local Storage pour la navbar
       window.dispatchEvent(new Event("storageUpdate"));
 

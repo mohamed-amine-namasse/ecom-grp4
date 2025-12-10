@@ -24,7 +24,7 @@ function Momo() {
     {
       title: "Nike Phantom",
       description: "Précision et performance pour chaque frappe.",
-      image: "images/nike2.jpg",
+      image: "images/images4.jpg",
     },
   ];
 

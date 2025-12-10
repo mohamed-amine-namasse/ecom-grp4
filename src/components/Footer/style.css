@@ -3,6 +3,7 @@
 .footer-container {
   /* Positionnement et apparence */
   /*margin-top: auto; /* Pousse le footer vers le bas si .App est un flex-column */
+
   padding: 30px 0px;
   background-color: white; /* Couleur de fond sombre */
   color: black; /* Texte blanc/gris clair */

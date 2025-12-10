@@ -1,0 +1,245 @@
+/* Fichier: style.css (CSS Complet pour la page Home) */
+
+/* --------------------
+   Variables Globales
+   -------------------- */
+:root {
+  --primary-color: #a52a2a; /* Marron foncé/Rouge Brique pour l'accentuation */
+  --secondary-color: #343a40; /* Gris foncé pour le texte principal */
+  --light-bg: #f8f9fa; /* Arrière-plan très clair */
+  --font-family-primary: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --box-shadow-light: 0 4px 8px rgba(0, 0, 0, 0.05);
+  --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --pink-bg: #f2e9e4; /* Couleur de fond personnalisée si vous utilisez un dégradé */
+}
+
+/* --------------------
+   Styles Généraux de la Page et Anti-Débordement
+   -------------------- */
+body,
+html {
+  overflow-x: hidden; /* Empêche le scrolling horizontal sur mobile */
+}
+
+.home-page {
+  font-family: var(--font-family-primary);
+  /* Utilisation du dégradé que vous avez défini, avec une valeur de repli si --pink-bg n'existe pas */
+  background: linear-gradient(50deg, var(--pink-bg, #ffffff), #ffc1cc);
+  color: var(--secondary-color);
+}
+
+/* --------------------
+   Header et Titres
+   -------------------- */
+.home-header {
+  padding: 40px 0;
+  background-color: var(--light-bg);
+  border-bottom: 1px solid #e9ecef;
+}
+
+.home-header h1 {
+  color: var(--primary-color);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.home-header .lead {
+  font-style: italic;
+  color: #6c757d;
+}
+
+.container h2 {
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color);
+  display: inline-block;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+}
+
+/* --------------------
+   Section SÉLECTION DE CHAUSSURES
+   -------------------- */
+.shoe-selector-container {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+/* Styles pour le réarrangement Responsive (Flexbox) */
+.shoe-content-wrapper {
+  display: flex; /* Active Flexbox */
+  flex-direction: column; /* Ordre par défaut (Mobile): Paragraphe puis Chaussures */
+}
+
+.shoe-description {
+  line-height: 1.6;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #495057;
+}
+
+/* Affichage Principal (Image) */
+/* Règle essentielle pour la réactivité des images */
+.shoe-display-block img,
+.main-shoe-display img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: var(--box-shadow-light);
+  transition: transform 0.3s ease;
+}
+
+.main-shoe-display img:hover {
+  transform: scale(1.02);
+}
+
+/* Liste des VIGNETTES (Thumbnails) */
+.thumbnail-list {
+  flex-wrap: wrap; /* Permet le retour à la ligne si nécessaire */
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.thumbnail-item {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--box-shadow-light);
+  opacity: 0.7;
+  box-sizing: border-box; /* Inclusion des bordures dans la taille */
+}
+
+.thumbnail-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnail-item:hover {
+  border-color: #adb5bd;
+  opacity: 1;
+}
+
+.thumbnail-item.is-selected {
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+  box-shadow: var(--box-shadow-hover);
+  opacity: 1;
+}
+
+/* --------------------
+   Sections de Contenu Général
+   -------------------- */
+.container p {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+/* --------------------
+   Loader (ShoppingLoader)
+   -------------------- */
+.shopping-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* --------------------
+   MOMO (Section Basse)
+   -------------------- */
+.container-fluid .momo-banner {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  margin-top: 50px;
+}
+
+/* =======================================================
+   MEDIA QUERIES pour la Réactivité (Grands Écrans)
+   ======================================================= */
+
+@media (min-width: 992px) {
+  /* Inversion de l'ordre pour GRAND ÉCRAN : Chaussures au-dessus du Paragraphe */
+  .shoe-content-wrapper {
+    flex-direction: column-reverse;
+  }
+
+  .shoe-description {
+    order: 2; /* S'assure que la description est en bas */
+  }
+
+  .shoe-display-block {
+    order: 1; /* S'assure que les chaussures sont en haut */
+  }
+}
+
+/* =======================================================
+   MEDIA QUERIES pour la Réactivité (Petits Écrans / iPhone)
+   ======================================================= */
+
+@media (max-width: 575.98px) {
+  /* ... (autres règles d'optimisation mobile) ... */
+
+  /* Optimisation des vignettes (TAILLE FORCÉE) */
+  .thumbnail-list {
+    gap: 0.5rem !important; /* Réduit l'espace entre les vignettes */
+    padding: 0 5px !important; /* Réduit le padding du conteneur des vignettes */
+  }
+
+  /* On force la taille et on assure que le contenu image s'adapte */
+  .thumbnail-item {
+    width: 20px !important; /* Forcer la largeur sur 60px */
+    height: 20px !important; /* Forcer la hauteur sur 60px */
+    min-width: 20px !important;
+  }
+
+  /* Si l'image elle-même est le problème (rare si max-width: 100% est appliqué) */
+  .thumbnail-item img {
+    max-width: 40% !important;
+    max-height: 40% !important;
+  }
+
+  /* ... (le reste de vos règles mobile) ... */
+  section.container,
+  section.shoe-selector-container {
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .home-header {
+    padding: 20px 0;
+  }
+
+  .home-header h1 {
+    font-size: 1.8rem !important;
+  }
+
+  .shoe-description {
+    text-align: left;
+    padding: 0 15px;
+    margin-bottom: 20px;
+  }
+}

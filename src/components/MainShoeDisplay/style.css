@@ -2,9 +2,7 @@
 .main-shoe-display-area {
   /* Dimensions et centrage du conteneur (in changés) */
 
-  width: 100%;
   display: flex;
-
   overflow: hidden;
   /* Arrière-plan (supprimé pour un look plus épuré, ou ajustez selon vos besoins) */
   background-color: transparent;
@@ -14,8 +12,8 @@
 /* ⭐️ NOUVEAU STYLE DE L'IMAGE ⭐️ */
 .main-shoe-image {
   /* L'image prend toute la largeur et la hauteur du conteneur */
-  height: 100%;
-  width: 100%;
+  height: 40%;
+  width: 40%;
   display: block;
 
   /* CLÉ : L'image remplit tout l'espace, potentiellement coupée mais pas d'espace vide */

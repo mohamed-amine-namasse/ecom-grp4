@@ -59,3 +59,14 @@
   color: white !important;
   border-color: #007bff !important;
 }
+
+.pagination a {
+  text-decoration: none;
+  color: black;
+}
+
+.pagination-wrapper {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}

@@ -84,9 +84,7 @@ function Cards() {
         })}
       </div>
 
-      <div
-        style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}
-      >
+      <div className="pagination-wrapper">
         <ReactPaginate
           breakLabel="..."
           nextLabel="Suivant >"

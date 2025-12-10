@@ -64,10 +64,9 @@ function Home() {
      
         <section className="shoe-selector-container container mt-5 mb-5">
           <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ea nemo,
-            esse laudantium reprehenderit numquam quae ut excepturi aliquid et
-            explicabo dolore odit unde est nam cumque eum minima facilis?
-            Perspiciatis!
+           Chez Foot Market, nous mettons à l’honneur les joueuses qui veulent aller plus loin, plus vite et plus fort. Découvrez une sélection de crampons spécialement conçus pour les femmes, alliant performance, confort et style sur tous les terrains.
+
+Que vous soyez débutante, passionnée ou joueuse confirmée, nous vous proposons des modèles adaptés à votre jeu : crampons pour terrain sec, synthétique, mouillé ou indoor. Notre mission : vous offrir l’équipement parfait pour exprimer tout votre potentiel.
           </p>
           <div>
            

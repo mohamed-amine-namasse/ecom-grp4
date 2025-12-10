@@ -1,13 +1,5 @@
 import logo from "./logo.svg";
 import "./App.css";
-<<<<<<< HEAD
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Error from "./pages/Error";
-import Shop from "./pages/Shop";
-<<<<<<< HEAD
-=======
 import NavScrollExample from "./components/NavScrollExample";
 
 import Footer from "./components/Footer";
@@ -28,29 +20,10 @@ import ProductDetail from "./pages/ProductDetail";
 import { CartProvider } from "./components/CartContext";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./components/AuthContext";
->>>>>>> mohamed-amine
-=======
-import Register from "./pages/Register";
-import Login from "./pages/Login";
->>>>>>> df38773b884cbb671207544995b44fc9f4d38aea
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 
 function App() {
   return (
-<<<<<<< HEAD
-    <Router>
-      <Navbar />
-
-      <Routes>
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/Register" element={<Register />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/" element={<Home />} />
-        <Route path="*" element={<Error />} />
-      </Routes>
-      <Footer />
-    </Router>
-=======
     <AuthProvider>
       <Router>
         <ScrollToTop />
@@ -78,7 +51,6 @@ function App() {
         <Footer />
       </Router>
     </AuthProvider>
->>>>>>> mohamed-amine
   );
 }
 

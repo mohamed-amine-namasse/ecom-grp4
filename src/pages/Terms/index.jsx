@@ -3,7 +3,7 @@ function Terms() {
   return (
     <div className="background">
       <h1 className="title-terms">
-        Conditions Générales d'utilisation / Conditions Générales de Vente
+        Conditions Générales d'utilisation/ Conditions Générales de Vente
         (CGU/CGV)
       </h1>
       <h2>Politique de confidentialité</h2>

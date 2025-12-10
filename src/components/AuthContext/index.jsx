@@ -1,8 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-// ⚠️ Assurez-vous que le chemin vers votre API est correct
 import { validateStoredToken } from "../Api";
 
-// Clé utilisée pour le Local Storage (doit correspondre à celle de NavScrollExample.js)
+// Clé utilisée pour le Local Storage
 const AUTH_STORAGE_KEY = "userAuth";
 
 // 1. Création du Contexte
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
 
     // 2. 🛑 Supprimer les données du Local Storage 🛑
-    // 🔑 CORRECTION : Utilisation de la clé AUTH_STORAGE_KEY pour la suppression.
+    //
     localStorage.removeItem(AUTH_STORAGE_KEY);
 
     // 3. (Crucial pour la Navbar) Déclencher l'événement de mise à jour du stockage
@@ -60,9 +59,7 @@ export const AuthProvider = ({ children }) => {
           const data = JSON.parse(storedAuth);
 
           // 🛑 VÉRIFICATION API : S'assurer que le token est valide
-          // Utilise la fonction importée.
-          // Note: Assurez-vous que validateStoredToken dans ../Api.js utilise le token
-          // de l'objet 'data' ou est adaptée pour valider le token de 'data'.
+
           await validateStoredToken(data.token);
 
           // Si le token est valide:
@@ -80,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      // 🛑 CECI EST LA LIGNE CRUCIALE : Assurer l'arrêt du chargement
+      //  Assurer l'arrêt du chargement
       setLoading(false);
     };
 
@@ -99,5 +96,4 @@ export const AuthProvider = ({ children }) => {
 // 4. Hook personnalisé pour utiliser le contexte
 export const useAuth = () => useContext(AuthContext);
 
-// Export par défaut (si vous utilisez le fournisseur directement)
 export default AuthProvider;

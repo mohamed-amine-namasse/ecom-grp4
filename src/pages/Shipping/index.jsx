@@ -24,7 +24,7 @@ function Shipping() {
 
     setLoading(true);
 
-    // 1. Point d'accès corrigé : cibler une commande spécifique par son ID (orderId)
+    // 1. cibler une commande spécifique par son ID (orderId)
     // 2. Les clés doivent être dans l'URL pour la méthode GET
     const ORDER_API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/orders/${orderId.trim()}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
 
@@ -82,7 +82,7 @@ function Shipping() {
               name="orderId"
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
-              placeholder="Ex. 123" // Exemple d'ID de commande
+              placeholder="Ex. 123"
             />
           </label>
 
@@ -114,7 +114,7 @@ function Shipping() {
                   {orderData.billing.last_name} ({orderData.billing.email})
                 </li>
               )}
-              {/* Vous pouvez ajouter plus de détails ici, par exemple la liste des produits */}
+
               {orderData.line_items && orderData.line_items.length > 0 && (
                 <li>
                   **Articles :**

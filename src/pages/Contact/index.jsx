@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import "./style.css";
 
 function Contact() {
-  // 1. Mise à jour de l'état pour inclure 'subject'
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,7 +11,6 @@ function Contact() {
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ⚠️ TRÈS IMPORTANT : Configurez ces variables
   const WORDPRESS_URL =
     "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
   const FORM_ID = 371;
@@ -31,27 +29,27 @@ function Contact() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // 1. Validation de base côté client (Ajout de la validation 'subject')
+    // Validation de base côté client (Ajout de la validation 'subject')
     if (isLoading) return;
     if (!form.name.trim()) return setStatus("Veuillez indiquer votre nom.");
     if (!validEmail(form.email)) return setStatus("Email invalide.");
-    if (!form.subject.trim()) return setStatus("Veuillez indiquer l'objet."); // <-- NOUVEAU
+    if (!form.subject.trim()) return setStatus("Veuillez indiquer l'objet.");
     if (!form.message.trim()) return setStatus("Veuillez écrire un message.");
 
-    // 2. Préparation et envoi
+    // Préparation et envoi
     setIsLoading(true);
     setStatus("Envoi en cours…");
 
     const formData = new FormData();
 
-    // 3. Ajout du champ 'subject' à l'objet FormData
-    // La clé CF7 par défaut pour l'objet est 'your-subject'
+    // Ajout des champs name,email,subject,message à l'objet FormData
+
     formData.append("your-name", form.name);
     formData.append("your-email", form.email);
-    formData.append("your-subject", form.subject); // <-- NOUVEAU
+    formData.append("your-subject", form.subject);
     formData.append("your-message", form.message);
 
-    // Champs de sécurité CF7 (inchangés)
+    // Champs de sécurité CF7
     formData.append("_wpcf7_unit_tag", `wpcf7-f${FORM_ID}-p0-o1`);
     formData.append("_wpcf7_form_scan_tests", "");
     formData.append("_wpcf7_submit", "1");
@@ -66,7 +64,7 @@ function Contact() {
 
       if (result.status === "mail_sent") {
         setStatus("✅ Merci, votre message a bien été envoyé !");
-        setForm({ name: "", email: "", subject: "", message: "" }); // Réinitialisation de 'subject'
+        setForm({ name: "", email: "", subject: "", message: "" });
       } else if (result.status === "validation_failed") {
         const errorMessages = result.invalid_fields
           .map((field) => field.message)
@@ -112,11 +110,10 @@ function Contact() {
           />
         </label>
 
-        {/* NOUVEAU CHAMP OBJET */}
         <label>
           Objet
           <input
-            name="subject" // <-- IMPORTANT : name="subject" pour correspondre à l'état
+            name="subject"
             value={form.subject}
             onChange={handleChange}
             disabled={isLoading}

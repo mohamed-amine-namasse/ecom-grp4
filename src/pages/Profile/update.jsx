@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { validateStoredToken, fetchWordPressUserId } from "../../components/Api";
+import {
+  validateStoredToken,
+  fetchWordPressUserId,
+} from "../../components/Api";
 import "./style.css";
 const WP_BASE =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json";
@@ -13,7 +16,7 @@ function Update() {
   const [userId, setUserId] = useState(null);
 
   // --------------------------------------------------------
-  // 1️⃣ Charger infos utilisateur au chargement de la page
+  //  Charger infos utilisateur au chargement de la page
   // --------------------------------------------------------
   useEffect(() => {
     async function loadUser() {
@@ -27,10 +30,6 @@ function Update() {
         const id = await fetchWordPressUserId(t);
         setUserId(id);
 
-        if (!validation.valid) {
-          setStatus("Session expirée. Veuillez vous reconnecter.");
-          return;
-        }
         const res = await fetch(`${WP_BASE}/wp/v2/users/${id}`, {
           headers: { Authorization: `Bearer ${t}` },
         });
@@ -51,7 +50,7 @@ function Update() {
   }, []);
 
   // --------------------------------------------------------
-  // 2️⃣ Update champs texte
+  // Update champs texte
   // --------------------------------------------------------
   function handleChange(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -66,13 +65,14 @@ function Update() {
   }
 
   // --------------------------------------------------------
-  // 3️⃣ Sauvegarde des données utilisateur WP
+  //  Sauvegarde des données utilisateur WP
   // --------------------------------------------------------
   async function handleSubmit(e) {
     e.preventDefault();
 
     if (!form.nom.trim()) return setStatus("Veuillez indiquer votre nom.");
-    if (!form.prenom.trim()) return setStatus("Veuillez indiquer votre prénom.");
+    if (!form.prenom.trim())
+      return setStatus("Veuillez indiquer votre prénom.");
     if (!validEmail(form.email)) return setStatus("Email invalide.");
 
     setStatus("Mise à jour…");
@@ -90,7 +90,7 @@ function Update() {
           email: form.email,
         }),
       });
-      
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
@@ -103,7 +103,7 @@ function Update() {
   }
 
   // --------------------------------------------------------
-  // 4️⃣ Update du mot de passe WP
+  //  Update du mot de passe WP
   // --------------------------------------------------------
   async function handlePasswordSave(e) {
     e.preventDefault();
@@ -207,7 +207,11 @@ function Update() {
             </label>
 
             <div className="actions" style={{ marginTop: 8 }}>
-              <button type="button" className="btn" onClick={handlePasswordSave}>
+              <button
+                type="button"
+                className="btn"
+                onClick={handlePasswordSave}
+              >
                 Sauvegarder le mot de passe
               </button>
             </div>

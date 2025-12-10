@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./style.css";
 import FilterControls from "../../components/FilterControls";
+import Pagination from "../../components/Pagination";
 import { Link } from "react-router";
 
 // ----------------------------------------------------------------------
@@ -61,8 +62,13 @@ function Shop() {
     materials: [],
   });
   const [totalProducts, setTotalProducts] = useState(0);
-
+  // ---  ÉTATS POUR LA PAGINATION ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(12); // Nombre de produits affichés par page
+  const [apiProducts, setApiProducts] = useState([]); // Pour stocker les 100 produits chargés initialement
+  // ------------------------------------------
   const handleFilterChange = (filterName, value) => {
+    setCurrentPage(1);
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
@@ -70,6 +76,7 @@ function Shop() {
   };
 
   const handleResetFilters = () => {
+    setCurrentPage(1);
     setFilters(initialFilters);
   };
 
@@ -153,7 +160,7 @@ function Shop() {
 
           price = isNaN(price) ? 0 : price;
           regularPrice = isNaN(regularPrice) ? 0 : regularPrice;
-          maxPrice = isNaN(maxPrice) ? 0 : maxPrice; // Correction de cohérence finale : S'assurer que regularPrice n'est jamais 0 // quand un prix est trouvé, ou qu'il n'est pas inférieur au prix de vente.
+          maxPrice = isNaN(maxPrice) ? 0 : maxPrice; // S'assurer que regularPrice n'est jamais 0 // quand un prix est trouvé, ou qu'il n'est pas inférieur au prix de vente.
 
           if (regularPrice === 0 && price > 0) {
             regularPrice = price;
@@ -211,8 +218,7 @@ function Shop() {
           };
         }); // Attendre que tous les appels API (variations) soient terminés
 
-        const formattedProducts = await Promise.all(productsPromises); // Calcul des options uniques (inchangé)
-
+        const formattedProducts = await Promise.all(productsPromises); // Calcul des options de filtrage
         const allMaterials = formattedProducts
           .map((p) => p.attributes.material)
           .filter((m) => m && String(m).trim() !== "");
@@ -260,7 +266,7 @@ function Shop() {
     };
 
     fetchProducts();
-  }, []); // 2. Fonction de filtrage principale (inchangé)
+  }, []); // 2. Fonction de filtrage principale
 
   const filteredProducts = useMemo(() => {
     if (products.length === 0) return [];
@@ -304,7 +310,18 @@ function Shop() {
 
     return workingProducts;
   }, [products, filters]);
+  // ---  useMemo pour extraire les produits de la page courante ---
+  const paginatedProducts = useMemo(() => {
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    return filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  }, [filteredProducts, currentPage, productsPerPage]);
 
+  // Calcul du nombre total de pages
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Fonction pour changer de page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   if (isLoading) {
     return (
       <main className="shop-container loading-state">
@@ -333,12 +350,14 @@ function Shop() {
   return (
     <main className="shop-container">
       <header className="shop-header">
-        <h1>Boutique</h1>
-        <p className="total-products-count">
-          {totalProducts > 0
-            ? `Total des produits: ${totalProducts} `
-            : "Aucun produit trouvé sur WooCommerce."}
-        </p>
+        <div className="d-flex align-items-center mt-3  ">
+          <h1 className="px-3">Boutique</h1>
+          <p className="total-products-count">
+            {totalProducts > 0
+              ? `Total des produits: ${totalProducts} `
+              : "Aucun produit trouvé sur WooCommerce."}
+          </p>
+        </div>
       </header>
 
       <div className="shop-layout">
@@ -360,68 +379,121 @@ function Shop() {
             {filteredProducts.length > 1 ? "s" : ""} correspondent à vos
             filtres.
           </p>
+          {/* Affiche le message s'il n'y a aucun résultat FILTRÉ */}
           {filteredProducts.length === 0 && (
             <p className="no-results">
               Aucun produit ne correspond à vos critères de recherche.
             </p>
           )}
-          {filteredProducts.map((prod) => {
+
+          {/* IMPORTANT : Utilisation de paginatedProducts pour l'affichage */}
+          {paginatedProducts.map((prod) => {
             const isOutOfStock = prod.stock_status === "outofstock";
             const productLink = `/product/${prod.id}`;
             const isVariable = prod.type === "variable";
             const hasPriceRange =
               isVariable &&
               prod.price !== prod.maxPrice &&
-              prod.maxPrice > prod.price; // VRAIE condition de promotion: Le prix de vente est strictement inférieur au prix régulier
+              prod.maxPrice > prod.price;
 
             const isOnSale = prod.price < prod.regularPrice;
 
             return (
               <article className="product-card" key={prod.id}>
-                <div className="product-media">
-                  <Link to={productLink} className="product-image-link">
-                    <img src={prod.image} alt={prod.name} />
-                  </Link>
-
-                  {isOutOfStock && (
-                    <div className="product-badge out-of-stock">
-                      Rupture de Stock
-                    </div>
-                  )}
-                </div>
-
-                <div className="product-body">
-                  <h3 className="product-title">
-                    <Link className="text-dark " to={productLink}>
-                      {prod.name}
+                <div itemScope itemType="https://schema.org/Product">
+                  <div className="product-media">
+                    <Link to={productLink} className="product-image-link">
+                      <img itemProp="image" src={prod.image} alt={prod.name} />
                     </Link>
-                  </h3>
-                  {prod.desc && prod.desc.trim() && (
-                    <p className="product-desc">{prod.desc}</p>
-                  )}
-                  <div className="product-footer">
-                    <div className="flex">
-                      {/* Affichage du prix régulier barré SI le produit est en promotion */}
-                      {isOnSale && (
-                        <span className="product-price old-price">
-                          {formatPrice(prod.regularPrice)}
-                        </span>
-                      )}
-                      {/* Prix actuel (prix de vente ou prix régulier) */}
-                      <span className="product-price current-price">
-                        {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
-                        {hasPriceRange && !isOnSale
-                          ? `${formatPrice(prod.price)} - ${formatPrice(
-                              prod.maxPrice
-                            )}`
-                          : formatPrice(prod.price)}
-                      </span>
+
+                    {isOutOfStock && (
+                      <div className="product-badge out-of-stock">
+                        Rupture de Stock
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="product-body">
+                    <h3 itemProp="name" className="product-title">
+                      <Link className="text-dark " to={productLink}>
+                        {prod.name}
+                      </Link>
+                    </h3>
+                    {prod.desc && prod.desc.trim() && (
+                      <p className="product-desc">{prod.desc}</p>
+                    )}
+                    <div className="product-footer">
+                      <div className="flex">
+                        {/* Affichage du prix régulier barré SI le produit est en promotion */}
+                        {isOnSale && (
+                          <div
+                            itemProp="offers"
+                            itemScope
+                            itemType="https://schema.org/Offer"
+                          >
+                            <span
+                              itemProp="price"
+                              className="product-price old-price"
+                            >
+                              {formatPrice(prod.regularPrice)}
+                            </span>
+                            <meta
+                              itemProp="availability"
+                              content={
+                                prod.stock_status === "instock"
+                                  ? "https://schema.org/InStock"
+                                  : "https://schema.org/OutOfStock"
+                              }
+                            />
+                            <meta itemProp="priceCurrency" content="EUR" />
+                          </div>
+                        )}
+                        {/* Prix actuel (prix de vente ou prix régulier) */}
+                        <div
+                          itemProp="offers"
+                          itemScope
+                          itemType="https://schema.org/Offer"
+                        >
+                          <span
+                            itemProp="price"
+                            className="product-price current-price"
+                          >
+                            {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
+                            {hasPriceRange && !isOnSale
+                              ? `${formatPrice(prod.price)} - ${formatPrice(
+                                  prod.maxPrice
+                                )}`
+                              : formatPrice(prod.price)}
+                          </span>
+                          <meta
+                            itemProp="availability"
+                            content={
+                              prod.stock_status === "instock"
+                                ? "https://schema.org/InStock"
+                                : "https://schema.org/OutOfStock"
+                            }
+                          />
+                          <meta itemProp="priceCurrency" content="EUR" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </article>
             );
           })}
+
+          {/* --- ZONE DE PAGINATION  --- */}
+          {/* La pagination s'affiche uniquement si on trouve des produits via les filtres ET plus d'une page */}
+          {filteredProducts.length > 0 && totalPages > 1 && (
+            <Pagination
+              productsPerPage={productsPerPage}
+              totalProducts={filteredProducts.length}
+              paginate={paginate}
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          )}
         </section>
       </div>
     </main>

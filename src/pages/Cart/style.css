@@ -1,12 +1,14 @@
 .cart-container {
   padding: 20px;
-  background-color: #ffc1cc;
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
 }
 
 .cart-container h1 {
   text-align: center;
   margin-bottom: 30px;
-  font-size: 2.5em;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
 .cart-empty-state {

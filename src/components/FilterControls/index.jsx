@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-// Assurez-vous d'avoir ce fichier de style ou d'intégrer le CSS dans votre feuille de style globale
 import "./style.css";
 
 // --- OPTIONS DE DÉMONSTRATION ---
-// En production, ces listes devraient être générées DYNAMIQUEMENT.
+
 const DUMMY_OPTIONS = {
   colors: ["Noir", "Rouge", "Blanc", "Marron", "Bleu", "Vert"],
   sizes: [35, 36, 37, 38, 39, 40, 41, 42],
-  // Marques statiques laissées ici pour référence, mais non utilisées pour le rendu final
   marques: ["Adidas", "Nike", "Puma"],
   surfaces: ["Gazon Naturel", "Synthétique", "Intérieur", "Terre Battue"],
   materials: ["Cuir", "Synthétique", "Tissu"],
@@ -23,7 +21,6 @@ const colorMap = {
   Vert: "#008000",
 };
 
-// ⭐️ AJOUT DE dynamicMarques comme prop pour les marques dynamiques ⭐️
 function FilterControls({
   filters,
   onFilterChange,
@@ -31,7 +28,6 @@ function FilterControls({
   maxShopPrice,
   dynamicMarques,
   dynamicSizes,
-  dynamicMaterials,
 }) {
   // Valeur maximale du curseur : utilise la prop dynamique, sinon une valeur par défaut.
   const priceMax = maxShopPrice || DUMMY_OPTIONS.priceMax;
@@ -103,7 +99,7 @@ function FilterControls({
       {/* --- BOUTON DE RÉINITIALISATION (Haut) --- */}
       <div className="d-grid mb-3">
         <button
-          className="btn btn-sm btn-outline-dark"
+          className="btn btn-sm btn-dark"
           onClick={handleFullReset}
           type="button"
         >
@@ -120,7 +116,7 @@ function FilterControls({
           <input
             type="range"
             min="0"
-            // ⭐️ UTILISATION DE LA VALEUR DYNAMIQUE ⭐️
+            //  UTILISATION DE LA VALEUR DYNAMIQUE
             max={priceMax}
             step="10"
             className="form-range"
@@ -133,9 +129,7 @@ function FilterControls({
       {/* 2. FILTRE TAILLE/POINTURE */}
       <FilterSection title="Taille / Pointure" name="sizes">
         <div className="d-flex flex-wrap gap-2 p-2">
-          {/* ⚠️ C'est ici que dynamicSizes doit être utilisé ! */}
           {(dynamicSizes || []).map((size) => {
-            // Utilisez dynamicSizes
             const isSelected = (filters.size || []).includes(String(size));
             return (
               <button
@@ -154,7 +148,6 @@ function FilterControls({
       <FilterSection title="Couleur" name="colors">
         <div className="d-flex flex-wrap gap-2 p-2 color-swatches">
           {DUMMY_OPTIONS.colors.map((color) => {
-            // ✅ Sécurisation avec || []
             const isSelected = (filters.color || []).includes(color);
             return (
               <div
@@ -202,7 +195,6 @@ function FilterControls({
       <FilterSection title="Matière" name="materials">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.materials.map((material) => {
-            // ✅ Sécurisation avec || []
             const isSelected = (filters.material || []).includes(material);
             return (
               <button
@@ -232,7 +224,7 @@ function FilterControls({
           >
             <option value="">Toutes les marques</option>
 
-            {/* ⭐️ UTILISATION ET SÉCURISATION DES MARQUES DYNAMIQUES ⭐️ */}
+            {/* UTILISATION ET SÉCURISATION DES MARQUES DYNAMIQUES  */}
             {/* dynamicMarques devrait toujours être un tableau ([] en initial) venant de Shop.jsx */}
             {(dynamicMarques || []).map((marque) => (
               <option key={marque} value={marque}>
@@ -247,7 +239,6 @@ function FilterControls({
       <FilterSection title="Surface" name="surfaces">
         <div className="d-flex flex-wrap gap-2 p-2">
           {DUMMY_OPTIONS.surfaces.map((surface) => {
-            // ✅ Sécurisation avec || []
             const isSelected = (filters.surface || []).includes(surface);
             return (
               <button

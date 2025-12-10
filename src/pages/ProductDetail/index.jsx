@@ -15,7 +15,7 @@ const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
 const formatPrice = (p) =>
   p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 
-// Nouveau composant : Affiche les étoiles de notation
+//  Affiche les étoiles de notation
 const RatingStars = ({ rating }) => {
   // Crée un tableau de 5 éléments. Remplit les X premières avec une étoile pleine (★) et le reste avec une étoile vide (☆).
   const fullStars = Math.round(rating);
@@ -53,17 +53,17 @@ function ProductDetail() {
   const [showStockFlash, setShowStockFlash] = useState(false);
   const [stockFlashMessage, setStockFlashMessage] = useState("");
 
-  // ⭐️ ÉTATS POUR LE PRIX D'AFFICHAGE (DYNAMIQUE) ⭐️
+  //  ÉTATS POUR LE PRIX D'AFFICHAGE (DYNAMIQUE)
   const [displayPrice, setDisplayPrice] = useState(null);
   const [displayRegularPrice, setDisplayRegularPrice] = useState(null);
 
-  // NOUVELLE FONCTION pour fermer le flash de stock
+  // FONCTION pour fermer le flash de stock
   const handleCloseStockFlash = () => {
     setShowStockFlash(false);
     setStockFlashMessage("");
   };
 
-  // --- NOUVEAUX ÉTATS POUR LE FORMULAIRE D'AVIS ---
+  // ---  ÉTATS POUR LE FORMULAIRE D'AVIS ---
   const [reviewForm, setReviewForm] = useState({
     reviewer: "",
     reviewer_email: "",
@@ -123,7 +123,7 @@ function ProductDetail() {
     const quantityToAdd = Math.max(1, parseInt(quantity, 10));
 
     if (product) {
-      // 🚀 Utiliser la variation sélectionnée pour le stock et l'ID
+      //  Utiliser la variation sélectionnée pour le stock et l'ID
       const stockSource = selectedVariation || product;
 
       // Vérification des sélections obligatoires
@@ -160,7 +160,7 @@ function ProductDetail() {
       const maxStock = stockSource.stock_quantity;
       const manageStock = stockSource.manage_stock;
 
-      // 🚀 VÉRIFICATION DE LA QUANTITÉ MAXIMALE
+      //  VÉRIFICATION DE LA QUANTITÉ MAXIMALE
       if (manageStock && maxStock !== null && quantityAfterAdd > maxStock) {
         // Cas d'erreur : stock dépassé
         let message = `Vous ne pouvez pas ajouter cette quantité dans le panier.`;
@@ -179,14 +179,14 @@ function ProductDetail() {
 
       // Si le stock est suffisant (ou non géré), continuer l'ajout
       const itemToAdd = {
-        // ⭐️ UTILISER L'ID DE LA VARIATION SI DISPONIBLE ⭐️
+        //  UTILISER L'ID DE LA VARIATION SI DISPONIBLE
         id: stockSource.id,
         // Créer un nom plus précis pour le panier
         name:
           product.name +
           (selectedColor ? ` - ${selectedColor}` : "") +
           (selectedSize ? ` / ${selectedSize}` : ""),
-        // ⭐️ UTILISER LE PRIX D'AFFICHAGE ACTUEL ⭐️
+        //  UTILISER LE PRIX D'AFFICHAGE ACTUEL
         price: displayPrice || product.price,
         // Utiliser l'image de la variation si elle existe
         image:
@@ -207,7 +207,7 @@ function ProductDetail() {
     }
   };
 
-  // NOUVEAU : Fonction pour fermer le flash manuellement
+  // Fonction pour fermer le flash manuellement
   const handleCloseFlash = () => {
     setShowFlash(false);
   };
@@ -225,7 +225,7 @@ function ProductDetail() {
       return;
     }
 
-    // 🔑 LOGIQUE CRUCIALE : DÉTERMINATION DU NOM ET DE L'EMAIL À ENVOYER 🔑
+    //  LOGIQUE CRUCIALE : DÉTERMINATION DU NOM ET DE L'EMAIL À ENVOYER
 
     // 1. Détermination du Nom (Reviewer)
     const reviewerNameToSend =
@@ -255,7 +255,7 @@ function ProductDetail() {
           body: JSON.stringify({
             product_id: id,
             review: reviewForm.review,
-            // ⭐️ UTILISER LES VALEURS DÉTERMINÉES CI-DESSUS ⭐️
+            //  UTILISER LES VALEURS DÉTERMINÉES CI-DESSUS
             reviewer: reviewerNameToSend,
             reviewer_email: reviewerEmailToSend,
             rating: reviewForm.rating,
@@ -316,7 +316,7 @@ function ProductDetail() {
           if (variationsResponse.ok) {
             variationsData = await variationsResponse.json();
             setProductVariations(variationsData);
-            // 🚨 VÉRIFICATION DE LA LISTE COMPLÈTE 🚨
+            //  VÉRIFICATION DE LA LISTE COMPLÈTE
             console.log(
               "Variations complètes chargées:",
               variationsData.map((v) => ({
@@ -339,7 +339,7 @@ function ProductDetail() {
           setSelectedVariation(defaultVariation);
         }
 
-        // ⭐️ DÉTERMINATION DES PRIX INITIAUX ⭐️
+        //  DÉTERMINATION DES PRIX INITIAUX
         let initialPrice = 0;
         let initialRegularPrice = 0;
 
@@ -358,7 +358,7 @@ function ProductDetail() {
           initialRegularPrice = parseFloat(data.regular_price) || 0;
         }
 
-        // ⭐️ DÉFINIR LE PRIX INITIAL DYNAMIQUE ⭐️
+        //  DÉFINIR LE PRIX INITIAL DYNAMIQUE
         setDisplayPrice(initialPrice);
         setDisplayRegularPrice(initialRegularPrice);
 
@@ -408,7 +408,7 @@ function ProductDetail() {
             options: attr.options.join(", "),
           }));
 
-        // 🚨 LOGIQUE POUR EXTRAIRE LES OPTIONS DE COULEUR/TAILLE
+        //  LOGIQUE POUR EXTRAIRE LES OPTIONS DE COULEUR/TAILLE
         const colorAttribute = data.attributes.find(
           (attr) =>
             attr.name.toLowerCase().includes("couleur") ||
@@ -422,7 +422,7 @@ function ProductDetail() {
 
         setAvailableColors(colors);
 
-        // 🚨 Si des variations existent, on sélectionne la première couleur/taille de la variation par défaut
+        //  Si des variations existent, on sélectionne la première couleur/taille de la variation par défaut
         if (defaultVariation) {
           // Utiliser les ATTRIBUTS de la variation pour initialiser les sélections
           const defaultColorAttr = defaultVariation.attributes.find(
@@ -458,7 +458,6 @@ function ProductDetail() {
         setProduct({
           id: data.id,
           name: data.name,
-          // ⭐️ Utiliser les prix initialisés ci-dessus
           price: initialPrice,
           regularPrice: initialRegularPrice,
           description: fullDescription,
@@ -490,7 +489,7 @@ function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  // ⭐️ EFFECT CRITIQUE : Recherche de variation, mise à jour du STOCK et du PRIX ⭐️
+  // Recherche de variation, mise à jour du STOCK et du PRIX
   useEffect(() => {
     // Ne s'exécute que si le produit est chargé et qu'il y a des variations à chercher
     if (!product || !product.isVariable || productVariations.length === 0) {
@@ -513,11 +512,11 @@ function ProductDetail() {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "") // Enlève les accents
             .replace(/[\/\\]/g, "") // Enlève les barres obliques/antislash
-            // ⭐️ CORRECTION 1 : Accepte les majuscules A-Z.
-            // ⭐️ CORRECTION 2 : Accepte les lettres minuscules a-z.
-            // ⭐️ CORRECTION 3 : Accepte les chiffres 0-9.
+            //  Accepte les majuscules A-Z.
+            // Accepte les lettres minuscules a-z.
+            //  Accepte les chiffres 0-9.
             // Nous allons conserver le remplacement initial par sécurité, mais en incluant A-Z.
-            .replace(/[^A-Za-z0-9]/g, "") // ENLÈVE TOUT CE QUI N'EST PAS UNE LETTRE OU UN CHIFFRE
+            .replace(/[^A-Za-z0-9]/g, "") // ENLEVER TOUT CE QUI N'EST PAS UNE LETTRE OU UN CHIFFRE
             .toLowerCase() // Tout en minuscules
             .trim()
         ); // Enlève les espaces résiduels (maintenant vides)
@@ -620,7 +619,9 @@ function ProductDetail() {
         <div className="alert alert-danger">
           <h2>Erreur</h2>
           <p>{error || "Détails du produit introuvables."}</p>
-          <Link to="/shop">Retour à la boutique</Link>
+          <button className="btn-add-to-cart">
+            <Link to="/shop">Retour à la boutique</Link>
+          </button>
         </div>
       </main>
     );
@@ -788,17 +789,17 @@ function ProductDetail() {
 
   return (
     <main className="product-detail-container">
-      <Link to="/shop" className="back-link">
-        &larr; Retour à la boutique
-      </Link>
+      <button className="btn bg-dark my-2">
+        <Link className="link-light text-decoration-none" to="/shop">
+          Retour à la boutique
+        </Link>
+      </button>
       {/* Message Flash d'ajout au panier avec bouton de fermeture (Succès) */}
       {showFlash && (
         <div className="flash-message-cart flash-success">
-          {/* ⭐️ Le conteneur "flash-message-content" sera ciblé par Flexbox ⭐️ */}
-
           <div className="flash-message-content">
             <p>
-              {/* ... (Logique IIFE pour construire le message du produit) ... */}
+              {/* ... (Logique  pour construire le message du produit) ... */}
 
               {(() => {
                 let name = product.name;
@@ -816,7 +817,6 @@ function ProductDetail() {
 
                 const articleName = `"${name}"`;
 
-                // 👇 MODIFIEZ `quantity` par `addedQuantity`
                 if (addedQuantity > 1) {
                   return `${addedQuantity} x ${articleName} ont été ajoutés à votre panier.`;
                 } else {
@@ -857,7 +857,7 @@ function ProductDetail() {
       )}
       <div className="product-content">
         <div className="product-image-area">
-          {/* ⭐️ Utiliser l'image de la variation sélectionnée si elle existe, sinon l'image du produit parent ⭐️ */}
+          {/*  Utiliser l'image de la variation sélectionnée si elle existe, sinon l'image du produit parent  */}
           <img
             src={stockSource.image?.src || product.image}
             alt={product.name}
@@ -868,30 +868,57 @@ function ProductDetail() {
             ))}
         </div>
         <div className="product-info-area">
-          <h1 className="product-name">{product.name}</h1>
-          {totalReviews > 0 && (
-            <div className="product-header-reviews">
-              <RatingStars rating={averageRating} />
-              <span className="review-count">({totalReviews} avis)</span>
-            </div>
-          )}
-          <div className="price-section">
-            {/* ⭐️ AFFICHAGE FIXE DU PRIX DU PARENT ⭐️ */}
-            {displayPrice < displayRegularPrice && (
-              <span className="old-price">
-                {formatPrice(displayRegularPrice)}
-              </span>
+          <div itemScope itemType="https://schema.org/Product">
+            <h1 itemProp="name" className="product-name">
+              {product.name}
+            </h1>
+            {totalReviews > 0 && (
+              <div
+                className="product-header-reviews"
+                itemProp="aggregateRating" /* <-- Propriété principale */
+                itemScope
+                itemType="https://schema.org/AggregateRating" /* <-- Type spécifique */
+              >
+                <span itemProp="ratingValue">{averageRating.toFixed(1)}</span>
+                <RatingStars rating={averageRating} />
+                <span className="review-count">
+                  (<span itemProp="reviewCount">{totalReviews}</span> avis)
+                </span>
+              </div>
             )}
-
-            <span className="current-price">{formatPrice(displayPrice)}</span>
-          </div>
-          {product.displayDescription && (
             <div
-              className="product-excerpt-description"
-              dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+              itemProp="offers"
+              itemScope
+              itemType="https://schema.org/Offer"
+            >
+              <div className="price-section">
+                <span className="current-price" itemProp="price">
+                  {formatPrice(displayPrice)}
+                </span>
+                <meta itemProp="priceCurrency" content="EUR" />
+                <link
+                  itemProp="availability"
+                  href={
+                    isVariationOutOfStock
+                      ? "https://schema.org/OutOfStock"
+                      : "https://schema.org/InStock"
+                  }
+                />
+              </div>
+            </div>
+            <meta
+              itemProp="image"
+              content={stockSource.image?.src || product.image}
             />
-          )}
-          {/* 🚨 SÉLECTEUR DE COULEUR 🚨 */}
+            {product.displayDescription && (
+              <div
+                className="product-excerpt-description"
+                itemProp="description"
+                dangerouslySetInnerHTML={{ __html: product.displayDescription }}
+              />
+            )}
+          </div>
+          {/*  SÉLECTEUR DE COULEUR  */}
           {availableColors.length > 0 && (
             <div className="color-selector-group">
               <label htmlFor="product-color">
@@ -917,7 +944,7 @@ function ProductDetail() {
               </select>
             </div>
           )}
-          {/* 🚨 SÉLECTEUR DE POINTURE EN CARRÉS 🚨 */}
+          {/*  SÉLECTEUR DE POINTURE EN CARRÉS  */}
           {availableSizes.length > 0 && (
             <div className="size-selector-group">
               <label>
@@ -933,7 +960,7 @@ function ProductDetail() {
                       selectedSize === size ? "selected" : ""
                     }`}
                     onClick={() => setSelectedSize(size)}
-                    // Vous pouvez désactiver les boutons pour les combinaisons en rupture de stock ici si nécessaire
+                    //  désactiver les boutons pour les combinaisons en rupture de stock ici si nécessaire
                   >
                     {size}
                   </button>
@@ -942,7 +969,7 @@ function ProductDetail() {
             </div>
           )}
           {/* -------------------------------------------------
-            ⭐️ LOGIQUE D'AFFICHAGE DU STOCK PAR VARIATION ⭐️
+             LOGIQUE D'AFFICHAGE DU STOCK PAR VARIATION 
             -------------------------------------------------
           */}
           {productVariations.length === 0 ? (
@@ -981,7 +1008,7 @@ function ProductDetail() {
             </>
           )}
 
-          {/* 🚨 Champ de sélection de quantité 🚨 */}
+          {/*  Champ de sélection de quantité  */}
           {!isVariationOutOfStock && !product.isOutOfStock && (
             <div className="quantity-selector-group">
               <label htmlFor="product-quantity">Quantité :</label>{" "}
@@ -1026,7 +1053,11 @@ function ProductDetail() {
           </button>
         </div>
       </div>
-      <div className="product-tabs-section">
+      <div
+        className="product-tabs-section"
+        itemscope
+        itemtype="https://schema.org/Product"
+      >
         <div className="tab-headers">
           <button
             className={`tab-header ${

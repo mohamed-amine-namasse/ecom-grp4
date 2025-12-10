@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Assurez-vous d'importer from 'react-router-dom'
+import { useParams } from "react-router";
 import "./orders.css";
 
-// ⚠️ ATTENTION: Remplacez ces valeurs par les vôtres,
-// ou utilisez des variables d'environnement dans un projet réel.
 const WOOCOMMERCE_FULL_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
 const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
@@ -24,7 +22,7 @@ const getStatusClass = (status) => {
   }
 };
 
-// 🔑 Le composant reçoit l'email de l'utilisateur connecté via props
+//  Le composant reçoit l'email de l'utilisateur connecté via props
 const Orders = ({ userEmail }) => {
   const { customerId } = useParams(); // Récupère le '0' de l'URL
 
@@ -37,7 +35,7 @@ const Orders = ({ userEmail }) => {
       setLoading(true);
       setError(null);
 
-      // 🛑 VÉRIFICATION CRITIQUE : L'email doit être présent pour le filtre
+      //  VÉRIFICATION  : L'email doit être présent pour le filtre
       if (!userEmail) {
         setLoading(false);
         setError(

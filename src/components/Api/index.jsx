@@ -49,6 +49,19 @@ export async function createPost(postData, auth) {
 
 // --- FONCTIONS JWT & AUTHENTIFICATION ---
 
+export async function validateToken(token) {
+  const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token/validate`;
+
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.json();
+}
+
 export async function validateStoredToken() {
   const ENDPOINT = `${WP_BASE}/jwt-auth/v1/token/validate`;
   const storedData = localStorage.getItem("JWT Token:");
@@ -176,5 +189,3 @@ export async function registerUserPublic(userData) {
     throw err;
   }
 }
-
-

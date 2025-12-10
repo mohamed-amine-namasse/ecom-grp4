@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc) !important;
   padding: 20px;
 }
 
@@ -64,7 +64,7 @@
 button[type="submit"] {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, var(--pink-bg), #ffc1cc);
   color: #fff;
   font-size: 1.1rem;
   font-weight: 700;

@@ -245,6 +245,13 @@ body,
   text-align: center;
 }
 
+.contain-order {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  padding: "10px";
+}
+
 /* responsive */
 @media (max-width: 720px) {
   .contact-card {

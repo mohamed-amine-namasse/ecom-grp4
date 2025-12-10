@@ -9,7 +9,7 @@ function ScrollToTop() {
     window.scrollTo(0, 0);
   }, [pathname]); // 👈 Déclencher l'effet lorsque 'pathname' change
 
-  return null; // Ce composant n'affiche rien, il gère juste un effet secondaire
+  return null;
 }
 
 export default ScrollToTop;

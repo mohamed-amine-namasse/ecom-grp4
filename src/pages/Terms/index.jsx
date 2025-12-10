@@ -1,18 +1,15 @@
-import { NavLink } from "react-router";
-import Nav from "react-bootstrap/Nav";
 import "./style.css";
 function Terms() {
   return (
     <div className="background">
-      <h1>Politique de confidentialité</h1>
-
-      <h2>Qui sommes-nous ?</h2>
-
-      <Nav.Link as={NavLink} to="/about">
-        A propos
-      </Nav.Link>
-
-      <h2>Commentaires</h2>
+      <h1 className="title-terms">
+        Conditions Générales d'utilisation/ Conditions Générales de Vente
+        (CGU/CGV)
+      </h1>
+      <h2>Politique de confidentialité</h2>
+      <h3>Qui sommes-nous ?</h3>
+      <a href={`./About`}>A propos</a>
+      <h3>Commentaires</h3>
       <p>
         Quand vous laissez un commentaire sur notre site, les données inscrites
         dans le formulaire de commentaire, ainsi que votre adresse IP et l’agent
@@ -20,92 +17,30 @@ function Terms() {
         détection des commentaires indésirables.
       </p>
 
+      <h3>Contenu embarqué depuis d’autres sites</h3>
       <p>
-        Une chaîne anonymisée créée à partir de votre adresse e-mail (également
-        appelée hash) peut être envoyée au service Gravatar pour vérifier si
-        vous utilisez ce dernier. Les clauses de confidentialité du service
-        Gravatar sont disponibles ici :
-        <a
-          href="https://automattic.com/privacy/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          https://automattic.com/privacy/
-        </a>
-        . Après validation de votre commentaire, votre photo de profil sera
-        visible publiquement à côté de votre commentaire.
+        Ce site peut inclure des contenus intégrés (par exemple des vidéos,
+        images, articles…). Le contenu intégré depuis d’autres sites se comporte
+        de la même manière que si le visiteur se rendait sur cet autre site.
       </p>
-
-      <h2>Médias</h2>
-      <p>
-        Si vous téléversez des images sur le site, nous vous conseillons
-        d’éviter de téléverser des images contenant des données EXIF de
-        coordonnées GPS. Les personnes visitant votre site peuvent télécharger
-        et extraire des données de localisation depuis ces images.
-      </p>
-
-      <h2>Cookies</h2>
-      <p>
-        Si vous déposez un commentaire sur notre site, il vous sera proposé
-        d’enregistrer votre nom, adresse e-mail et site dans des cookies. C’est
-        uniquement pour votre confort afin de ne pas avoir à saisir ces
-        informations si vous déposez un autre commentaire plus tard. Ces cookies
-        expirent au bout d’un an.
-      </p>
-
-      <p>
-        Si vous vous rendez sur la page de connexion, un cookie temporaire sera
-        créé afin de déterminer si votre navigateur accepte les cookies. Il ne
-        contient pas de données personnelles et sera supprimé automatiquement à
-        la fermeture de votre navigateur.
-      </p>
-
-      <p>
-        Lorsque vous vous connecterez, nous mettrons en place un certain nombre
-        de cookies pour enregistrer vos informations de connexion et vos
-        préférences d’écran. La durée de vie d’un cookie de connexion est de
-        deux jours, celle d’un cookie d’option d’écran est d’un an. Si vous
-        cochez « Se souvenir de moi », votre cookie de connexion sera conservé
-        pendant deux semaines. Si vous vous déconnectez de votre compte, le
-        cookie de connexion sera effacé.
-      </p>
-
-      <p>
-        En modifiant ou en publiant une publication, un cookie supplémentaire
-        sera enregistré dans votre navigateur. Ce cookie ne comprend aucune
-        donnée personnelle. Il indique simplement l’ID de la publication
-        modifiée. Il expire au bout d’un jour.
-      </p>
-
-      <h2>Contenu embarqué depuis d’autres sites</h2>
-      <p>
-        Les articles de ce site peuvent inclure des contenus intégrés (par
-        exemple des vidéos, images, articles…). Le contenu intégré depuis
-        d’autres sites se comporte de la même manière que si le visiteur se
-        rendait sur cet autre site.
-      </p>
-
       <p>
         Ces sites web pourraient collecter des données sur vous, utiliser des
         cookies, embarquer des outils de suivis tiers, et suivre vos
         interactions avec ces contenus embarqués si vous disposez d’un compte
         connecté sur leur site web.
       </p>
-
-      <h2>Utilisation et transmission de vos données personnelles</h2>
+      <h3>Utilisation et transmission de vos données personnelles</h3>
       <p>
         Si vous demandez une réinitialisation de votre mot de passe, votre
         adresse IP sera incluse dans l’e-mail de réinitialisation.
       </p>
-
-      <h2>Durées de stockage de vos données</h2>
+      <h3>Durées de stockage de vos données</h3>
       <p>
         Si vous laissez un commentaire, le commentaire et ses métadonnées sont
         conservés indéfiniment. Cela permet de reconnaître et d’approuver
         automatiquement les commentaires suivants au lieu de les laisser dans la
         file de modération.
       </p>
-
       <p>
         Pour les comptes qui s’inscrivent sur notre site (le cas échéant), nous
         stockons également les données personnelles indiquées dans leur profil.
@@ -113,8 +48,7 @@ function Terms() {
         personnelles à tout moment (à l’exception de leur identifiant). Les
         gestionnaires du site peuvent aussi voir et modifier ces informations.
       </p>
-
-      <h2>Les droits que vous avez sur vos données</h2>
+      <h3>Les droits que vous avez sur vos données</h3>
       <p>
         Si vous avez un compte ou si vous avez laissé des commentaires sur le
         site, vous pouvez demander à recevoir un fichier contenant toutes les
@@ -124,149 +58,197 @@ function Terms() {
         en compte les données stockées à des fins administratives, légales ou
         pour des raisons de sécurité.
       </p>
-
-      <h2>Où vos données sont envoyées</h2>
+      <h3>Où vos données sont envoyées</h3>
       <p>
         Les commentaires des visiteurs peuvent être vérifiés à l’aide d’un
         service automatisé de détection des commentaires indésirables.
       </p>
+      <section>
+        <h2>Propriété Intellectuelle et Usage de Marques Tiers</h2>
+        <dl>
+          <dd>
+            <p>
+              <b>Nature du Projet :</b> Le site web Foot Market est développé et
+              exploité dans un cadre purement <b>académique</b> et
+              <b> pédagogique</b> . Il s'agit d'une{" "}
+              <b>simulation de commerce électronique</b> et ne constitue en
+              aucun cas une activité commerciale réelle.
+            </p>
+          </dd>
+          <dd>
+            <p>
+              <b>Utilisation des Marques et Images :</b> Les marques, logos,
+              dénominations de produits (ex : Nike, Adidas, Puma, etc.) et les
+              images de crampons ou autres articles affichés sur{" "}
+              <b>Foot Market</b> sont la{" "}
+              <b>propriété intellectuelle de leurs détenteurs respectifs</b>{" "}
+              (les fabricants et marques tiers).
+            </p>
+          </dd>
+          <dd>
+            <p>
+              <b>Absence de Commercialisation :</b> L'usage de ces marques et
+              images sur{" "}
+              <b>
+                Foot Market est fait sans but lucratif, ni intention de
+                contrefaçon, de concurrence déloyale ou de commercialisation
+              </b>
+              . Leur présence est uniquement destinée à des fins illustratives,
+              de démonstration fonctionnelle et d'évaluation académique des
+              compétences en développement web et e-commerce.
+            </p>
+          </dd>
+          <dd>
+            <p>
+              <b>Restrictions :</b> Il est <b>formellement interdit</b> aux
+              utilisateurs de copier, reproduire ou exploiter à des fins
+              commerciales ou lucratives tout contenu protégé par les droits
+              d'auteur affiché sur cette plateforme.
+            </p>
+          </dd>
+        </dl>
+      </section>
 
-      <h1>Politique en matière de remboursements et de retours</h1>
+      <section>
+        <h2>Droit d'Auteur sur le code et le design </h2>
 
-      <h2>Aperçu</h2>
-      <p>
-        Notre politique de remboursement et de retour est valable pendant 30
-        jours. Si 30 jours se sont écoulés depuis votre achat, nous ne pouvons
-        malheureusement pas vous offrir un remboursement complet ni un échange.
-      </p>
+        <p>
+          Le code source, le design graphique et la structure spécifique du site{" "}
+          <b>Foot Market </b>
+          sont la <b> propriété intellectuelle de ses développeurs étudiants</b>
+          .
+        </p>
+      </section>
 
-      <p>
-        Pour être admissible à un retour, votre article doit être inutilisé et
-        dans le même état que vous l’avez reçu. Il doit également être dans son
-        emballage d’origine.
-      </p>
+      <hr className="line" />
+      <h2>Conditions Générales de Vente (CGV)</h2>
+      {/* ARTICLE 1 */}
+      <section id="scope">
+        <h3>Article 1 : Champ d'Application et Modification des CGV</h3>
+        <p>
+          Les présentes Conditions Générales de Vente (CGV) s'appliquent à
+          l'ensemble des ventes conclues via le site internet
+          <a href="[VOTRE URL]">[VOTRE URL]</a>, entre la société{" "}
+          <strong>Foot Market</strong> (le "Vendeur") et toute personne physique
+          non professionnelle (le "Client").
+        </p>
+        <p>
+          Toute validation de commande implique l'adhésion sans réserve du
+          Client aux présentes CGV. Le Vendeur se réserve le droit de les
+          modifier. Les conditions applicables sont celles en vigueur à la date
+          de la commande.
+        </p>
+      </section>
+      {/* ARTICLE 2 */}
+      <section id="products">
+        <h3>Article 2 : Produits et Disponibilité</h3>
+        <dl>
+          <dd>
+            <strong>Caractéristiques :</strong> Les crampons et accessoires sont
+            présentés avec leurs caractéristiques essentielles. Les informations
+            sont aussi précises que possible, mais ne sont pas contractuelles
+            (photos non-contractuelles).
+          </dd>
+          <dd>
+            <strong>Prix :</strong> Les prix sont indiqués en Euros (€) TTC. Les
+            frais de livraison sont en sus et affichés avant la validation.
+          </dd>
+          <dd>
+            <strong>Disponibilité :</strong> En cas d'indisponibilité d'un
+            produit après passation de la commande, le Client sera informé dans
+            les meilleurs délais et pourra être remboursé.
+          </dd>
+        </dl>
+      </section>
+      {/* ARTICLE 3 */}
+      <section id="order">
+        <h3>Article 3 : Commande</h3>
+        <ol>
+          <li>Le Client sélectionne ses produits (taille, couleur, etc.).</li>
+          <li>Le Client vérifie le récapitulatif de son panier.</li>
+          <li>Le Client s'identifie ou crée son compte.</li>
+          <li>Le Client choisit le mode de livraison.</li>
+          <li>Le Client accepte les CGV.</li>
+          <li>Le Client valide le paiement ("Payer la commande").</li>
+        </ol>
+        <p>
+          La confirmation de commande par email formalise la conclusion du
+          contrat.
+        </p>
+      </section>
+      {/* ARTICLE 4 */}
+      <section id="payment">
+        <h3>Article 4 : Paiement</h3>
+        <p>
+          Le paiement est exigible immédiatement à la commande. Les modes de
+          paiement acceptés sont :{" "}
+          <strong>
+            [Liste des méthodes : Carte Bancaire, PayPal, Virement, etc.]
+          </strong>
+          .
+        </p>
+        <blockquote className="payment-note">
+          Le Vendeur utilise un système de paiement sécurisé pour garantir la
+          confidentialité des données bancaires.
+        </blockquote>
+      </section>
+      {/* ARTICLE 5 */}
+      <section id="delivery">
+        <h3>Article 5 : Livraison</h3>
+        <dl>
+          <dt>Zone de Livraison</dt>
+          <dd>
+            Les produits sont livrables en{" "}
+            <strong>[France métropolitaine, UE, Monde]</strong>.
+          </dd>
 
-      <p>
-        Plusieurs types de produits ne peuvent pas être retournés. Les produits
-        périssables tels que la nourriture, les fleurs, les journaux ou les
-        magazines ne peuvent pas être retournés. Nous n’acceptons pas non plus
-        les produits intimes ou sanitaires, les matières dangereuses ou les
-        liquides ou gaz inflammables.
-      </p>
+          <dt>Délais</dt>
+          <dd>
+            Le délai moyen de livraison est de <strong>3 jours ouvrés</strong>{" "}
+            après expédition. Ce délai est donné à titre indicatif.
+          </dd>
 
-      <div class="refund-box">
-        <h3>Articles supplémentaires non retournables :</h3>
-        <ul>
-          <li>Cartes cadeaux</li>
-          <li>Produits logiciels téléchargeables</li>
-          <li>Certains articles de santé et de soins personnels</li>
-        </ul>
-      </div>
-
-      <p>
-        Pour compléter votre retour, nous exigeons un reçu ou une preuve
-        d’achat.
-      </p>
-
-      <p>
-        <strong>Veuillez ne pas renvoyer votre achat au fabricant.</strong>
-      </p>
-
-      <h3>Remboursements partiels possibles :</h3>
-      <ul>
-        <li>Livre présentant des signes évidents d’utilisation</li>
-        <li>
-          CD, DVD, cassette VHS, logiciel, jeu vidéo, cassette audio ou vinyle
-          ouvert
-        </li>
-        <li>Article non dans son état d’origine, endommagé ou incomplet</li>
-        <li>Article retourné plus de 30 jours après la livraison</li>
-      </ul>
-
-      <h2>Remboursements</h2>
-      <p>
-        Une fois que votre retour est reçu et inspecté, nous vous enverrons un
-        e-mail pour vous informer que nous avons bien reçu votre article
-        retourné et pour vous informer de l’approbation ou du refus du
-        remboursement.
-      </p>
-
-      <p>
-        Si vous êtes approuvé, votre remboursement sera traité et un crédit sera
-        automatiquement appliqué à votre méthode de paiement d’origine, dans un
-        délai donné.
-      </p>
-
-      <h2>Remboursements en retard ou manquants</h2>
-      <p>Si vous n’avez pas reçu votre remboursement :</p>
-
-      <ul>
-        <li>Vérifiez votre compte bancaire.</li>
-        <li>Contactez votre compagnie de carte bancaire.</li>
-        <li>Contactez ensuite votre banque.</li>
-      </ul>
-
-      <p>
-        Si vous avez fait tout cela et que vous n’avez toujours pas reçu votre
-        remboursement, veuillez nous contacter à <strong></strong>.
-      </p>
-
-      <h2>Articles en promotion</h2>
-      <p>
-        Seuls les articles au prix normal peuvent être remboursés. Les articles
-        en promotion ne peuvent pas être remboursés.
-      </p>
-
-      <h2>Échanges</h2>
-      <p>
-        Nous remplaçons uniquement les articles défectueux ou endommagés. Si
-        vous souhaitez échanger un produit contre le même article,
-        contactez-nous à <strong></strong> et envoyez votre article à :{" "}
-        <strong></strong>.
-      </p>
-
-      <h2>Cadeaux</h2>
-      <p>
-        Si l’article a été marqué comme cadeau lors de l’achat et vous a été
-        envoyé directement, vous recevrez un crédit-cadeau pour la valeur de
-        votre retour.
-      </p>
-
-      <p>
-        Si l’article n’était pas marqué comme cadeau ou a été envoyé à la
-        personne qui vous l’a offert, le remboursement sera adressé au donneur
-        du cadeau.
-      </p>
-
-      <h2>Retour d’articles</h2>
-      <p>
-        Pour retourner un produit, envoyez-le à : <strong></strong>.
-      </p>
-
-      <p>
-        Les frais de retour sont à votre charge et ne sont pas remboursables. Si
-        vous recevez un remboursement, les frais de retour seront déduits du
-        montant total.
-      </p>
-
-      <p>
-        Le délai de réception d’un échange peut varier selon votre lieu de
-        résidence.
-      </p>
-
-      <p>
-        Pour des articles de grande valeur, nous recommandons un service
-        d’expédition suivi ou assuré. Nous ne garantissons pas la réception de
-        l’article retourné.
-      </p>
-
-      <h2>Besoin d’aide ?</h2>
+          <dt>Réception</dt>
+          <dd>
+            Le Client doit vérifier l'état du colis à la réception. Toute
+            anomalie (produit manquant, colis endommagé) doit être signalée au
+            transporteur et au Vendeur dans les meilleurs délais.
+          </dd>
+        </dl>
+      </section>
+      {/* ARTICLE 6 */}
+      <section id="retraction">
+        <h3>Article 6 : Droit de Rétractation et Retours</h3>
+        <p>
+          Conformément à la loi, le Client dispose d'un délai de{" "}
+          <strong>quatorze (14) jours</strong> à compter de la réception pour
+          exercer son droit de rétractation.
+        </p>
+        <p>
+          <strong>Conditions de retour :</strong> Les crampons doivent être
+          retournés neufs, non portés, non lavés, avec toutes les étiquettes et
+          dans leur emballage d'origine. Les frais de retour sont à la charge du
+          Client.
+        </p>
+        <p>
+          Le remboursement interviendra dans un délai maximum de quatorze (14)
+          jours suivant la réception et la vérification des produits retournés.
+        </p>
+      </section>
+      {/* ARTICLE 7 */}
+      <section id="guarantees">
+        <h3>Article 7 : Garanties Légales</h3>
+        <p>
+          Tous les produits bénéficient de la garantie légale de conformité
+          (articles L. 217-4 et suivants du Code de la consommation) et de la
+          garantie des vices cachés (articles 1641 et suivants du Code civil).
+        </p>
+      </section>
+      <h3>Besoin d’aide ?</h3>
       <p>
         Pour toute question concernant les retours et
-        remboursements.Contactez-nous via la page:
-        <Nav.Link as={NavLink} to="/contact">
-          Contact
-        </Nav.Link>
+        remboursements.Contactez-nous via la page:{" "}
+        <a href={`./Contact`}>Contact</a>
       </p>
     </div>
   );

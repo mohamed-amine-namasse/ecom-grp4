@@ -1,8 +1,8 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
-import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import "./style.css";
 
 function Momo() {
   const products = [
@@ -32,12 +32,8 @@ function Momo() {
     <Row className="g-4">
       {products.map((product, index) => (
         <Col key={index}>
-          <Card className="h-100 text-center">
-            <Card.Img
-              variant="top"
-              src={product.image}
-              style={{ height: "200px", objectFit: "cover" }}
-            />
+          <Card className="h-100 text-center momo-card">
+            <Card.Img variant="top" src={product.image} className="momo-img" />
           </Card>
         </Col>
       ))}

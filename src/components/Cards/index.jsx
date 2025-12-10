@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router";
+import "./style.css";
 
 const API_URL =
   "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
@@ -38,7 +39,6 @@ function Cards() {
   if (loading) return <p>Chargement des produits...</p>;
   if (error) return <p>Erreur: {error}</p>;
 
-  // Pagination
   const endOffset = itemOffset + itemsPerPage;
   const currentItems = products.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(products.length / itemsPerPage);
@@ -50,58 +50,28 @@ function Cards() {
 
   return (
     <>
-      {/* AFFICHAGE DES PRODUITS */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px",
-          justifyContent: "center",
-        }}
-      >
+      <div className="cards-container">
         {currentItems.map((p) => {
-          const hover = hoverId === p.id;
-          // 1. Définir le chemin vers la page de détails
+          const isHover = hoverId === p.id;
           const detailPath = `/product/${p.id}`;
+
           return (
             <Card
               key={p.id}
-              style={{
-                width: "18rem",
-                borderRadius: 12,
-                boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-                position: "relative",
-                cursor: "pointer",
-                overflow: "hidden",
-              }}
+              className={`product-card ${isHover ? "hover" : ""}`}
               onMouseEnter={() => setHoverId(p.id)}
               onMouseLeave={() => setHoverId(null)}
             >
               <Card.Img
                 src={p.images[0]?.src || "https://via.placeholder.com/300x300"}
                 alt={p.name}
-                style={{
-                  width: "100%",
-                  height: "300px",
-                  objectFit: "cover",
-                  borderRadius: "12px",
-                  transition: "0.3s ease",
-                  filter: hover ? "brightness(60%)" : "brightness(100%)",
-                }}
               />
 
               <Button
                 as={Link}
                 to={detailPath}
                 variant="primary"
-                style={{
-                  position: "absolute",
-                  bottom: "50%",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  opacity: hover ? 1 : 0,
-                  transition: "0.25s ease",
-                }}
+                className="view-button"
               >
                 Voir le produit
               </Button>
@@ -114,7 +84,6 @@ function Cards() {
         })}
       </div>
 
-      {/* PAGINATION */}
       <div
         style={{ marginTop: "30px", display: "flex", justifyContent: "center" }}
       >
@@ -129,39 +98,6 @@ function Cards() {
           activeClassName="active-page"
         />
       </div>
-
-      {/* STYLE DE LA PAGINATION */}
-      <style>{`
-      a{color:black;
-      text-decoration:none;}
-        .pagination {
-          display: flex;
-          gap: 10px;
-          list-style: none;
-          font-size: 18px;
-          padding: 0;
-        }
-
-        .pagination li {
-          cursor: pointer;
-          padding: 8px 12px;
-          border-radius: 8px;
-          transition: 0.2s ease;
-          
-        }
-
-        .pagination li:hover {
-          background-color: #eaeaea;
-        }
-
-        /* Style du numéro de page actif */
-        .active-page {
-          background-color: #007bff !important;
-          color: white !important;
-          border-color: #007bff !important;
-        }
-          
-      `}</style>
     </>
   );
 }

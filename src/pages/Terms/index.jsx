@@ -127,8 +127,7 @@ function Terms() {
         <h3>Article 1 : Champ d'Application et Modification des CGV</h3>
         <p>
           Les présentes Conditions Générales de Vente (CGV) s'appliquent à
-          l'ensemble des ventes conclues via le site internet
-          <a href="[VOTRE URL]">[VOTRE URL]</a>, entre la société{" "}
+          l'ensemble des ventes conclues entre la société{" "}
           <strong>Foot Market</strong> (le "Vendeur") et toute personne physique
           non professionnelle (le "Client").
         </p>
@@ -182,10 +181,7 @@ function Terms() {
         <p>
           Le paiement est exigible immédiatement à la commande. Les modes de
           paiement acceptés sont :{" "}
-          <strong>
-            [Liste des méthodes : Carte Bancaire, PayPal, Virement, etc.]
-          </strong>
-          .
+          <strong>Carte Bancaire, PayPal, Virement, etc.</strong>.
         </p>
         <blockquote className="payment-note">
           Le Vendeur utilise un système de paiement sécurisé pour garantir la
@@ -199,7 +195,7 @@ function Terms() {
           <dt>Zone de Livraison</dt>
           <dd>
             Les produits sont livrables en{" "}
-            <strong>[France métropolitaine, UE, Monde]</strong>.
+            <strong>France métropolitaine, UE, Monde</strong>.
           </dd>
 
           <dt>Délais</dt>

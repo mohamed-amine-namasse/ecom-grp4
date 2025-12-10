@@ -38,7 +38,6 @@ const FALLBACK_PRODUCTS = {
 };
 
 function Figures() {
-  // ...existing code...
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

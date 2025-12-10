@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { validateStoredToken } from "../../components/Api";
 import { useAuth } from "../../components/AuthContext";
 import { useMatch } from "react-router"; //  useMatch pour détecter la sous-route
+import { Link } from "react-router";
 import Orders from "./orders";
 
 function Profile() {
@@ -95,15 +96,18 @@ function Profile() {
         <h2>Menu</h2>
         <ul>
           <li>
-            <a href="/profile/update">Modification du profil</a>
+            <Link to="/profile/update">Modification du profil</Link>
           </li>
           <li>
             {user && user.id ? (
-              <a href={`/profile/orders/0`}>Commandes (ID Client: {user.id})</a>
+              <Link to="/profile/orders/0">
+                Commandes (ID Client: {user.id})
+              </Link>
             ) : (
-              <span className="disabled-link" title="ID client non disponible">
-                Commandes
-              </span>
+              <span
+                className="disabled-link"
+                title="ID client non disponible"
+              ></span>
             )}
           </li>
         </ul>

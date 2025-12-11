@@ -1,7 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
 import NavScrollExample from "./components/NavScrollExample";
-
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";

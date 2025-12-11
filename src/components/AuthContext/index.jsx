@@ -35,11 +35,11 @@ export const AuthProvider = ({ children }) => {
 
   // Fonction pour la déconnexion (utilisée par NavScrollExample.js)
   const logout = () => {
-    // 1. 🛑 Vider l'état global du contexte 🛑
+    // 1.  Vider l'état global du contexte
     setUser(null);
     setIsAuthenticated(false);
 
-    // 2. 🛑 Supprimer les données du Local Storage 🛑
+    // 2.  Supprimer les données du Local Storage
     //
     localStorage.removeItem(AUTH_STORAGE_KEY);
 
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
         try {
           const data = JSON.parse(storedAuth);
 
-          // 🛑 VÉRIFICATION API : S'assurer que le token est valide
+          //  S'assurer que le token est valide
 
           await validateStoredToken(data.token);
 

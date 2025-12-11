@@ -270,7 +270,7 @@ function NavScrollExample() {
       <Navbar expand="lg" className="p-3 border-bottom border-dark">
         <Container fluid className="d-flex align-items-center">
           {" "}
-          <Navbar.Toggle aria-controls="nav-links-collapse" className="me-4" />
+          <Navbar.Toggle aria-controls="nav-links-collapse" />
           <Navbar.Brand
             as={(props) => <NavLink to="/" {...props} />}
             className=" d-flex align-items-center"
@@ -292,103 +292,105 @@ function NavScrollExample() {
               )}
             </Nav>
           </Navbar.Collapse>
-          {/* Groupe de recherche */}
-          <div className="search-container">
-            {" "}
-            <Form className="d-flex search-group align-items-center ">
-              <Button
-                variant="outline-dark"
-                className="btn-search d-flex align-items-center justify-content-center"
-                aria-label="Recherche"
-                onClick={handleSearchClick}
-              >
-                <IoSearchOutline size={25} />
-              </Button>
-              <Form.Control
-                ref={inputRef}
-                className="d-none d-lg-block"
-                type="search"
-                placeholder="Rechercher un article"
-                aria-label="Search"
-                value={searchTerm}
-                onChange={handleSearchTermChange}
-              />
-            </Form>
-            {/* SUGGESTIONS DESKTOP */}
-            {window.innerWidth >= 992 && shouldShowSuggestionsContainer && (
-              <div className="suggestions-list">
-                {renderSuggestionsContent(false)}
-              </div>
-            )}
-          </div>
-          <Nav className="nav-icons  d-flex align-items-center">
-            {/* 1. PANIER */}
-            <Nav.Link
-              as={NavLink}
-              to="/cart"
-              className="p-1 text-dark"
-              style={{ position: "relative" }}
-            >
-              <PiShoppingCartFill size={30} />
-              {getCartCount > 0 && (
-                <Badge
-                  bg="danger"
-                  pill
-                  className="position-absolute top-10 start-80 translate-middle"
-                >
-                  {getCartCount}
-                </Badge>
-              )}
-            </Nav.Link>
-            {/* 2. Livraison */}
-            <Nav.Link
-              as={NavLink}
-              to="/shipping"
-              className="p-1 text-dark"
-              aria-label="Livraison utilisateur"
-              title="Livraison"
-            >
-              <FaShippingFast size={30} />
-            </Nav.Link>
-
-            {isLoggedIn ? (
-              // --- Utilisateur CONNECTÉ : PROFIL + DÉCONNEXION ---
-              <>
-                <Nav.Link
-                  as={NavLink}
-                  to="/profile"
-                  className="p-1 text-dark"
-                  aria-label="Profil utilisateur"
-                  title={`Profil de ${
-                    authData?.user_display_name || "Utilisateur"
-                  }`}
-                >
-                  <PiUserCircleGearFill size={30} />
-                </Nav.Link>
-
+          <div className="d-flex align-items-center">
+            {/* Groupe de recherche */}
+            <div className="search-container ">
+              {" "}
+              <Form className="d-flex search-group align-items-center ">
                 <Button
-                  variant="link"
-                  onClick={handleLogout}
-                  className="p-1 text-dark"
-                  aria-label="Déconnexion"
-                  title="Déconnexion"
+                  variant="outline-dark"
+                  className="btn-search d-flex align-items-center justify-content-center"
+                  aria-label="Recherche"
+                  onClick={handleSearchClick}
                 >
-                  <RiLogoutBoxRLine size={30} />
+                  <IoSearchOutline size={25} />
                 </Button>
-              </>
-            ) : (
-              // --- Utilisateur DÉCONNECTÉ : CONNEXION ---
+                <Form.Control
+                  ref={inputRef}
+                  className="d-none d-lg-block"
+                  type="search"
+                  placeholder="Rechercher un article"
+                  aria-label="Search"
+                  value={searchTerm}
+                  onChange={handleSearchTermChange}
+                />
+              </Form>
+              {/* SUGGESTIONS DESKTOP */}
+              {window.innerWidth >= 992 && shouldShowSuggestionsContainer && (
+                <div className="suggestions-list">
+                  {renderSuggestionsContent(false)}
+                </div>
+              )}
+            </div>
+            <Nav className="nav-icons  d-flex align-items-center">
+              {/* 1. PANIER */}
               <Nav.Link
                 as={NavLink}
-                to="/login"
+                to="/cart"
                 className="p-1 text-dark"
-                aria-label="Connexion ou inscription"
-                title="Connexion"
+                style={{ position: "relative" }}
               >
-                <BiSolidUserCircle size={30} />
+                <PiShoppingCartFill size={30} />
+                {getCartCount > 0 && (
+                  <Badge
+                    bg="danger"
+                    pill
+                    className="position-absolute top-10 start-80 translate-middle"
+                  >
+                    {getCartCount}
+                  </Badge>
+                )}
               </Nav.Link>
-            )}
-          </Nav>
+              {/* 2. Livraison */}
+              <Nav.Link
+                as={NavLink}
+                to="/shipping"
+                className="p-1 text-dark"
+                aria-label="Livraison utilisateur"
+                title="Livraison"
+              >
+                <FaShippingFast size={30} />
+              </Nav.Link>
+
+              {isLoggedIn ? (
+                // --- Utilisateur CONNECTÉ : PROFIL + DÉCONNEXION ---
+                <>
+                  <Nav.Link
+                    as={NavLink}
+                    to="/profile"
+                    className="p-1 text-dark"
+                    aria-label="Profil utilisateur"
+                    title={`Profil de ${
+                      authData?.user_display_name || "Utilisateur"
+                    }`}
+                  >
+                    <PiUserCircleGearFill size={30} />
+                  </Nav.Link>
+
+                  <Button
+                    variant="link"
+                    onClick={handleLogout}
+                    className="p-1 text-dark"
+                    aria-label="Déconnexion"
+                    title="Déconnexion"
+                  >
+                    <RiLogoutBoxRLine size={30} />
+                  </Button>
+                </>
+              ) : (
+                // --- Utilisateur DÉCONNECTÉ : CONNEXION ---
+                <Nav.Link
+                  as={NavLink}
+                  to="/login"
+                  className="p-1 text-dark"
+                  aria-label="Connexion ou inscription"
+                  title="Connexion"
+                >
+                  <BiSolidUserCircle size={30} />
+                </Nav.Link>
+              )}
+            </Nav>
+          </div>
         </Container>
 
         {/* Modal de recherche pour mobile */}

@@ -324,12 +324,7 @@ function NavScrollExample() {
             </div>
             <Nav className="nav-icons  d-flex align-items-center">
               {/* 1. PANIER */}
-              <Nav.Link
-                as={NavLink}
-                to="/cart"
-                className="p-1 text-dark"
-                style={{ position: "relative" }}
-              >
+              <Nav.Link as={NavLink} to="/cart" className="p-1 text-dark rel">
                 <PiShoppingCartFill size={30} />
                 {getCartCount > 0 && (
                   <Badge

@@ -268,14 +268,17 @@ function NavScrollExample() {
   return (
     <>
       <Navbar expand="lg" className="p-3 border-bottom border-dark">
-        <Container fluid className="d-flex align-items-center">
+        <Container
+          fluid
+          className="d-flex align-items-center justify-content-center "
+        >
           {" "}
           <Navbar.Toggle aria-controls="nav-links-collapse" />
           <Navbar.Brand
             as={(props) => <NavLink to="/" {...props} />}
-            className=" d-flex align-items-center"
+            className=" d-flex align-items-center  "
           >
-            <img src={logo} alt="Foot Market Logo" className="navbar-logo" />
+            <img src={logo} alt="Foot Market Logo" className="navbar-logo " />
           </Navbar.Brand>
           <Navbar.Collapse id="nav-links-collapse">
             <Nav className="my-2 my-lg-0 nav-links" navbarScroll>

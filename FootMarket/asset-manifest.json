@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/FootMarket/static/css/main.2abc8c19.css",
+    "main.js": "/FootMarket/static/js/main.ea297e3c.js",
+    "static/media/shoe.gif": "/FootMarket/static/media/shoe.d568aa9942449bc7cc03.gif",
+    "static/media/crampon3.jpg": "/FootMarket/static/media/crampon3.164c3c9ca644101faecb.jpg",
+    "static/media/crampon2.jpg": "/FootMarket/static/media/crampon2.c69685f5af4257261e4b.jpg",
+    "static/media/crampon1.jpg": "/FootMarket/static/media/crampon1.82f6ac894993b8dfb6a6.jpg",
+    "static/media/LOGO.jpg": "/FootMarket/static/media/LOGO.fe5415b54c5b405f48e0.jpg",
+    "static/media/images2.jpg": "/FootMarket/static/media/images2.508d6839da953bf80522.jpg",
+    "static/media/logo.svg": "/FootMarket/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/FootMarket/index.html",
+    "main.2abc8c19.css.map": "/FootMarket/static/css/main.2abc8c19.css.map",
+    "main.ea297e3c.js.map": "/FootMarket/static/js/main.ea297e3c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2abc8c19.css",
+    "static/js/main.ea297e3c.js"
+  ]
+}

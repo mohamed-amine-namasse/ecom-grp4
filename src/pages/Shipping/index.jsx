@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router";
 import "./style.css";
 
 function Shipping() {
@@ -135,9 +136,9 @@ function Shipping() {
         <p>France: 2–5 jours. Retours possibles sous 14 jours.</p>
 
         <div className="actions">
-          <a href="/contact" className="btn">
+          <Link to="/contact" className="btn">
             Contactez le support
-          </a>
+          </Link>
         </div>
       </section>
     </main>

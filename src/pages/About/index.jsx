@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 import "../Contact/style.css";
 
 function About() {
@@ -31,13 +32,13 @@ function About() {
 
           <h2>Contact</h2>
           <p className="muted">
-            Une question ? <a href="/contact">Contactez-nous</a>.
+            Une question ? <Link to="/contact">Contactez-nous</Link>.
           </p>
 
           <div className="actions">
-            <a href="/shop" className="btn">
+            <Link to="/shop" className="btn">
               Découvrir les crampons
-            </a>
+            </Link>
           </div>
         </div>
       </section>

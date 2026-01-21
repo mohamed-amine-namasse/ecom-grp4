@@ -3,14 +3,7 @@ import { useParams, Link } from "react-router";
 import { useCart } from "../../components/CartContext";
 import { useAuth } from "../../components/AuthContext";
 import "./style.css";
-
-// --- CONFIGURATION WOOCOMMERCE ---
-const WOOCOMMERCE_FULL_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
-const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
-const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
-// ---------------------------------
-
+import { API_CONFIG } from "../../config/api_shop";
 // Fonction utilitaire pour le formatage du prix
 const formatPrice = (p) =>
   p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
@@ -75,17 +68,20 @@ function ProductDetail() {
   //  État pour gérer l'onglet actif ('description' ou 'additional_info')
   const [activeTab, setActiveTab] = useState("description");
 
-  // 1. Définition de l'URL pour la récupération des avis (hors useEffect)
-  const API_REVIEWS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews?product=${id}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
-
-  // 2. Définition de la fonction de récupération des avis (hors useEffect)
+  // . Définition de la fonction de récupération des avis (hors useEffect)
   const fetchReviews = async () => {
     try {
-      const response = await fetch(API_REVIEWS_URL);
+      // On utilise baseUrl + le endpoint reviews filtré par ID produit
+      // On réutilise la logique de AUTH (ck/cs) via une construction manuelle simple
+
+      const authParams = API_CONFIG.allProductsUrl.split("?")[1];
+      const response = await fetch(
+        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?product=${id}&${authParams}`,
+      );
       if (!response.ok) {
         console.warn(
           "Impossible de charger les avis. Statut:",
-          response.status
+          response.status,
         );
         setReviews([]);
         return;
@@ -129,14 +125,14 @@ function ProductDetail() {
       // Vérification des sélections obligatoires
       if (availableColors.length > 0 && !selectedColor) {
         setStockFlashMessage(
-          "Veuillez sélectionner une couleur avant d'ajouter au panier."
+          "Veuillez sélectionner une couleur avant d'ajouter au panier.",
         );
         setShowStockFlash(true);
         return;
       }
       if (availableSizes.length > 0 && !selectedSize) {
         setStockFlashMessage(
-          "Veuillez sélectionner une pointure avant d'ajouter au panier."
+          "Veuillez sélectionner une pointure avant d'ajouter au panier.",
         );
         setShowStockFlash(true);
         return;
@@ -148,7 +144,7 @@ function ProductDetail() {
         (availableColors.length > 0 || availableSizes.length > 0)
       ) {
         setStockFlashMessage(
-          "La combinaison Couleur/Pointure sélectionnée n'est pas disponible en stock ou n'existe pas."
+          "La combinaison Couleur/Pointure sélectionnée n'est pas disponible en stock ou n'existe pas.",
         );
         setShowStockFlash(true);
         return;
@@ -242,11 +238,11 @@ function ProductDetail() {
     // Si l'utilisateur est déconnecté et n'a pas de champ email, il pourrait y avoir une erreur
     // si l'API n'accepte pas "guest@example.com". C'est la meilleure approximation sans champ d'entrée.
 
-    const API_POST_REVIEW_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/reviews`;
+    const authParams = API_CONFIG.allProductsUrl.split("?")[1];
 
     try {
       const response = await fetch(
-        `${API_POST_REVIEW_URL}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`,
+        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?${authParams}`,
         {
           method: "POST",
           headers: {
@@ -261,7 +257,7 @@ function ProductDetail() {
             rating: reviewForm.rating,
             status: "approved", // Ou 'hold' si vous voulez modérer
           }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -269,7 +265,7 @@ function ProductDetail() {
         throw new Error(
           `Erreur lors de l'envoi de l'avis: ${
             errorData.message || response.statusText
-          }`
+          }`,
         );
       }
 
@@ -296,12 +292,13 @@ function ProductDetail() {
       return;
     }
 
-    const API_PRODUCT_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
-    const API_VARIATIONS_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
-
     const fetchProduct = async () => {
       try {
-        const response = await fetch(API_PRODUCT_URL);
+        setIsLoading(true);
+        const authParams = API_CONFIG.allProductsUrl.split("?")[1];
+        const response = await fetch(
+          `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/${id}?${authParams}`,
+        );
         if (response.status === 404) throw new Error("Produit non trouvé.");
         if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
         const data = await response.json();
@@ -312,7 +309,9 @@ function ProductDetail() {
         const isVariable = data.type === "variable";
 
         if (isVariable) {
-          const variationsResponse = await fetch(API_VARIATIONS_URL);
+          const variationsResponse = await fetch(
+            API_CONFIG.getVariationsUrl(id),
+          );
           if (variationsResponse.ok) {
             variationsData = await variationsResponse.json();
             setProductVariations(variationsData);
@@ -323,7 +322,7 @@ function ProductDetail() {
                 id: v.id,
                 attributes: v.attributes,
                 stock_status: v.stock_status,
-              }))
+              })),
             );
           }
         }
@@ -374,7 +373,7 @@ function ProductDetail() {
         if (!displayDescription || displayDescription === "<p></p>\n") {
           const plainTextDescription = fullDescription.replace(
             /<[^>]*>?/gm,
-            " "
+            " ",
           );
 
           if (plainTextDescription.length > 10) {
@@ -401,7 +400,7 @@ function ProductDetail() {
 
         const attributes = data.attributes
           .filter(
-            (attr) => attr.visible && attr.options && attr.options.length > 0
+            (attr) => attr.visible && attr.options && attr.options.length > 0,
           )
           .map((attr) => ({
             name: attr.name,
@@ -412,7 +411,7 @@ function ProductDetail() {
         const colorAttribute = data.attributes.find(
           (attr) =>
             attr.name.toLowerCase().includes("couleur") ||
-            attr.name.toLowerCase().includes("color")
+            attr.name.toLowerCase().includes("color"),
         );
 
         let colors = [];
@@ -428,12 +427,12 @@ function ProductDetail() {
           const defaultColorAttr = defaultVariation.attributes.find(
             (attr) =>
               attr.name.toLowerCase().includes("couleur") ||
-              attr.name.toLowerCase().includes("color")
+              attr.name.toLowerCase().includes("color"),
           );
           const defaultSizeAttr = defaultVariation.attributes.find(
             (attr) =>
               attr.name.toLowerCase().includes("pointure") ||
-              attr.name.toLowerCase().includes("taille")
+              attr.name.toLowerCase().includes("taille"),
           );
 
           setSelectedColor(defaultColorAttr ? defaultColorAttr.option : "");
@@ -445,7 +444,7 @@ function ProductDetail() {
         }
 
         const sizeAttribute = data.attributes.find((attr) =>
-          attr.name.toLowerCase().includes("pointure")
+          attr.name.toLowerCase().includes("pointure"),
         );
 
         let sizes = [];
@@ -479,7 +478,7 @@ function ProductDetail() {
       } catch (err) {
         console.error("Erreur de récupération du produit ou des avis:", err);
         setError(
-          `Impossible de charger les détails du produit: ${err.message}`
+          `Impossible de charger les détails du produit: ${err.message}`,
         );
       } finally {
         setIsLoading(false);
@@ -576,7 +575,7 @@ function ProductDetail() {
 
         if (colorMatch && sizeMatch) {
           console.log(
-            `✅ MATCH TROUVÉ : ID ${variation.id} (Couleur: ${variationColor}, Taille: ${variationSize})`
+            `✅ MATCH TROUVÉ : ID ${variation.id} (Couleur: ${variationColor}, Taille: ${variationSize})`,
           );
           return true;
         }

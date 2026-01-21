@@ -3,20 +3,8 @@ import "./style.css";
 import FilterControls from "../../components/FilterControls";
 import Pagination from "../../components/Pagination";
 import { Link } from "react-router";
+import { API_CONFIG } from "../../config/api_shop";
 
-// ----------------------------------------------------------------------
-// --- CONFIGURATION WOOCOMMERCE ---
-// ----------------------------------------------------------------------
-
-const WOOCOMMERCE_FULL_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
-const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
-const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
-
-// Construction de l'URL API
-const API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}&per_page=100`;
-
-// Définition des filtres initiaux
 const initialFilters = {
   size: [],
   color: [],
@@ -30,7 +18,7 @@ const initialFilters = {
 // Fonction utilitaire pour extraire une valeur d'attribut spécifique
 const getAttributeValue = (attributes, name) => {
   const attr = attributes.find(
-    (a) => a.name.toLowerCase() === name.toLowerCase()
+    (a) => a.name.toLowerCase() === name.toLowerCase(),
   );
 
   if (attr && attr.options) {
@@ -86,11 +74,10 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(API_URL);
-
+        const response = await fetch(API_CONFIG.allProductsUrl);
         if (!response.ok) {
           throw new Error(
-            `Erreur HTTP: ${response.status} - Vérifiez les clés API.`
+            `Erreur HTTP: ${response.status} - Vérifiez les clés API.`,
           );
         }
 
@@ -119,8 +106,7 @@ function Shop() {
             } // Si la méthode rapide n'a pas donné de prix, on passe à la vérification des variations
 
             if (price === 0) {
-              const variationsUrl = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/products/${product.id}/variations?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
-
+              const variationsUrl = API_CONFIG.getVariationsUrl(product.id);
               if (product.variations && product.variations.length > 0) {
                 const variationsResponse = await fetch(variationsUrl);
                 if (variationsResponse.ok) {
@@ -258,7 +244,7 @@ function Shop() {
       } catch (err) {
         console.error("Erreur de récupération des produits:", err);
         setError(
-          "Impossible de charger les produits. Vérifiez la connexion ou les clés API."
+          "Impossible de charger les produits. Vérifiez la connexion ou les clés API.",
         );
       } finally {
         setIsLoading(false);
@@ -276,14 +262,14 @@ function Shop() {
     workingProducts = workingProducts.filter(
       (prod) =>
         prod.price >= filters.priceRange[0] &&
-        prod.price <= filters.priceRange[1]
+        prod.price <= filters.priceRange[1],
     );
 
     if (filters.disponibility !== "all") {
       const status =
         filters.disponibility === "in-stock" ? "instock" : "outofstock";
       workingProducts = workingProducts.filter(
-        (prod) => prod.stock_status === status
+        (prod) => prod.stock_status === status,
       );
     }
 
@@ -291,7 +277,7 @@ function Shop() {
       if (filters[attributeName].length > 0) {
         if (Array.isArray(attributeValue)) {
           return filters[attributeName].some((filterVal) =>
-            attributeValue.includes(String(filterVal))
+            attributeValue.includes(String(filterVal)),
           );
         }
         return filters[attributeName].includes(attributeValue);
@@ -305,7 +291,7 @@ function Shop() {
         filterByAttribute("size", prod.attributes.size) &&
         filterByAttribute("material", prod.attributes.material) &&
         filterByAttribute("surface", prod.attributes.surface) &&
-        filterByAttribute("marque", prod.attributes.marque)
+        filterByAttribute("marque", prod.attributes.marque),
     );
 
     return workingProducts;
@@ -461,7 +447,7 @@ function Shop() {
                             {/* Affichage intelligent : Plage de prix si variable et PAS en promo, sinon prix unique */}
                             {hasPriceRange && !isOnSale
                               ? `${formatPrice(prod.price)} - ${formatPrice(
-                                  prod.maxPrice
+                                  prod.maxPrice,
                                 )}`
                               : formatPrice(prod.price)}
                           </span>

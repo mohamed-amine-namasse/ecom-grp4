@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
 import "./style.css";
+import { API_CONFIG } from "../../config/api_shipping";
 
 function Shipping() {
   const [orderId, setOrderId] = useState("");
@@ -8,26 +9,19 @@ function Shipping() {
   const [orderData, setOrderData] = useState(null); // Pour stocker les données de la commande
   const [loading, setLoading] = useState(false);
 
-  const WOOCOMMERCE_FULL_URL =
-    "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
-  const CONSUMER_KEY = "ck_aa9a985d1afe4839d747e479a02fb4120116df9b";
-  const CONSUMER_SECRET = "cs_aa80e9a2a76467d2dd9b5f49ae0ab17f51b7a407";
-
   async function handleTrack(e) {
     e.preventDefault();
     setStatusMessage("");
     setOrderData(null); // Réinitialiser les données précédentes
-
-    if (!orderId.trim()) {
+    const trimmedId = orderId.trim();
+    if (!trimmedId) {
       setStatusMessage("Veuillez saisir un numéro de commande.");
       return;
     }
 
     setLoading(true);
-
-    // 1. cibler une commande spécifique par son ID (orderId)
-    // 2. Les clés doivent être dans l'URL pour la méthode GET
-    const ORDER_API_URL = `${WOOCOMMERCE_FULL_URL}/wp-json/wc/v3/orders/${orderId.trim()}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
+    // Utilisation de l'URL propre venant de la config
+    const ORDER_API_URL = API_CONFIG.getOrderUrl(trimmedId);
 
     try {
       const res = await fetch(ORDER_API_URL, {
@@ -40,11 +34,11 @@ function Shipping() {
 
         // WooCommerce renvoie un code 404 (Not Found) si la commande n'existe pas
         if (res.status === 404) {
-          setStatusMessage(`Commande ${orderId.trim()} introuvable.`);
+          setStatusMessage(`Commande ${trimmedId}introuvable.`);
         } else {
           setStatusMessage(
             err.message ||
-              `Erreur serveur (${res.status}) lors de la recherche.`
+              `Erreur serveur (${res.status}) lors de la recherche.`,
           );
         }
       } else {
@@ -53,7 +47,7 @@ function Shipping() {
         // 3. Afficher les informations pertinentes de la commande
         setOrderData(data); // Stocker toutes les données de la commande
         setStatusMessage(
-          `Commande trouvée ! Statut : ${data.status} (Total: ${data.total} ${data.currency})`
+          `Commande trouvée ! Statut : ${data.status} (Total: ${data.total} ${data.currency})`,
         );
       }
     } catch (error) {

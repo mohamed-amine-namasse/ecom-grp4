@@ -74,9 +74,8 @@ function ProductDetail() {
       // On utilise baseUrl + le endpoint reviews filtré par ID produit
       // On réutilise la logique de AUTH (ck/cs) via une construction manuelle simple
 
-      const authParams = API_CONFIG.allProductsUrl.split("?")[1];
       const response = await fetch(
-        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?product=${id}&${authParams}`,
+        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?product=${id}&${API_CONFIG.auth}`,
       );
       if (!response.ok) {
         console.warn(
@@ -238,11 +237,9 @@ function ProductDetail() {
     // Si l'utilisateur est déconnecté et n'a pas de champ email, il pourrait y avoir une erreur
     // si l'API n'accepte pas "guest@example.com". C'est la meilleure approximation sans champ d'entrée.
 
-    const authParams = API_CONFIG.allProductsUrl.split("?")[1];
-
     try {
       const response = await fetch(
-        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?${authParams}`,
+        `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/reviews?&${API_CONFIG.auth}`,
         {
           method: "POST",
           headers: {
@@ -295,9 +292,9 @@ function ProductDetail() {
     const fetchProduct = async () => {
       try {
         setIsLoading(true);
-        const authParams = API_CONFIG.allProductsUrl.split("?")[1];
+
         const response = await fetch(
-          `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/${id}?${authParams}`,
+          `${API_CONFIG.baseUrl}/wp-json/wc/v3/products/${id}?${API_CONFIG.auth}`,
         );
         if (response.status === 404) throw new Error("Produit non trouvé.");
         if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);

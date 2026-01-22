@@ -2,13 +2,8 @@ import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import { API_CONFIG } from "../../config/api_cards";
 import "./style.css";
-
-const API_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
-
-const CONSUMER_KEY = "ck_89f4f1f6552d002670c02d923f080ae18083fc61";
-const CONSUMER_SECRET = "cs_075f8a5e20aed7a6a802834eab69795a5ac8da07";
 
 const FALLBACK_PRODUCTS = {
   nike: {
@@ -66,14 +61,13 @@ function Figures() {
   }, []);
 
   async function getProductByBrand(brand) {
-    const url = `${API_URL}?search=${brand}&consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
     try {
-      const response = await fetch(url);
+      const response = await fetch(API_CONFIG.getSearchUrl(brand));
       if (!response.ok) {
         const text = await response.text();
         console.error(
           `Erreur API pour "${brand}" (status ${response.status}):`,
-          text
+          text,
         );
         return null;
       }

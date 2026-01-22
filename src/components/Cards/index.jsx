@@ -2,13 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Card, Button } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { Link } from "react-router";
+import { API_CONFIG } from "../../config/api_cards";
 import "./style.css";
-
-const API_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
-
-const CONSUMER_KEY = "ck_89f4f1f6552d002670c02d923f080ae18083fc61";
-const CONSUMER_SECRET = "cs_075f8a5e20aed7a6a802834eab69795a5ac8da07";
 
 function Cards() {
   const itemsPerPage = 4;
@@ -19,9 +14,7 @@ function Cards() {
   const [itemOffset, setItemOffset] = useState(0);
 
   useEffect(() => {
-    fetch(
-      `${API_URL}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`
-    )
+    fetch(API_CONFIG.allProductsUrl)
       .then((res) => {
         if (!res.ok) throw new Error("Erreur réseau");
         return res.json();

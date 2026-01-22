@@ -10,22 +10,15 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import "./style.css";
+import { API_CONFIG } from "../../config/api_checkout";
 
 // Fonction utilitaire pour le formatage du prix
 const formatPrice = (p) => {
   return p.toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 };
 
-// Utiliser variable d'environnement, fallback optionnel
-const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY ||
-    "pk_test_51SaCaURpucHWGHGFLujFQb5NuwDLONlNeyaLq6Gj74vHNxJJhom8NbTZdEE6yZIrxCR3heI92DnJDphekVTJjxTz00pYKhG5M2"
-);
-
-// Base URL WordPress
-const WP_API_BASE =
-  process.env.REACT_APP_WP_API_BASE ||
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress";
+// On utilise la clé de la config
+const stripePromise = loadStripe(API_CONFIG.stripePublicKey);
 
 // ******************************************************
 //  FONCTIONS DE VALIDATION
@@ -114,8 +107,8 @@ function Checkout() {
         value.trim() === ""
           ? null
           : isValid
-          ? true
-          : "Le code postal doit contenir exactement 5 chiffres.";
+            ? true
+            : "Le code postal doit contenir exactement 5 chiffres.";
       setValidationErrors((prev) => ({ ...prev, postalCode: error }));
     } else if (name === "phone") {
       const isValid = validatePhone(value);
@@ -123,8 +116,8 @@ function Checkout() {
         value.trim() === ""
           ? null
           : isValid
-          ? true
-          : "Le téléphone doit contenir 10 chiffres (ex: 0123456789).";
+            ? true
+            : "Le téléphone doit contenir 10 chiffres (ex: 0123456789).";
 
       setValidationErrors((prev) => ({ ...prev, phone: error }));
     }
@@ -135,8 +128,8 @@ function Checkout() {
         value.trim() === ""
           ? null
           : isValid
-          ? true
-          : "Veuillez entrer une adresse email valide.";
+            ? true
+            : "Veuillez entrer une adresse email valide.";
 
       setValidationErrors((prev) => ({ ...prev, email: error }));
     }
@@ -156,7 +149,7 @@ function Checkout() {
   // Vérifie si TOUS les champs d'adresse (sauf email/phone) sont remplis
   const isAllShippingFieldsFilled = Object.entries(shippingAddress).every(
     ([key, val]) =>
-      key !== "email" && key !== "phone" ? val.trim() !== "" : true
+      key !== "email" && key !== "phone" ? val.trim() !== "" : true,
   );
 
   // Vérifie si les champs de Contact sont remplis
@@ -177,7 +170,7 @@ function Checkout() {
   const handlePlaceOrderWithCOD = async () => {
     if (!canProceedToPayment || cartItems.length === 0) {
       setPaymentMessage(
-        "Veuillez remplir toutes les informations correctement (y compris email, téléphone et code postal valides) et avoir des articles dans le panier."
+        "Veuillez remplir toutes les informations correctement (y compris email, téléphone et code postal valides) et avoir des articles dans le panier.",
       );
       return;
     }
@@ -203,7 +196,8 @@ function Checkout() {
       status: "processing",
     };
 
-    const endpoint = `${WP_API_BASE}/wp-json/your-custom/v1/create-cod-order`;
+    // On utilise l'URL de la config
+    const endpoint = API_CONFIG.codOrderUrl;
 
     try {
       const resp = await fetch(endpoint, {
@@ -218,7 +212,7 @@ function Checkout() {
         setPaymentSuccess(true);
         setOrderId(data.order_id);
         setPaymentMessage(
-          `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`
+          `🎉 Commande (Paiement à la livraison) passée avec succès ! Votre numéro de commande est : **${data.order_id}**`,
         );
         await clearCart();
       } else {
@@ -273,7 +267,7 @@ function Checkout() {
 
       if (!validatePostalCode(billing.postalCode)) {
         setStatus(
-          "Le code postal de facturation doit être valide (5 chiffres)."
+          "Le code postal de facturation doit être valide (5 chiffres).",
         );
         return;
       }
@@ -289,7 +283,8 @@ function Checkout() {
       setProcessing(true);
       setStatus("");
 
-      const endpoint = `${WP_API_BASE}/wp-json/stripe/v1/create-payment-intent`;
+      // On utilise l'URL Stripe de la config
+      const endpoint = API_CONFIG.stripePaymentIntentUrl;
 
       try {
         const resp = await fetch(endpoint, {

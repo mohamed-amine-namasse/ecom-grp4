@@ -19,18 +19,8 @@ import Spinner from "react-bootstrap/Spinner";
 import Badge from "react-bootstrap/Badge";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router"; // Pour la redirection
+import { API_CONFIG } from "../../config/api_shop";
 import "./style.css";
-
-// ----------------------------------------------------------------------
-// --- CONFIGURATION WOOCOMMERCE & GESTION DES CLÉS ---
-// ----------------------------------------------------------------------
-
-const WOOCOMMERCE_BASE_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/";
-
-const CONSUMER_KEY = "ck_ae0703c9b00197c41256d3da1618e3e0209c7fc2";
-const CONSUMER_SECRET = "cs_a79c66ab51106107de3d3355a0a015909629e3fc";
-const AUTH_STORAGE_KEY = "userAuth";
 
 // ----------------------------------------------------------------------
 // --- FONCTIONS GLOBALEMENT EXPORTÉES (Utilisées par le composant de connexion/login) ---
@@ -41,7 +31,7 @@ const AUTH_STORAGE_KEY = "userAuth";
  * @returns {object|null} L'objet utilisateur si trouvé et valide, sinon null.
  */
 const getAuthDataFromLocalStorage = () => {
-  const storedData = localStorage.getItem(AUTH_STORAGE_KEY);
+  const storedData = localStorage.getItem(API_CONFIG.authStorageKey);
   try {
     const authData = storedData ? JSON.parse(storedData) : null;
     if (authData && authData.token) {
@@ -49,7 +39,7 @@ const getAuthDataFromLocalStorage = () => {
     }
   } catch (e) {
     console.error("Erreur de parsing de userAuth dans Local Storage:", e);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(API_CONFIG.authStorageKey);
   }
   return null;
 };
@@ -61,9 +51,9 @@ const getAuthDataFromLocalStorage = () => {
  */
 export const setAuthDataState = (data) => {
   if (data) {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(API_CONFIG.authStorageKey, JSON.stringify(data));
   } else {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(API_CONFIG.authStorageKey);
   }
 };
 
@@ -75,8 +65,9 @@ const fetchWooCommerceProducts = async (query) => {
     return [];
   }
 
-  const authHeader = "Basic " + btoa(`${CONSUMER_KEY}:${CONSUMER_SECRET}`);
-  const apiUrl = `${WOOCOMMERCE_BASE_URL}wp-json/wc/v3/products?search=${query}&per_page=5&status=publish`;
+  // Utilisation de la config pour l'URL et le Header
+  const apiUrl = API_CONFIG.getSearchUrl(query);
+  const authHeader = API_CONFIG.getBasicAuthHeader();
 
   try {
     const response = await fetch(apiUrl, {
@@ -101,7 +92,7 @@ const fetchWooCommerceProducts = async (query) => {
   } catch (error) {
     console.error(
       "Échec de la recherche de produits (Network/CORS/Fetch):",
-      error
+      error,
     );
     throw new Error(`Échec de connexion réseau.`);
   }
@@ -170,7 +161,7 @@ function NavScrollExample() {
       setError(null);
     } catch (e) {
       setError(
-        e.message || "Une erreur inconnue s'est produite lors de la recherche."
+        e.message || "Une erreur inconnue s'est produite lors de la recherche.",
       );
       setSuggestions([]);
       console.error("Erreur gérée lors de la recherche:", e);

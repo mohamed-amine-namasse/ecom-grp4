@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
+import { API_CONFIG } from "../../config/api_cards";
 import "./style.css";
-
-const API_URL =
-  "https://mohamed-amine-namasse.students-laplateforme.io/wordpress-eco/wordpress/wp-json/wc/v3/products";
-
-const CONSUMER_KEY = "ck_89f4f1f6552d002670c02d923f080ae18083fc61";
-const CONSUMER_SECRET = "cs_075f8a5e20aed7a6a802834eab69795a5ac8da07";
 
 function MonCarousel() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch(
-      `${API_URL}?consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`
-    )
+    fetch(API_CONFIG.allProductsUrl)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error("Erreur API WooCommerce:", err));

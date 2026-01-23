@@ -34,7 +34,7 @@ function Shipping() {
 
         // WooCommerce renvoie un code 404 (Not Found) si la commande n'existe pas
         if (res.status === 404) {
-          setStatusMessage(`Commande ${trimmedId}introuvable.`);
+          setStatusMessage(`Commande ${trimmedId} introuvable.`);
         } else {
           setStatusMessage(
             err.message ||

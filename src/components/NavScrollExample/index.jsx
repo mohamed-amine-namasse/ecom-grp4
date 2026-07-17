@@ -292,7 +292,7 @@ function NavScrollExample() {
               {" "}
               <Form className="d-flex search-group align-items-center ">
                 <Button
-                  variant="outline-dark"
+                  variant="light"
                   className="btn-search d-flex align-items-center justify-content-center"
                   aria-label="Recherche"
                   onClick={handleSearchClick}
